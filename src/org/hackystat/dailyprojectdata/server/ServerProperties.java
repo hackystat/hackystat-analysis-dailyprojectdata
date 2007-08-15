@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.util.Properties;
 
 /**
- * Provides access to the values stored in the sensorbase.properties file. 
+ * Provides access to the values stored in the dailyprojectdata.properties file. 
  * @author Philip Johnson
  */
 public class ServerProperties {
@@ -34,7 +34,7 @@ public class ServerProperties {
     String propFile = userHome + "/.hackystat/dailyprojectdata/dailyprojectdata.properties";
     Properties properties = new Properties();
     // Set defaults
-    properties.setProperty(SENSORBASE_HOST_KEY, "http://localhost:9876/sensorbase");
+    properties.setProperty(SENSORBASE_HOST_KEY, "http://localhost:9876/sensorbase/");
     properties.setProperty(HOSTNAME_KEY, "localhost");
     properties.setProperty(PORT_KEY, "9877");
     properties.setProperty(CONTEXT_ROOT_KEY, "dailyprojectdata");
@@ -88,7 +88,7 @@ public class ServerProperties {
   }
   
   /**
-   * Returns the fully qualified host name, such as "http://localhost:9876/sensorbase/".
+   * Returns the fully qualified host name, such as "http://localhost:9877/dailyprojectdata/".
    * @return The fully qualified host name.
    */
   public static String getFullHost() {

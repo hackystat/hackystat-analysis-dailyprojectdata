@@ -4,6 +4,7 @@ import java.util.Enumeration;
 import java.util.Map;
 
 import org.hackystat.dailyprojectdata.resource.devtime.DevTimeManager;
+import org.hackystat.dailyprojectdata.resource.devtime.DevTimeResource;
 import org.hackystat.utilities.logger.HackystatLogger;
 import org.restlet.Application;
 import org.restlet.Component;

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <!-- Primitive elements and attributes -->
+  <xs:attribute name="Project" type="xs:string"/>
+  <xs:attribute name="Owner" type="xs:string"/>
+  <xs:attribute name="StartTime" type="xs:dateTime"/>
+  <xs:attribute name="UriPattern" type="xs:string"/>
+  <xs:attribute name="MemberUri" type="xs:anyURI"/>
+  <xs:attribute name="DevTime" type="xs:integer"/>
+  
+  <xs:element name="DevTimeDailyProjectData">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="MemberData" minOccurs="1" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attribute ref="Project" use="required"/>
+      <xs:attribute ref="Owner" use="required"/>
+      <xs:attribute ref="StartTime" use="required"/>
+      <xs:attribute ref="UriPattern" use="required"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="MemberData">
+    <xs:complexType>
+      <xs:attribute ref="MemberUri" use="required"/>
+      <xs:attribute ref="DevTime" use="required"/>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
+
+
+
+
+
+
+
+
+
+
+

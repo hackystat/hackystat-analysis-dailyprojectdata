@@ -12,7 +12,7 @@ import org.restlet.data.ChallengeScheme;
  * Performs authentication of each HTTP request using HTTP Basic authentication. 
  * Checks user/password credentials by pinging SensorBase, then caching authentic 
  * user/password combinations.  If a cached user/password combo does not match the 
- * current usr/password combo, then the SensorBase is pinged again (because maybe
+ * current user/password combo, then the SensorBase is pinged again (because maybe
  * the user has changed their password recently). 
  * @author Philip Johnson
  */
