@@ -63,6 +63,8 @@ public class Server extends Application {
     // Now create all of the Resource Managers and store them in the Context.
     Map<String, Object> attributes = server.getContext().getAttributes();
     attributes.put("DevTimeManager", new DevTimeManager(server));
+    
+    // Provide a pointer to this server in the Context as well. 
     attributes.put("DailyProjectDataServer", server);
     
     // Now let's open for business. 

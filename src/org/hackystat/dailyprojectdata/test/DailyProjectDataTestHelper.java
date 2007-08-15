@@ -8,6 +8,9 @@ public class DailyProjectDataTestHelper {
   /** The DailyProjectData server used in these tests. */
   private static Server server;
 
+  /** The SensorBase URI. */
+  private static String sensorBaseHost; 
+
   /**
    * Constructor.
    */
@@ -20,6 +23,9 @@ public class DailyProjectDataTestHelper {
    */
   @BeforeClass public static void setupServer() throws Exception {
     DailyProjectDataTestHelper.server = Server.newInstance();
+    DailyProjectDataTestHelper.sensorBaseHost = server.get
+    
+    
   }
 
   /**
