@@ -1,11 +1,28 @@
 package org.hackystat.dailyprojectdata.resource.devtime;
 
+import java.io.StringWriter;
+import java.math.BigInteger;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Marshaller;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
 import org.hackystat.dailyprojectdata.resource.dailyprojectdata.DailyProjectDataResource;
+import org.hackystat.dailyprojectdata.resource.devtime.jaxb.DevTimeDailyProjectData;
+import org.hackystat.dailyprojectdata.resource.devtime.jaxb.MemberData;
+import org.hackystat.utilities.stacktrace.StackTrace;
 import org.restlet.Context;
+import org.restlet.data.MediaType;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.resource.Representation;
 import org.restlet.resource.Variant;
+import org.w3c.dom.Document;
 
 /**
  * Implements the Resource for processing GET {host}/devtime/{user}/{project}/{starttime} requests.
@@ -14,7 +31,7 @@ import org.restlet.resource.Variant;
  * @author Philip Johnson
  */
 public class DevTimeResource extends DailyProjectDataResource {
-
+  
   /**
    * The standard constructor.
    * @param context The context.
@@ -33,7 +50,55 @@ public class DevTimeResource extends DailyProjectDataResource {
    */
   @Override
   public Representation getRepresentation(Variant variant) {
+    if (variant.getMediaType().equals(MediaType.TEXT_XML)) {
+      try {
+        // For now, we just create a fake one. 
+        DevTimeDailyProjectData devTime = new DevTimeDailyProjectData();
+        devTime.setOwner(uriUser);
+        devTime.setProject(project);
+        devTime.setUriPattern("**");
+        devTime.setTotalDevTime(BigInteger.ZERO);
+        MemberData memberData = new MemberData();
+        memberData.setMemberUri(uriUser);
+        memberData.setDevTime(BigInteger.ZERO);
+        devTime.getMemberData().add(memberData);
+        String xmlData = makeDevTime(devTime);
+        return super.getStringRepresentation(xmlData);
+      }
+      catch (Exception e) {
+        server.getLogger().warning("Error processing devTime: " + StackTrace.toString(e));
+        return null;
+      }
+    }
     return null;
+  }
+  
+  /**
+   * Returns the passed SensorData instance as a String encoding of its XML representation.
+   * Final because it's called in constructor.
+   * @param data The SensorData instance. 
+   * @return The XML String representation.
+   * @throws Exception If problems occur during translation. 
+   */
+  private String makeDevTime (DevTimeDailyProjectData data) throws Exception {
+    JAXBContext devTimeJAXB = 
+      (JAXBContext)this.server.getContext().getAttributes().get("DevTimeJAXB");
+    Marshaller marshaller = devTimeJAXB.createMarshaller(); 
+    DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+    dbf.setNamespaceAware(true);
+    DocumentBuilder documentBuilder = dbf.newDocumentBuilder();
+    Document doc = documentBuilder.newDocument();
+    marshaller.marshal(data, doc);
+    DOMSource domSource = new DOMSource(doc);
+    StringWriter writer = new StringWriter();
+    StreamResult result = new StreamResult(writer);
+    TransformerFactory tf = TransformerFactory.newInstance();
+    Transformer transformer = tf.newTransformer();
+    transformer.transform(domSource, result);
+    String xmlString = writer.toString();
+    // Now remove the processing instruction.  This approach seems like a total hack.
+    // xmlString = xmlString.substring(xmlString.indexOf('>') + 1);
+    return xmlString;
   }
 }
 

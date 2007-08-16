@@ -2,14 +2,12 @@ package org.hackystat.dailyprojectdata.test;
 
 import org.hackystat.dailyprojectdata.server.Server;
 import org.junit.BeforeClass;
+import static org.hackystat.dailyprojectdata.server.ServerProperties.SENSORBASE_HOST_KEY;
 
 public class DailyProjectDataTestHelper {
 
   /** The DailyProjectData server used in these tests. */
   private static Server server;
-
-  /** The SensorBase URI. */
-  private static String sensorBaseHost; 
 
   /**
    * Constructor.
@@ -23,17 +21,22 @@ public class DailyProjectDataTestHelper {
    */
   @BeforeClass public static void setupServer() throws Exception {
     DailyProjectDataTestHelper.server = Server.newInstance();
-    DailyProjectDataTestHelper.sensorBaseHost = server.get
-    
-    
   }
 
   /**
-   * Returns the hostname associated with this test server. 
+   * Returns the hostname associated with this DPD test server. 
    * @return The host name, including the context root. 
    */
-  protected String getHostName() {
+  protected String getDailyProjectDataHostName() {
     return DailyProjectDataTestHelper.server.getHostName();
+  }
+  
+  /**
+   * Returns the sensorbase hostname that this DPD server communicates with.
+   * @return The host name, including the context root. 
+   */
+  protected String getSensorBaseHostName() {
+    return DailyProjectDataTestHelper.server.getServerProperties().get(SENSORBASE_HOST_KEY);
   }
 }
 

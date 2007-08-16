@@ -23,16 +23,32 @@ public class ServerProperties {
   /** The XML directory key. */
   public static final String XML_DIR_KEY =         "dailyprojectdata.xml.dir";
   
+  /** Where we store the properties. */
+  private Properties properties; 
+  
+  /**
+   * Creates a new ServerProperties instance. 
+   * Prints an error to the console if problems occur on loading. 
+   */
+  public ServerProperties() {
+    try {
+      initializeProperties();
+    }
+    catch (Exception e) {
+      System.out.println("Error initializing DPD server properties.");
+    }
+  }
+  
   /**
    * Reads in the properties in ~/.hackystat/dailyprojectdata/dailyprojectdata.properties 
    * if this file exists, and provides default values for all properties. .
    * @throws Exception if errors occur.
    */
-  static void initializeProperties () throws Exception {
+  private void initializeProperties () throws Exception {
     String userHome = System.getProperty("user.home");
     String userDir = System.getProperty("user.dir");
     String propFile = userHome + "/.hackystat/dailyprojectdata/dailyprojectdata.properties";
-    Properties properties = new Properties();
+    this.properties = new Properties();
     // Set defaults
     properties.setProperty(SENSORBASE_HOST_KEY, "http://localhost:9876/sensorbase/");
     properties.setProperty(HOSTNAME_KEY, "localhost");
@@ -61,20 +77,19 @@ public class ServerProperties {
   }
 
   /**
-   * Prints all of the sensorbase settings to the logger.
-   * @param server The SensorBase server.   
+   * Prints all of the DPD settings to the logger.
+   * @param server The DPD server.   
    */
-  static void echoProperties(Server server) {
+  public void echoProperties(Server server) {
     String cr = System.getProperty("line.separator"); 
     String eq = " = ";
     String pad = "                ";
-    String propertyInfo = "SensorBase Properties:" + cr +
+    String propertyInfo = "DailyProjectData Properties:" + cr +
       pad + SENSORBASE_HOST_KEY   + eq + get(SENSORBASE_HOST_KEY) + cr +
       pad + HOSTNAME_KEY      + eq + get(HOSTNAME_KEY) + cr +
       pad + CONTEXT_ROOT_KEY  + eq + get(CONTEXT_ROOT_KEY) + cr +
       pad + LOGGING_LEVEL_KEY + eq + get(LOGGING_LEVEL_KEY) + cr +
-      pad + PORT_KEY          + eq + get(PORT_KEY) + cr +
-      pad + XML_DIR_KEY       + eq + get(XML_DIR_KEY);
+      pad + PORT_KEY          + eq + get(PORT_KEY) + cr;
     server.getLogger().info(propertyInfo);
   }
   
@@ -83,15 +98,15 @@ public class ServerProperties {
    * @param key Should be one of the public static final strings in this class.
    * @return The value of the key, or null if not found.
    */
-  public static String get(String key) {
-    return System.getProperty(key);
+  public String get(String key) {
+    return this.properties.getProperty(key);
   }
   
   /**
    * Returns the fully qualified host name, such as "http://localhost:9877/dailyprojectdata/".
    * @return The fully qualified host name.
    */
-  public static String getFullHost() {
+  public String getFullHost() {
     return "http://" + get(HOSTNAME_KEY) + ":" + get(PORT_KEY) + "/" + get(CONTEXT_ROOT_KEY) + "/";
   }
 }

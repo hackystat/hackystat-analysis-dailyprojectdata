@@ -2,11 +2,14 @@ package org.hackystat.dailyprojectdata.resource.dailyprojectdata;
 
 import org.hackystat.dailyprojectdata.server.Server;
 import org.restlet.Context;
+import org.restlet.data.CharacterSet;
+import org.restlet.data.Language;
 import org.restlet.data.MediaType;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.resource.Representation;
 import org.restlet.resource.Resource;
+import org.restlet.resource.StringRepresentation;
 import org.restlet.resource.Variant;
 
 /**
@@ -26,7 +29,13 @@ public abstract class DailyProjectDataResource extends Resource {
   
   /** To be retrieved from the URL as the 'email' template parameter, or null. */
   protected String uriUser = null; 
-  
+
+  /** To be retrieved from the URL as the 'project' template parameter, or null. */
+  protected String project = null; 
+
+  /** To be retrieved from the URL as the 'timestamp' template parameter, or null. */
+  protected String timestamp = null; 
+
   /** The authenticated user, retrieved from the ChallengeResponse, or null */
   protected String authUser = null;
   
@@ -60,5 +69,18 @@ public abstract class DailyProjectDataResource extends Resource {
    */
   @Override
   public abstract Representation getRepresentation(Variant variant);
+  
+  /**
+   * Creates and returns a new Restlet StringRepresentation built from xmlData.
+   * The xmlData will be prefixed with a processing instruction indicating UTF-8 and version 1.0.
+   * @param xmlData The xml data as a string. 
+   * @return A StringRepresentation of that xmldata. 
+   */
+  public static StringRepresentation getStringRepresentation(String xmlData) {
+    StringBuilder builder = new StringBuilder(500);
+   // builder.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+    builder.append(xmlData);
+    return new StringRepresentation(builder, MediaType.TEXT_XML, Language.ALL, CharacterSet.UTF_8);
+  }
   
 }

@@ -7,6 +7,7 @@
   <xs:attribute name="UriPattern" type="xs:string"/>
   <xs:attribute name="MemberUri" type="xs:anyURI"/>
   <xs:attribute name="DevTime" type="xs:integer"/>
+  <xs:attribute name="TotalDevTime" type="xs:integer"/>
   
   <xs:element name="DevTimeDailyProjectData">
     <xs:complexType>
@@ -17,6 +18,7 @@
       <xs:attribute ref="Owner" use="required"/>
       <xs:attribute ref="StartTime" use="required"/>
       <xs:attribute ref="UriPattern" use="required"/>
+      <xs:attribute ref="TotalDevTime" use="required"/>
     </xs:complexType>
   </xs:element>
 
