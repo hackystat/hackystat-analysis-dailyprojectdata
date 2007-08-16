@@ -21,6 +21,10 @@ import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.Representation;
 
+/**
+ * Provides a client to support access to the DailyProjectData service. 
+ * @author Philip Johnson
+ */
 public class DailyProjectDataClient {
   
   /** Holds the userEmail to be associated with this client. */

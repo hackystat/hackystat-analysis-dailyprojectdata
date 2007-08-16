@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.hackystat.dailyprojectdata.resource.devtime.DevTimeManager;
 import org.hackystat.dailyprojectdata.resource.devtime.DevTimeResource;
+import org.hackystat.sensorbase.client.SensorBaseClient;
 import org.hackystat.utilities.logger.HackystatLogger;
 import org.restlet.Application;
 import org.restlet.Component;
@@ -17,6 +18,7 @@ import static org.hackystat.dailyprojectdata.server.ServerProperties.HOSTNAME_KE
 import static org.hackystat.dailyprojectdata.server.ServerProperties.PORT_KEY;
 import static org.hackystat.dailyprojectdata.server.ServerProperties.CONTEXT_ROOT_KEY;
 import static org.hackystat.dailyprojectdata.server.ServerProperties.LOGGING_LEVEL_KEY;
+import static org.hackystat.dailyprojectdata.server.ServerProperties.SENSORBASE_HOST_KEY;
 
 import java.util.logging.Level;
 import java.util.logging.LogManager;
@@ -75,13 +77,18 @@ public class Server extends Application {
         org.hackystat.dailyprojectdata.resource.devtime.jaxb.ObjectFactory.class);
     attributes.put("DevTimeJAXB", devTimeJAXB);
     
-    // Provide a pointer to this server in the Context as well. 
+    // Provide a pointer to this server in the Context so that Resources can get at this server.
     attributes.put("DailyProjectDataServer", server);
     
     // Now let's open for business. 
     server.logger.warning("Host: " + server.hostName);
     HackystatLogger.setLoggingLevel(server.logger, server.properties.get(LOGGING_LEVEL_KEY));
     server.properties.echoProperties(server);
+    String sensorBaseHost = server.properties.get(SENSORBASE_HOST_KEY);
+    boolean sensorBaseOK = SensorBaseClient.isHost(sensorBaseHost);
+    server.logger.warning("SensorBase " + sensorBaseHost + 
+        ((sensorBaseOK) ? " was contacted successfully." : 
+          " NOT AVAILABLE. This service will not run correctly."));
     server.logger.warning("DailyProjectData (Version " + getVersion() + ") now running.");
     server.component.start();
     disableRestletLogging();
@@ -123,7 +130,8 @@ public class Server extends Application {
     Router authRouter = new Router(getContext());
     authRouter.attach("/devtime/{email}/{project}/{timestamp}", DevTimeResource.class);
     // Here's the Guard that we will place in front of authRouter.
-    Guard guard = new Authenticator(getContext());
+    Guard guard = new Authenticator(getContext(), 
+        this.getServerProperties().get(SENSORBASE_HOST_KEY));
     guard.setNext(authRouter);
     return guard;
   }

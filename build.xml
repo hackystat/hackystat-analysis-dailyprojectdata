@@ -32,15 +32,18 @@
   <available file="${env.RESTLET_HOME}/lib/org.restlet.jar" type="file" property="restlet.available"/>
   <fail message="This package requires the Restlet Framework to be downloaded and RESTLET_HOME defined" unless="restlet.available"/>
 
-  <!-- Make sure that the JAXB library is available . --> 
-  <!-- Needed even under Java 6 so that a Java 5-compatible dist can be created. -->   
-  <available file="${env.JAXB_HOME}/lib/jaxb-xjc.jar" type="file" property="jaxb.available"/>
-  <fail message="This package requires JAXB to be installed and JAXB_HOME defined" unless="jaxb.available"/>
- 
+  <!-- Make sure that the JAXB library is available (by default in Java 6, through manual installation in Java 5. --> 
+  <available classname="javax.xml.bind.JAXBContext" property="jaxb.available"/>
+  <fail message="This package requires JAXB to be installed" unless="jaxb.available"/>
+  
   <!-- Make sure that Hackystat Utilities are is available . --> 
   <available file="${env.HACKYSTAT_UTILITIES_HOME}/stacktrace.lib.jar" type="file" property="hackystat.utilities.available"/>
   <fail message="This package requires the Hackystat Utilities to be installed and HACKYSTAT_UTILITIES_HOME defined" unless="hackystat.utilities.available"/>   
-  
+ 
+  <!-- Make sure that Hackystat SensorBase library is available . --> 
+  <available file="${env.HACKYSTAT_SENSORBASE_HOME}/sensorbase.lib.jar" type="file" property="hackystat.sensorbase.available"/>
+  <fail message="This package requires the Hackystat SensorBase to be installed and HACKYSTAT_SENSORBASE_HOME defined" unless="hackystat.sensorbase.available"/>   
+
   <!-- Basic properties for this system. --> 
   <property name="system.name" value="hackystat-dailyprojectdata" />
   <property name="majorVersionNumber" value="8" />
@@ -62,16 +65,14 @@
   <path id="compile.classpath">
     <fileset file="${env.HACKYSTAT_UTILITIES_HOME}/hackystatlogger.lib.jar"/>
     <fileset file="${env.HACKYSTAT_UTILITIES_HOME}/stacktrace.lib.jar"/>
+    <fileset file="${env.HACKYSTAT_UTILITIES_HOME}/tstamp.lib.jar"/>
+    <fileset file="${env.HACKYSTAT_SENSORBASE_HOME}/sensorbase.lib.jar"/>
     <fileset file="${env.JUNIT_HOME}/junit-${junit.version}.jar"/>
     <fileset file="${env.RESTLET_HOME}/lib/org.restlet.jar"/> 
     <fileset file="${env.RESTLET_HOME}/lib/com.noelios.restlet.jar"/> 
     <fileset file="${env.RESTLET_HOME}/lib/com.noelios.restlet.ext.net.jar"/> 
     <fileset file="${env.RESTLET_HOME}/lib/com.noelios.restlet.ext.simple_3.1.jar"/> 
     <fileset file="${env.RESTLET_HOME}/lib/org.simpleframework_3.1/org.simpleframework.jar"/> 
-    <fileset file="${env.JAXB_HOME}/lib/activation.jar"/> 
-    <fileset file="${env.JAXB_HOME}/lib/jaxb-api.jar"/> 
-    <fileset file="${env.JAXB_HOME}/lib/jaxb-impl.jar"/> 
-    <fileset file="${env.JAXB_HOME}/lib/jsr173_1.0_api.jar"/> 
     <fileset file="${env.FINDBUGS_HOME}/lib/annotations.jar"/> 
   </path> 
 

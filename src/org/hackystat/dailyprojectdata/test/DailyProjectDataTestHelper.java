@@ -4,6 +4,10 @@ import org.hackystat.dailyprojectdata.server.Server;
 import org.junit.BeforeClass;
 import static org.hackystat.dailyprojectdata.server.ServerProperties.SENSORBASE_HOST_KEY;
 
+/**
+ * Provides a helper class to facilitate JUnit testing. 
+ * @author Philip Johnson
+ */
 public class DailyProjectDataTestHelper {
 
   /** The DailyProjectData server used in these tests. */
@@ -13,6 +17,7 @@ public class DailyProjectDataTestHelper {
    * Constructor.
    */
   public DailyProjectDataTestHelper () {
+    // Does nothing.
   }
   
   /**

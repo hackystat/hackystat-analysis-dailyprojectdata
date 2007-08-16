@@ -89,7 +89,7 @@ public class ServerProperties {
       pad + HOSTNAME_KEY      + eq + get(HOSTNAME_KEY) + cr +
       pad + CONTEXT_ROOT_KEY  + eq + get(CONTEXT_ROOT_KEY) + cr +
       pad + LOGGING_LEVEL_KEY + eq + get(LOGGING_LEVEL_KEY) + cr +
-      pad + PORT_KEY          + eq + get(PORT_KEY) + cr;
+      pad + PORT_KEY          + eq + get(PORT_KEY);
     server.getLogger().info(propertyInfo);
   }
   

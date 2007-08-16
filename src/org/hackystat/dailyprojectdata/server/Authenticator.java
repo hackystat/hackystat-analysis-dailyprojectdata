@@ -1,6 +1,7 @@
 package org.hackystat.dailyprojectdata.server;
 
 import java.util.HashMap;
+
 import java.util.Map;
 
 import org.hackystat.sensorbase.client.SensorBaseClient;
@@ -18,15 +19,21 @@ import org.restlet.data.ChallengeScheme;
  */
 public class Authenticator extends Guard {
   
+  /** A map containing previously verified credentials. */
   private Map<String, String> credentials = new HashMap<String, String>();
+  
+  /** The sensorbase host, such as "http://localhost:9876/sensorbase/" */
+  private String sensorBaseHost;
   
 
   /**
    * Initializes this Guard to do HTTP Basic authentication.
    * @param context The server context.
+   * @param sensorBaseHost The host, such as 'http://localhost:9876/sensorbase/'.
    */
-  public Authenticator (Context context) {
+  public Authenticator (Context context, String sensorBaseHost) {
     super(context, ChallengeScheme.HTTP_BASIC,  "DailyProjectData");
+    this.sensorBaseHost = sensorBaseHost;
   }
   
   /**
@@ -43,7 +50,6 @@ public class Authenticator extends Guard {
       return true;
     }
     // Otherwise we check the credentials with the SensorBase.
-    String sensorBaseHost = (String)getContext().getAttributes().get("SensorBaseHost");
     boolean isRegistered = SensorBaseClient.isRegistered(sensorBaseHost, identifier, secret);
     if (isRegistered) {
       credentials.put(identifier, secret);

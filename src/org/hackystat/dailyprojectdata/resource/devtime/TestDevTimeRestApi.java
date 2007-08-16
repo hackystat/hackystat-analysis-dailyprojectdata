@@ -15,6 +15,10 @@ import org.hackystat.sensorbase.resource.sensordata.jaxb.SensorDatas;
 import org.hackystat.utilities.tstamp.Tstamp;
 import org.junit.Test;
 
+/**
+ * Tests the DevTime part of the DailyProjectData REST API. 
+ * @author Philip Johnson
+ */
 public class TestDevTimeRestApi extends DailyProjectDataTestHelper {
   
   /** The user for this test case. */
@@ -36,12 +40,11 @@ public class TestDevTimeRestApi extends DailyProjectDataTestHelper {
     batchData.getSensorData().add(makeDevEvent("2007-05-01T00:01:00", user));
     
     // Connect to the sensorbase and register the DailyProjectDataDevEvent user. 
-//    SensorBaseClient.registerUser(getSensorBaseHostName(), user);
-//    SensorBaseClient client = new SensorBaseClient(getSensorBaseHostName(), user, user);
-//    client.enableHttpTracing(true);
-//    client.authenticate();
-//    // Send the sensor data to the SensorBase. 
-//    client.putSensorDataBatch(batchData);
+    SensorBaseClient.registerUser(getSensorBaseHostName(), user);
+    SensorBaseClient client = new SensorBaseClient(getSensorBaseHostName(), user, user);
+    client.authenticate();
+    // Send the sensor data to the SensorBase. 
+    client.putSensorDataBatch(batchData);
     
     // Now connect to the DPD server. 
     DailyProjectDataClient dpdClient = new DailyProjectDataClient(getDailyProjectDataHostName(), 
@@ -49,14 +52,15 @@ public class TestDevTimeRestApi extends DailyProjectDataTestHelper {
     dpdClient.authenticate(); 
     DevTimeDailyProjectData devTime = dpdClient.getDevTime(user, "default", 
         Tstamp.makeTimestamp("2007-04-30"));
-    assertEquals("Checking default devTime", 0, devTime.getTotalDevTime());
+    assertEquals("Checking default devTime", 0, devTime.getTotalDevTime().intValue());
   }
   
   /**
    * Creates a sample SensorData DevEvent instance given a timestamp and a user. 
    * @param tstampString The timestamp as a string
    * @param user The user.
-   * @return The new SensorData DevEvent instance. 
+   * @return The new SensorData DevEvent instance.
+   * @throws Exception If problems occur. 
    */
   private SensorData makeDevEvent(String tstampString, String user) throws Exception {
     XMLGregorianCalendar tstamp = Tstamp.makeTimestamp(tstampString);

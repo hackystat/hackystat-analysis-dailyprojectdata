@@ -8,10 +8,18 @@ import org.hackystat.dailyprojectdata.server.Server;
  */
 public class DevTimeManager {
   
-  
-  public DevTimeManager(Server server) {
+  /**
+   * The default constructor is not available.
+   */
+  private DevTimeManager() {
+    // default constructor not available to clients. 
   }
   
-  
-
+  /**
+   * Provides a manager for DevTime instances. 
+   * @param server The DailyProjectData server.
+   */
+  public DevTimeManager(Server server) {
+    // currently does nothing.
+  }
 }

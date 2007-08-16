@@ -75,7 +75,6 @@ public class DevTimeResource extends DailyProjectDataResource {
   
   /**
    * Returns the passed SensorData instance as a String encoding of its XML representation.
-   * Final because it's called in constructor.
    * @param data The SensorData instance. 
    * @return The XML String representation.
    * @throws Exception If problems occur during translation. 
@@ -96,8 +95,6 @@ public class DevTimeResource extends DailyProjectDataResource {
     Transformer transformer = tf.newTransformer();
     transformer.transform(domSource, result);
     String xmlString = writer.toString();
-    // Now remove the processing instruction.  This approach seems like a total hack.
-    // xmlString = xmlString.substring(xmlString.indexOf('>') + 1);
     return xmlString;
   }
 }
