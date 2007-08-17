@@ -50,9 +50,9 @@ public class TestDevTimeRestApi extends DailyProjectDataTestHelper {
     DailyProjectDataClient dpdClient = new DailyProjectDataClient(getDailyProjectDataHostName(), 
         user, user);
     dpdClient.authenticate(); 
-    DevTimeDailyProjectData devTime = dpdClient.getDevTime(user, "default", 
+    DevTimeDailyProjectData devTime = dpdClient.getDevTime(user, "Default", 
         Tstamp.makeTimestamp("2007-04-30"));
-    assertEquals("Checking default devTime", 0, devTime.getTotalDevTime().intValue());
+    assertEquals("Checking default devTime", 10, devTime.getTotalDevTime().intValue());
   }
   
   /**

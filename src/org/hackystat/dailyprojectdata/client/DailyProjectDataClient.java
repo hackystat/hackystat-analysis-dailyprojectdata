@@ -139,7 +139,7 @@ public class DailyProjectDataClient {
    * @throws DailyProjectDataClientException If authentication is not successful. 
    */
   public synchronized DailyProjectDataClient authenticate() throws DailyProjectDataClientException {
-    String uri = "devtime/" + this.userEmail + "/" + "default/" + Tstamp.makeTimestamp(); 
+    String uri = "devtime/" + this.userEmail + "/" + "Default/" + Tstamp.makeTimestamp(); 
     Response response = makeRequest(Method.GET, uri, null); 
     if (!response.getStatus().isSuccess()) {
       throw new DailyProjectDataClientException(response.getStatus());

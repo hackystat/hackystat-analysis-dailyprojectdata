@@ -2,9 +2,12 @@ package org.hackystat.dailyprojectdata.resource.devtime;
 
 import java.io.StringWriter;
 import java.math.BigInteger;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
+import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.Transformer;
@@ -15,7 +18,12 @@ import javax.xml.transform.stream.StreamResult;
 import org.hackystat.dailyprojectdata.resource.dailyprojectdata.DailyProjectDataResource;
 import org.hackystat.dailyprojectdata.resource.devtime.jaxb.DevTimeDailyProjectData;
 import org.hackystat.dailyprojectdata.resource.devtime.jaxb.MemberData;
+import org.hackystat.sensorbase.client.SensorBaseClient;
+import org.hackystat.sensorbase.resource.sensordata.jaxb.SensorData;
+import org.hackystat.sensorbase.resource.sensordata.jaxb.SensorDataIndex;
+import org.hackystat.sensorbase.resource.sensordata.jaxb.SensorDataRef;
 import org.hackystat.utilities.stacktrace.StackTrace;
+import org.hackystat.utilities.tstamp.Tstamp;
 import org.restlet.Context;
 import org.restlet.data.MediaType;
 import org.restlet.data.Request;
@@ -52,15 +60,26 @@ public class DevTimeResource extends DailyProjectDataResource {
   public Representation getRepresentation(Variant variant) {
     if (variant.getMediaType().equals(MediaType.TEXT_XML)) {
       try {
-        // For now, we just create a fake one. 
+        SensorBaseClient client = super.getSensorBaseClient();
+        XMLGregorianCalendar startTime = Tstamp.makeTimestamp(this.timestamp);
+        XMLGregorianCalendar endTime = Tstamp.incrementDays(startTime, 1);
+        SensorDataIndex index = client.getProjectSensorData(authUser, project, startTime, endTime);
+        Set<SensorData> data = new HashSet<SensorData>();
+        for (SensorDataRef ref : index.getSensorDataRef()) {
+          if (ref.getSensorDataType().equals("DevEvent")) {
+            data.add(client.getSensorData(ref));
+          }
+        }
+        // For now, each DevEvent represents five minutes of time.
+        BigInteger devTimeMinutes = BigInteger.valueOf(data.size() * 5);
         DevTimeDailyProjectData devTime = new DevTimeDailyProjectData();
         devTime.setOwner(uriUser);
         devTime.setProject(project);
         devTime.setUriPattern("**");
-        devTime.setTotalDevTime(BigInteger.ZERO);
+        devTime.setTotalDevTime(devTimeMinutes);
         MemberData memberData = new MemberData();
         memberData.setMemberUri(uriUser);
-        memberData.setDevTime(BigInteger.ZERO);
+        memberData.setDevTime(devTimeMinutes);
         devTime.getMemberData().add(memberData);
         String xmlData = makeDevTime(devTime);
         return super.getStringRepresentation(xmlData);
@@ -94,8 +113,7 @@ public class DevTimeResource extends DailyProjectDataResource {
     TransformerFactory tf = TransformerFactory.newInstance();
     Transformer transformer = tf.newTransformer();
     transformer.transform(domSource, result);
-    String xmlString = writer.toString();
-    return xmlString;
+    return writer.toString();
   }
 }
 

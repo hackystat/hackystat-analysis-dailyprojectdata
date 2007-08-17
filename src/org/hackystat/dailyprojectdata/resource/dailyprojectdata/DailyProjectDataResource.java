@@ -1,6 +1,9 @@
 package org.hackystat.dailyprojectdata.resource.dailyprojectdata;
 
+import java.util.Map;
+
 import org.hackystat.dailyprojectdata.server.Server;
+import org.hackystat.sensorbase.client.SensorBaseClient;
 import org.restlet.Context;
 import org.restlet.data.CharacterSet;
 import org.restlet.data.Language;
@@ -11,6 +14,8 @@ import org.restlet.resource.Representation;
 import org.restlet.resource.Resource;
 import org.restlet.resource.StringRepresentation;
 import org.restlet.resource.Variant;
+import static 
+org.hackystat.dailyprojectdata.server.Authenticator.AUTHENTICATOR_SENSORBASECLIENTS_KEY;
 
 /**
  * An abstract superclass for all DailyProjectData resources that supplies common 
@@ -58,6 +63,8 @@ public abstract class DailyProjectDataResource extends Resource {
     }
     this.server = (Server)getContext().getAttributes().get("DailyProjectDataServer");
     this.uriUser = (String) request.getAttributes().get("user");
+    this.project = (String) request.getAttributes().get("project");
+    this.timestamp = (String) request.getAttributes().get("timestamp");
     getVariants().clear(); // copied from BookmarksResource.java, not sure why needed.
     getVariants().add(new Variant(MediaType.TEXT_XML));
   }
@@ -76,11 +83,18 @@ public abstract class DailyProjectDataResource extends Resource {
    * @param xmlData The xml data as a string. 
    * @return A StringRepresentation of that xmldata. 
    */
-  public static StringRepresentation getStringRepresentation(String xmlData) {
-    StringBuilder builder = new StringBuilder(500);
-   // builder.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-    builder.append(xmlData);
-    return new StringRepresentation(builder, MediaType.TEXT_XML, Language.ALL, CharacterSet.UTF_8);
+  public StringRepresentation getStringRepresentation(String xmlData) {
+    return new StringRepresentation(xmlData, MediaType.TEXT_XML, Language.ALL, CharacterSet.UTF_8);
   }
   
+  /**
+   * Returns a SensorBaseClient instance associated with the User in this request. 
+   * @return The SensorBaseClient instance. 
+   */
+  public SensorBaseClient getSensorBaseClient() {
+    Map userClientMap = 
+      (Map)this.server.getContext().getAttributes().get(AUTHENTICATOR_SENSORBASECLIENTS_KEY);
+    return (SensorBaseClient)userClientMap.get(this.authUser);
+  }
+
 }
