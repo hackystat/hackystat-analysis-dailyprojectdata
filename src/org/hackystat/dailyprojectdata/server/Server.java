@@ -3,7 +3,6 @@ package org.hackystat.dailyprojectdata.server;
 import java.util.Enumeration;
 import java.util.Map;
 
-import org.hackystat.dailyprojectdata.resource.devtime.DevTimeManager;
 import org.hackystat.dailyprojectdata.resource.devtime.DevTimeResource;
 import org.hackystat.sensorbase.client.SensorBaseClient;
 import org.hackystat.utilities.logger.HackystatLogger;
@@ -67,12 +66,9 @@ public class Server extends Application {
       .attach("/" + server.properties.get(CONTEXT_ROOT_KEY), server);
  
     
-    // Now create all of the Resource Managers and store them in the Context.
-    Map<String, Object> attributes = server.getContext().getAttributes();
-    attributes.put("DevTimeManager", new DevTimeManager(server));
-    
-    // Create and store the JAXBContext instances here, so we only pay the construction costs once.
+    // Create and store the JAXBContext instances on the server context.
     // They are supposed to be thread safe. 
+    Map<String, Object> attributes = server.getContext().getAttributes();
     JAXBContext devTimeJAXB = JAXBContext.newInstance(
         org.hackystat.dailyprojectdata.resource.devtime.jaxb.ObjectFactory.class);
     attributes.put("DevTimeJAXB", devTimeJAXB);

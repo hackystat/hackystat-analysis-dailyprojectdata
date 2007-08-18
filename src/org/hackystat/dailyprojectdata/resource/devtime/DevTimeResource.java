@@ -1,9 +1,6 @@
 package org.hackystat.dailyprojectdata.resource.devtime;
 
 import java.io.StringWriter;
-import java.math.BigInteger;
-import java.util.HashSet;
-import java.util.Set;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
@@ -19,7 +16,6 @@ import org.hackystat.dailyprojectdata.resource.dailyprojectdata.DailyProjectData
 import org.hackystat.dailyprojectdata.resource.devtime.jaxb.DevTimeDailyProjectData;
 import org.hackystat.dailyprojectdata.resource.devtime.jaxb.MemberData;
 import org.hackystat.sensorbase.client.SensorBaseClient;
-import org.hackystat.sensorbase.resource.sensordata.jaxb.SensorData;
 import org.hackystat.sensorbase.resource.sensordata.jaxb.SensorDataIndex;
 import org.hackystat.sensorbase.resource.sensordata.jaxb.SensorDataRef;
 import org.hackystat.utilities.stacktrace.StackTrace;
@@ -39,8 +35,6 @@ import org.w3c.dom.Document;
  * @author Philip Johnson
  */
 public class DevTimeResource extends DailyProjectDataResource {
-  
-  private boolean[] devEventArray = new boolean[288];
   
   /**
    * The standard constructor.
@@ -62,27 +56,33 @@ public class DevTimeResource extends DailyProjectDataResource {
   public Representation getRepresentation(Variant variant) {
     if (variant.getMediaType().equals(MediaType.TEXT_XML)) {
       try {
+        // [1] get the SensorBaseClient for the user making this request.
         SensorBaseClient client = super.getSensorBaseClient();
+        // [2] get a SensorDataIndex of all sensor data for this Project on the requested day.
         XMLGregorianCalendar startTime = Tstamp.makeTimestamp(this.timestamp);
         XMLGregorianCalendar endTime = Tstamp.incrementDays(startTime, 1);
         SensorDataIndex index = client.getProjectSensorData(authUser, project, startTime, endTime);
-        Set<SensorData> data = new HashSet<SensorData>();
+        // [3] look through this index for DevEvent sensor data, and update the DevTime counter. 
+        MemberDevTimeCounter counter = new MemberDevTimeCounter();
         for (SensorDataRef ref : index.getSensorDataRef()) {
           if (ref.getSensorDataType().equals("DevEvent")) {
-            data.add(client.getSensorData(ref));
+            // If it's a devEvent, get the member and timestamp and update the MemberDevTimeCounter.
+            counter.addMemberDevEvent(ref.getOwner(), ref.getTimestamp());
           }
         }
-        // For now, each DevEvent represents five minutes of time.
-        BigInteger devTimeMinutes = BigInteger.valueOf(data.size() * 5);
+        // [4] create and return the DevTimeDailyProjectData
         DevTimeDailyProjectData devTime = new DevTimeDailyProjectData();
+        //     create the individuam MemberData elements. 
+        for (String member : counter.getMembers()) {
+          MemberData memberData = new MemberData();
+          memberData.setMemberUri(member);
+          memberData.setDevTime(counter.getMemberDevTime(member));
+          devTime.getMemberData().add(memberData);
+        }
         devTime.setOwner(uriUser);
         devTime.setProject(project);
-        devTime.setUriPattern("**");
-        devTime.setTotalDevTime(devTimeMinutes);
-        MemberData memberData = new MemberData();
-        memberData.setMemberUri(uriUser);
-        memberData.setDevTime(devTimeMinutes);
-        devTime.getMemberData().add(memberData);
+        devTime.setUriPattern("**"); // we don't support UriPatterns yet. 
+        devTime.setTotalDevTime(counter.getTotalDevTime());
         String xmlData = makeDevTime(devTime);
         return super.getStringRepresentation(xmlData);
       }
@@ -116,20 +116,6 @@ public class DevTimeResource extends DailyProjectDataResource {
     Transformer transformer = tf.newTransformer();
     transformer.transform(domSource, result);
     return writer.toString();
-  }
-  
-  /**
-   * Takes a timestamp and returns an index between 0 and 287 indicating which five minute chunk
-   * this timestamp falls within. 
-   *
-   * @param timeStamp  The date used to determine the five minute period.
-   * @return           The index in the day array corresponding to the timestamp.
-   */
-  private void stampArray(XMLGregorianCalendar tstamp) {
-    int hours = tstamp.getHour();
-    int minutes = tstamp.getMinute();
-    int index = (int) ((hours * 60 + minutes) / 288);
-    devEventArray[index] = true;
   }
 }
 

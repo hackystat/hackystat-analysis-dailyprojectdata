@@ -53,6 +53,7 @@ public class TestDevTimeRestApi extends DailyProjectDataTestHelper {
     DevTimeDailyProjectData devTime = dpdClient.getDevTime(user, "Default", 
         Tstamp.makeTimestamp("2007-04-30"));
     assertEquals("Checking default devTime", 10, devTime.getTotalDevTime().intValue());
+    assertEquals("Checking MemberData size", 1, devTime.getMemberData().size());
   }
   
   /**
