@@ -40,6 +40,8 @@ import org.w3c.dom.Document;
  */
 public class DevTimeResource extends DailyProjectDataResource {
   
+  private boolean[] devEventArray = new boolean[288];
+  
   /**
    * The standard constructor.
    * @param context The context.
@@ -114,6 +116,20 @@ public class DevTimeResource extends DailyProjectDataResource {
     Transformer transformer = tf.newTransformer();
     transformer.transform(domSource, result);
     return writer.toString();
+  }
+  
+  /**
+   * Takes a timestamp and returns an index between 0 and 287 indicating which five minute chunk
+   * this timestamp falls within. 
+   *
+   * @param timeStamp  The date used to determine the five minute period.
+   * @return           The index in the day array corresponding to the timestamp.
+   */
+  private void stampArray(XMLGregorianCalendar tstamp) {
+    int hours = tstamp.getHour();
+    int minutes = tstamp.getMinute();
+    int index = (int) ((hours * 60 + minutes) / 288);
+    devEventArray[index] = true;
   }
 }
 
