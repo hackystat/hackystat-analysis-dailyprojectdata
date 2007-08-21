@@ -46,9 +46,14 @@ public class DailyProjectDataClient {
   
   /**
    * Initializes a new DailyProjectDataClient, given the host, userEmail, and password. 
+   * Note that the userEmail and password refer to the underlying SensorBase client
+   * associated with this DailyProjectData service.  This service does not keep its own
+   * independent set of userEmails and passwords.  Authentication is not actually performed
+   * in this constructor. Use the authenticate() method to explicitly check the authentication
+   * credentials. 
    * @param host The host, such as 'http://localhost:9877/dailyprojectdata'.
-   * @param email The user's email that we will use for authentication. 
-   * @param password The password we will use for authentication.
+   * @param email The user's email used for authentication. 
+   * @param password The password used for authentication.
    */
   public DailyProjectDataClient(String host, String email, String password) {
     validateArg(host);
@@ -131,14 +136,18 @@ public class DailyProjectDataClient {
   }
   
   /**
-   * Authenticates this user and password with the dailyprojectdata server.  
-   * Does this by getting the devtime DPD instance for the 24 hours starting right now, which 
-   * is likely to be empty and thus be a low cost operation.
-   * We could convert to a real "ping" style interface at some point if this method is used a lot.  
+   * Authenticates this user and password with this DailyProjectData service, throwing a
+   * DailyProjectDataException if the user and password associated with this instance
+   * are not valid credentials. 
+   * Note that authentication is performed by checking these credentials with the 
+   * SensorBase; this service does not keep its own independent set of usernames and passwords.
    * @return This DailyProjectDataClient instance. 
    * @throws DailyProjectDataClientException If authentication is not successful. 
    */
   public synchronized DailyProjectDataClient authenticate() throws DailyProjectDataClientException {
+    // Performs authentication by running the DevTime analysis for the next 24 hours, which is 
+    // likely to involve little to no data and thus be quite cheap. We could convert to a 'ping'
+    // style interface in future if we need to. 
     String uri = "devtime/" + this.userEmail + "/" + "Default/" + Tstamp.makeTimestamp(); 
     Response response = makeRequest(Method.GET, uri, null); 
     if (!response.getStatus().isSuccess()) {
@@ -148,13 +157,15 @@ public class DailyProjectDataClient {
   }
   
   /**
-   * Returns a DevTimeDailyProjectData instance from this server. 
+   * Returns a DevTimeDailyProjectData instance from this server, or throws a
+   * DailyProjectData exception if problems occurred.  
    * @param user The user. 
    * @param project The project.
    * @param timestamp The Timestamp indicating the start of the 24 hour period of DevTime.
    * @return The DevTimeDailyProjectData instance. 
-   * @throws DailyProjectDataClientException If the server does not return the DPD or 
-   * returns something that cannot be marshalled into DevTimeDailyProjectData instance. 
+   * @throws DailyProjectDataClientException If the credentials associated with this instance
+   * are not valid, or if the underlying SensorBase service cannot be reached, or if one or more
+   * of the supplied user, password, or timestamp is not valid.
    */
   public synchronized DevTimeDailyProjectData getDevTime(String user, String project, 
       XMLGregorianCalendar timestamp) throws DailyProjectDataClientException {

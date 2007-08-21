@@ -1,0 +1,6 @@
+org.hackystat.dailyprojectdata.client
+org.hackystat.dailyprojectdata.resource.dailyprojectdata
+org.hackystat.dailyprojectdata.resource.devtime
+org.hackystat.dailyprojectdata.resource.devtime.jaxb
+org.hackystat.dailyprojectdata.server
+org.hackystat.dailyprojectdata.test
