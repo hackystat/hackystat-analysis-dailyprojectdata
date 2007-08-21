@@ -98,7 +98,7 @@
   </target>
  
  <target name="run" depends="compile" description="Compiles the sensorbase and starts it up.">
-  <java classname="org.hackystat.sensorbase.server.Server" fork="yes">
+  <java classname="org.hackystat.dailyprojectdata.server.Server" fork="yes">
     <classpath>
       <pathelement location="${build.dir}/classes" />
       <path refid="compile.classpath"/>

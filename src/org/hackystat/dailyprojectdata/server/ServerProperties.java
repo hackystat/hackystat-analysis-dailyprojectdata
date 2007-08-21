@@ -70,6 +70,11 @@ public class ServerProperties {
         stream.close();
       }
     }
+    // make sure that SENSORBASE_HOST always has a final slash.
+    String sensorBaseHost = (String) properties.get(SENSORBASE_HOST_KEY);
+    if (!sensorBaseHost.endsWith("/")) {
+      properties.put(SENSORBASE_HOST_KEY, sensorBaseHost + "/");
+    }
     // Now add to System properties.
     Properties systemProperties = System.getProperties();
     systemProperties.putAll(properties);

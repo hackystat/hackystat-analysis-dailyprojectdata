@@ -28,6 +28,8 @@ import org.restlet.resource.Representation;
 import org.restlet.resource.Variant;
 import org.w3c.dom.Document;
 
+import static org.hackystat.dailyprojectdata.server.ServerProperties.SENSORBASE_HOST_KEY;
+
 /**
  * Implements the Resource for processing GET {host}/devtime/{user}/{project}/{starttime} requests.
  * Requires the authenticated user to be {user} or else the Admin user for the sensorbase 
@@ -72,10 +74,11 @@ public class DevTimeResource extends DailyProjectDataResource {
         }
         // [4] create and return the DevTimeDailyProjectData
         DevTimeDailyProjectData devTime = new DevTimeDailyProjectData();
-        //     create the individuam MemberData elements. 
+        //     create the individual MemberData elements.
+        String sensorBaseHost = this.server.getServerProperties().get(SENSORBASE_HOST_KEY);
         for (String member : counter.getMembers()) {
           MemberData memberData = new MemberData();
-          memberData.setMemberUri(member);
+          memberData.setMemberUri(sensorBaseHost + "users/" + member);
           memberData.setDevTime(counter.getMemberDevTime(member));
           devTime.getMemberData().add(memberData);
         }

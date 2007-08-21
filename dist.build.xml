@@ -10,7 +10,7 @@
     <!-- Define the directories and distribution name -->
     <property name="dist.dir" location="${build.dir}/dist" />
     <property name="dist.tmp.dir" location="${basedir}/dist-tmp" />
-    <property name="dist.name" value="${system.name}-${version}" />
+    <property name="dist.name" value="hackystat-analysis-dailyprojectdata-${version}" />
 
     <!-- Copy distribution files to the tmp dir. -->
  
@@ -21,7 +21,7 @@
 
     <!-- Create the zip distribution of this system, and then delete the tmp dir. -->
     <mkdir dir="${dist.dir}" />
-    <zip zipfile="${dist.dir}/${system.name}-${version}.zip" basedir="${dist.tmp.dir}" />
+    <zip zipfile="${dist.dir}/${dist.name}.zip" basedir="${dist.tmp.dir}" />
     <delete dir="${dist.tmp.dir}"/>   
   </target>
 

@@ -21,20 +21,19 @@
   <import file="validateXml.build.xml"/>
   
   <echo>
-    Hackystat SensorBase Verification Task
+    Hackystat DailyProjectData Verification Task
     
     System and Environment settings:
       Ant version:     ${ant.version}
       Checkstyle Home: ${env.CHECKSTYLE_HOME}
       Emma Home:       ${env.EMMA_HOME}
-      Derby Home:      ${env.DERBY_HOME}
       FindBugs Home:   ${env.FINDBUGS_HOME} 
       Java version:    ${java.version}
-      JavaMail Home:   ${env.JAVAMAIL_HOME} 
-      JAXB Home:       ${env.JAXB_HOME}
       JUnit Home:      ${env.JUNIT_HOME}
-      PMD  Home:       ${env.PMD_HOME}
+      PMD Home:        ${env.PMD_HOME}
       Restlet Home:    ${env.RESTLET_HOME}
+      Utilities Home:  ${env.HACKYSTAT_UTILITIES_HOME}
+      SensorBase Home: ${env.HACKYSTAT_SENSORBASE_HOME}
     
     This task fails the build unless all of the following are true:
       * System compiles without warnings or errors.
