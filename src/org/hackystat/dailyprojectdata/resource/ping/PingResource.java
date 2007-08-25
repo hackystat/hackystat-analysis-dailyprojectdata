@@ -24,8 +24,7 @@ public class PingResource extends DailyProjectDataResource {
   }
   
   /**
-   * Returns an DevTimeDailyProjectData instance representing the DevTime associated with the 
-   * Project data, or null if not authorized. 
+   * Returns the string "DailyProjectData".
    * @param variant The representational variant requested.
    * @return The representation. 
    */
