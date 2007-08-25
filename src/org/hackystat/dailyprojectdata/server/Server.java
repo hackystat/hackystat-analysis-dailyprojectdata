@@ -4,6 +4,7 @@ import java.util.Enumeration;
 import java.util.Map;
 
 import org.hackystat.dailyprojectdata.resource.devtime.DevTimeResource;
+import org.hackystat.dailyprojectdata.resource.ping.PingResource;
 import org.hackystat.sensorbase.client.SensorBaseClient;
 import org.hackystat.utilities.logger.HackystatLogger;
 import org.restlet.Application;
@@ -129,7 +130,13 @@ public class Server extends Application {
     Guard guard = new Authenticator(getContext(), 
         this.getServerProperties().get(SENSORBASE_HOST_KEY));
     guard.setNext(authRouter);
-    return guard;
+    
+    // Now create our "top-level" router which will allow the Ping URI to proceed without
+    // authentication, but all other URI patterns will go to the guarded Router. 
+    Router router = new Router(getContext());
+    router.attach("/ping", PingResource.class);
+    router.attachDefault(guard);
+    return router;
   }
 
 

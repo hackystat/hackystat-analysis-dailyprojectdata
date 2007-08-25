@@ -185,4 +185,30 @@ public class DailyProjectDataClient {
     return devTime;
   } 
   
+  /**
+   * Returns true if the passed host is a DailyProjectData host. 
+   * @param host The URL of a DailyProjectData host, "http://localhost:9876/dailyprojectdata".
+   * @return True if this URL responds as a DailyProjectData host. 
+   */
+  public static boolean isHost(String host) {
+    // All sensorbase hosts use the HTTP protocol.
+    if (!host.startsWith("http://")) {
+      return false;
+    }
+    // Create the host/register URL.
+    try {
+      String registerUri = host.endsWith("/") ? host + "ping" : host + "/ping"; 
+      Request request = new Request();
+      request.setResourceRef(registerUri);
+      request.setMethod(Method.GET);
+      Client client = new Client(Protocol.HTTP);
+      Response response = client.handle(request);
+      String pingText = response.getEntity().getText();
+      return (response.getStatus().isSuccess() && "DailyProjectData".equals(pingText));
+    }
+    catch (Exception e) {
+      return false;
+    }
+  }
+  
 }
