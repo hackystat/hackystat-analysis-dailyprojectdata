@@ -132,9 +132,10 @@ public class Server extends Application {
     guard.setNext(authRouter);
     
     // Now create our "top-level" router which will allow the Ping URI to proceed without
-    // authentication, but all other URI patterns will go to the guarded Router. 
+    // authentication, but all other URI patterns will go to the guarded Router.
     Router router = new Router(getContext());
     router.attach("/ping", PingResource.class);
+    router.attach("/ping?user={user}&password={password}", PingResource.class);
     router.attachDefault(guard);
     return router;
   }

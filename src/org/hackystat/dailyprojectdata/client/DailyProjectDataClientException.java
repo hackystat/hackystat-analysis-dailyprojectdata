@@ -36,5 +36,13 @@ public class DailyProjectDataClientException extends Exception {
   public DailyProjectDataClientException(String description, Throwable error) {
     super(description, error);
   }
+  
+  /**
+   * Thrown when some problem occurs with Client not involving the server. 
+   * @param description The problem description.
+   */
+  public DailyProjectDataClientException(String description) {
+    super(description);
+  }
 
 }

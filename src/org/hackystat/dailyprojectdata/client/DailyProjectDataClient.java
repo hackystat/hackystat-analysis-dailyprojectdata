@@ -7,7 +7,6 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.hackystat.dailyprojectdata.resource.devtime.jaxb.DevTimeDailyProjectData;
-import org.hackystat.utilities.tstamp.Tstamp;
 import org.restlet.Client;
 import org.restlet.data.ChallengeResponse;
 import org.restlet.data.ChallengeScheme;
@@ -106,7 +105,7 @@ public class DailyProjectDataClient {
     ChallengeResponse authentication = new ChallengeResponse(scheme, this.userEmail, this.password);
     request.setChallengeResponse(authentication);
     if (this.isTraceEnabled) {
-      System.out.println("SensorBaseClient Tracing: " + method + " " + reference);
+      System.out.println("DailyProjectDataClient Tracing: " + method + " " + reference);
       if (entity != null) {
         try {
           System.out.println(entity.getText());
@@ -145,13 +144,21 @@ public class DailyProjectDataClient {
    * @throws DailyProjectDataClientException If authentication is not successful. 
    */
   public synchronized DailyProjectDataClient authenticate() throws DailyProjectDataClientException {
-    // Performs authentication by running the DevTime analysis for the next 24 hours, which is 
-    // likely to involve little to no data and thus be quite cheap. We could convert to a 'ping'
-    // style interface in future if we need to. 
-    String uri = "devtime/" + this.userEmail + "/" + "Default/" + Tstamp.makeTimestamp(); 
+    // Performs authentication by invoking ping with user and password as form params.
+    String uri = "ping?user=" + this.userEmail + "&password=" + this.password;
     Response response = makeRequest(Method.GET, uri, null); 
     if (!response.getStatus().isSuccess()) {
       throw new DailyProjectDataClientException(response.getStatus());
+    }
+    String responseString;
+    try {
+      responseString = response.getEntity().getText();
+    }
+    catch (Exception e) {
+      throw new DailyProjectDataClientException("Bad response", e);
+    }
+    if (!"DailyProjectData authenticated".equals(responseString)) {
+      throw new DailyProjectDataClientException("Authentication failed");
     }
     return this;
   }
