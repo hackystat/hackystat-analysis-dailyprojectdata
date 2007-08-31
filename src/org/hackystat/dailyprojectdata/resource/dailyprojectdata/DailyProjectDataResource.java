@@ -91,9 +91,11 @@ public abstract class DailyProjectDataResource extends Resource {
    * Returns a SensorBaseClient instance associated with the User in this request. 
    * @return The SensorBaseClient instance. 
    */
+  @SuppressWarnings("unchecked")
   public SensorBaseClient getSensorBaseClient() {
-    Map userClientMap = 
-      (Map)this.server.getContext().getAttributes().get(AUTHENTICATOR_SENSORBASECLIENTS_KEY);
+    Map<String, SensorBaseClient> userClientMap = 
+      (Map<String, SensorBaseClient>)this.server.getContext()
+      .getAttributes().get(AUTHENTICATOR_SENSORBASECLIENTS_KEY);
     return (SensorBaseClient)userClientMap.get(this.authUser);
   }
 
