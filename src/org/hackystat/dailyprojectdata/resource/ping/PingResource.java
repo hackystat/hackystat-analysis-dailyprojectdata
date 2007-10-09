@@ -1,6 +1,6 @@
 package org.hackystat.dailyprojectdata.resource.ping;
 
-import static org.hackystat.dailyprojectdata.server.ServerProperties.SENSORBASE_HOST_KEY;
+import static org.hackystat.dailyprojectdata.server.ServerProperties.SENSORBASE_FULLHOST_KEY;
 
 import org.hackystat.dailyprojectdata.resource.dailyprojectdata.DailyProjectDataResource;
 import org.hackystat.sensorbase.client.SensorBaseClient;
@@ -53,7 +53,7 @@ public class PingResource extends DailyProjectDataResource {
       return new StringRepresentation(unauthenticated);
     }
     // There is a user and password. So, check the SensorBase to see. 
-    String sensorBaseHost = server.getServerProperties().get(SENSORBASE_HOST_KEY);
+    String sensorBaseHost = server.getServerProperties().get(SENSORBASE_FULLHOST_KEY);
     boolean OK = SensorBaseClient.isRegistered(sensorBaseHost, user, password);
     return new StringRepresentation((OK ? authenticated : unauthenticated));
   }

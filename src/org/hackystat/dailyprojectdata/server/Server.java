@@ -18,7 +18,7 @@ import static org.hackystat.dailyprojectdata.server.ServerProperties.HOSTNAME_KE
 import static org.hackystat.dailyprojectdata.server.ServerProperties.PORT_KEY;
 import static org.hackystat.dailyprojectdata.server.ServerProperties.CONTEXT_ROOT_KEY;
 import static org.hackystat.dailyprojectdata.server.ServerProperties.LOGGING_LEVEL_KEY;
-import static org.hackystat.dailyprojectdata.server.ServerProperties.SENSORBASE_HOST_KEY;
+import static org.hackystat.dailyprojectdata.server.ServerProperties.SENSORBASE_FULLHOST_KEY;
 
 import java.util.logging.Level;
 import java.util.logging.LogManager;
@@ -43,16 +43,26 @@ public class Server extends Application {
   
   /** Holds the ServerProperties instance for this Service. */
   private ServerProperties properties;
-  
+
   /**
-   * Creates a new instance of a DailyProjectData HTTP server, listening on the supplied port.  
+   * Creates a new instance of a DailyProjectData HTTP server, listening on the supplied port.
    * @return The Server instance created. 
    * @throws Exception If problems occur starting up this server. 
    */
   public static Server newInstance() throws Exception {
+    return newInstance(new ServerProperties());
+  }
+  
+  /**
+   * Creates a new instance of a DailyProjectData HTTP server, listening on the supplied port.
+   * @param properties The ServerProperties instance used to initialize this server.  
+   * @return The Server instance created. 
+   * @throws Exception If problems occur starting up this server. 
+   */
+  public static Server newInstance(ServerProperties properties) throws Exception {
     Server server = new Server();
     server.logger = HackystatLogger.getLogger("org.hackystat.dailyprojectdata");
-    server.properties = new ServerProperties();
+    server.properties = properties;
     server.hostName = "http://" +
                       server.properties.get(HOSTNAME_KEY) + 
                       ":" + 
@@ -65,7 +75,6 @@ public class Server extends Application {
     server.component.getServers().add(Protocol.HTTP, port);
     server.component.getDefaultHost()
       .attach("/" + server.properties.get(CONTEXT_ROOT_KEY), server);
- 
     
     // Create and store the JAXBContext instances on the server context.
     // They are supposed to be thread safe. 
@@ -80,15 +89,18 @@ public class Server extends Application {
     // Now let's open for business. 
     server.logger.warning("Host: " + server.hostName);
     HackystatLogger.setLoggingLevel(server.logger, server.properties.get(LOGGING_LEVEL_KEY));
-    server.properties.echoProperties(server);
-    String sensorBaseHost = server.properties.get(SENSORBASE_HOST_KEY);
+    server.logger.info(server.properties.echoProperties());
+    String sensorBaseHost = server.properties.get(SENSORBASE_FULLHOST_KEY);
     boolean sensorBaseOK = SensorBaseClient.isHost(sensorBaseHost);
     server.logger.warning("SensorBase " + sensorBaseHost + 
         ((sensorBaseOK) ? " was contacted successfully." : 
           " NOT AVAILABLE. This service will not run correctly."));
     server.logger.warning("DailyProjectData (Version " + getVersion() + ") now running.");
     server.component.start();
-    disableRestletLogging();
+    String restletLoggingString = server.properties.get(ServerProperties.RESTLET_LOGGING_KEY);
+    if (!(restletLoggingString.equalsIgnoreCase("true"))) {
+      disableRestletLogging();
+    }
     return server;
   }
 
@@ -97,8 +109,8 @@ public class Server extends Application {
    */
   private static void disableRestletLogging() {
     LogManager logManager = LogManager.getLogManager();
-    for (Enumeration e = logManager.getLoggerNames(); e.hasMoreElements() ;) {
-      String logName = e.nextElement().toString();
+    for (Enumeration<String> e = logManager.getLoggerNames(); e.hasMoreElements() ;) {
+      String logName = e.nextElement();
       if (logName.startsWith("com.noelios") ||
           logName.startsWith("org.restlet")) {
         logManager.getLogger(logName).setLevel(Level.OFF);
@@ -128,7 +140,7 @@ public class Server extends Application {
     authRouter.attach("/devtime/{user}/{project}/{timestamp}", DevTimeResource.class);
     // Here's the Guard that we will place in front of authRouter.
     Guard guard = new Authenticator(getContext(), 
-        this.getServerProperties().get(SENSORBASE_HOST_KEY));
+        this.getServerProperties().get(SENSORBASE_FULLHOST_KEY));
     guard.setNext(authRouter);
     
     // Now create our "top-level" router which will allow the Ping URI to proceed without

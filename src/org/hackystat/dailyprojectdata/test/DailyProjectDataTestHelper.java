@@ -1,8 +1,8 @@
 package org.hackystat.dailyprojectdata.test;
 
 import org.hackystat.dailyprojectdata.server.Server;
+import org.hackystat.dailyprojectdata.server.ServerProperties;
 import org.junit.BeforeClass;
-import static org.hackystat.dailyprojectdata.server.ServerProperties.SENSORBASE_HOST_KEY;
 
 /**
  * Provides a helper class to facilitate JUnit testing. 
@@ -11,6 +11,7 @@ import static org.hackystat.dailyprojectdata.server.ServerProperties.SENSORBASE_
 public class DailyProjectDataTestHelper {
 
   /** The DailyProjectData server used in these tests. */
+  private static org.hackystat.sensorbase.server.Server sensorbaseServer;
   private static Server server;
 
   /**
@@ -25,7 +26,16 @@ public class DailyProjectDataTestHelper {
    * @throws Exception If problems occur setting up the server. 
    */
   @BeforeClass public static void setupServer() throws Exception {
-    DailyProjectDataTestHelper.server = Server.newInstance();
+    // Create a testing version of the Sensorbase.
+    org.hackystat.sensorbase.server.ServerProperties sensorbaseProps = 
+      new org.hackystat.sensorbase.server.ServerProperties();
+    sensorbaseProps.setTestProperties();
+    DailyProjectDataTestHelper.sensorbaseServer = 
+      org.hackystat.sensorbase.server.Server.newInstance(sensorbaseProps);
+    // Now create a testing version of the DPD service.
+    ServerProperties dpdProperties = new ServerProperties();
+    dpdProperties.setTestProperties();
+    DailyProjectDataTestHelper.server = Server.newInstance(dpdProperties);
   }
 
   /**
@@ -41,7 +51,8 @@ public class DailyProjectDataTestHelper {
    * @return The host name, including the context root. 
    */
   protected String getSensorBaseHostName() {
-    return DailyProjectDataTestHelper.server.getServerProperties().get(SENSORBASE_HOST_KEY);
+    return DailyProjectDataTestHelper.sensorbaseServer
+    .getServerProperties().getFullHost();
   }
 }
 
