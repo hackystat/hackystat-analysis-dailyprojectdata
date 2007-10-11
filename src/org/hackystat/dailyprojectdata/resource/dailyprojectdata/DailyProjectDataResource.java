@@ -96,7 +96,7 @@ public abstract class DailyProjectDataResource extends Resource {
     Map<String, SensorBaseClient> userClientMap = 
       (Map<String, SensorBaseClient>)this.server.getContext()
       .getAttributes().get(AUTHENTICATOR_SENSORBASECLIENTS_KEY);
-    return (SensorBaseClient)userClientMap.get(this.authUser);
+    return userClientMap.get(this.authUser);
   }
 
 }
