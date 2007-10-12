@@ -19,6 +19,7 @@
       <classpath>
         <pathelement location="${build.dir}/classes" />
         <path refid="compile.classpath"/>
+        <fileset file="${env.JAVAMAIL_HOME}/mail.jar"/> 
       </classpath>
       <formatter type="xml" />
       <batchtest todir="${junit.dir}">
