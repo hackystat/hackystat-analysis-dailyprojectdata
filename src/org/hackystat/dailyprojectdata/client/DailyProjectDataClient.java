@@ -166,10 +166,10 @@ public class DailyProjectDataClient {
   /**
    * Returns a DevTimeDailyProjectData instance from this server, or throws a
    * DailyProjectData exception if problems occurred.  
-   * @param user The user. 
-   * @param project The project.
+   * @param user The user that owns the project. 
+   * @param project The project owned by user. 
    * @param timestamp The Timestamp indicating the start of the 24 hour period of DevTime.
-   * @return The DevTimeDailyProjectData instance. 
+   * @return A DevTimeDailyProjectData instance. 
    * @throws DailyProjectDataClientException If the credentials associated with this instance
    * are not valid, or if the underlying SensorBase service cannot be reached, or if one or more
    * of the supplied user, password, or timestamp is not valid.
