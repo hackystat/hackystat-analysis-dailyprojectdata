@@ -13,6 +13,9 @@
   </taskdef>   
 
   <target name="jaxb" description="Runs the XJC compiler.">
-    <xjc schema="${basedir}/xml/schema/DevTimeDailyProjectData.xsd" destdir="src" package="org.hackystat.dailyprojectdata.resource.devtime.jaxb"/>
+    <xjc schema="${basedir}/xml/schema/DevTimeDailyProjectData.xsd" destdir="src" 
+         package="org.hackystat.dailyprojectdata.resource.devtime.jaxb">
+      <produces dir="${src.dir}/org/hackystat/dailyprojectdata/resource/devtime/jaxb" includes="*" />
+    </xjc>
   </target>
 </project>
