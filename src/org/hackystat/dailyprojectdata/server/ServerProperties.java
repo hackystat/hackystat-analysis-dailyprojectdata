@@ -24,7 +24,7 @@ public class ServerProperties {
   public static final String XML_DIR_KEY =         "dailyprojectdata.xml.dir";
   /** The Restlet Logging key. */
   public static final String RESTLET_LOGGING_KEY = "dailyprojectdata.restlet.logging";
-  /** The sensorbase port key during testing. */
+  /** The dpd port key during testing. */
   public static final String TEST_PORT_KEY =       "dailyprojectdata.test.port";
   /** The test installation key. */
   public static final String TEST_INSTALL_KEY =    "dailyprojectdata.test.install";
