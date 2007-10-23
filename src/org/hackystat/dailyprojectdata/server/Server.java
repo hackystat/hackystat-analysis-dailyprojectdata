@@ -54,6 +54,19 @@ public class Server extends Application {
   }
   
   /**
+   * Creates a new instance of a DailyProjectData HTTP server suitable for unit testing. 
+   * DPD properties are initialized from the User's dailyprojectdata.properties file, 
+   * then set to their "testing" versions.   
+   * @return The Server instance created. 
+   * @throws Exception If problems occur starting up this server. 
+   */
+  public static Server newTestInstance() throws Exception {
+    ServerProperties properties = new ServerProperties();
+    properties.setTestProperties();
+    return newInstance(properties);
+  }
+  
+  /**
    * Creates a new instance of a DailyProjectData HTTP server, listening on the supplied port.
    * @param properties The ServerProperties instance used to initialize this server.  
    * @return The Server instance created. 
