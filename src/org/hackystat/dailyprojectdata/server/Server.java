@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.hackystat.dailyprojectdata.resource.devtime.DevTimeResource;
 import org.hackystat.dailyprojectdata.resource.ping.PingResource;
+import org.hackystat.dailyprojectdata.resource.unittest.UnitTestDPDResource;
 import org.hackystat.sensorbase.client.SensorBaseClient;
 import org.hackystat.utilities.logger.HackystatLogger;
 import org.restlet.Application;
@@ -151,6 +152,8 @@ public class Server extends Application {
     // requests will require authentication.
     Router authRouter = new Router(getContext());
     authRouter.attach("/devtime/{user}/{project}/{timestamp}", DevTimeResource.class);
+    authRouter.attach("/unittest/{user}/{projectname}/{timestamp}", 
+        UnitTestDPDResource.class);
     // Here's the Guard that we will place in front of authRouter.
     Guard guard = new Authenticator(getContext(), 
         this.getServerProperties().get(SENSORBASE_FULLHOST_KEY));

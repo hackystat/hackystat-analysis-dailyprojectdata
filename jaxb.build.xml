@@ -1,21 +1,23 @@
 <project name="jaxb" default="jaxb">
-  <description>
+	<description>
   Supports JAXB binding process (creation of Java classes from the XmlSchema documents.)
   </description>
 
-  <import file="build.xml"/>
-  <property environment="env"/>
-    
-  <taskdef name="xjc" classname="com.sun.tools.xjc.XJCTask">
-    <classpath>
-      <fileset dir="${env.JAXB_HOME}/lib" includes="*.jar" />
-    </classpath>
-  </taskdef>   
+	<import file="build.xml" />
+	<property environment="env" />
 
-  <target name="jaxb" description="Runs the XJC compiler.">
-    <xjc schema="${basedir}/xml/schema/DevTimeDailyProjectData.xsd" destdir="src" 
-         package="org.hackystat.dailyprojectdata.resource.devtime.jaxb">
-      <produces dir="${src.dir}/org/hackystat/dailyprojectdata/resource/devtime/jaxb" includes="*" />
-    </xjc>
-  </target>
+	<taskdef name="xjc" classname="com.sun.tools.xjc.XJCTask">
+		<classpath>
+			<fileset dir="${env.JAXB_HOME}/lib" includes="*.jar" />
+		</classpath>
+	</taskdef>
+
+	<target name="jaxb" description="Runs the XJC compiler.">
+		<xjc schema="${basedir}/xml/schema/DevTimeDailyProjectData.xsd" destdir="src" package="org.hackystat.dailyprojectdata.resource.devtime.jaxb">
+			<produces dir="${src.dir}/org/hackystat/dailyprojectdata/resource/devtime/jaxb" includes="*" />
+		</xjc>
+		<xjc schema="${basedir}/xml/schema/UnitTestDailyProjectData.xsd" destdir="src" package="org.hackystat.dailyprojectdata.resource.unittest.jaxb">
+			<produces dir="${src.dir}/org/hackystat/dailyprojectdata/resource/unittest/jaxb" includes="*" />
+		</xjc>
+	</target>
 </project>

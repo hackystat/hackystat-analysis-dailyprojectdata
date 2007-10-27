@@ -10,6 +10,7 @@
 
   <target name="validateXml" description="Validates XML files against their schemas.">
     <schemavalidate noNamespaceFile="${schema.dir}/DevTimeDailyProjectData.xsd" file="${examples.dir}/devtimedailyprojectdata.example.xml"/>
+    <schemavalidate noNamespaceFile="${schema.dir}/UnitTestDailyProjectData.xsd" file="${examples.dir}/unittestdailyprojectdata.example.xml"/>
   </target>
 </project>
 
