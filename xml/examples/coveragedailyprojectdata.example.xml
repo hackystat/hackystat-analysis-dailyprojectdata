@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<CoverageDailyProjectData Project="Default" Owner="johnson@hawaii.edu" StartTime="2006-01-31T00:00:00.000" Type="Line" Tool="Emma">
+ <ConstructData Name="Foo" NumCovered="47" NumUncovered="63"/>
+ <ConstructData Name="Bar" NumCovered="67" NumUncovered="22"/>
+ <ConstructData Name="Baz" NumCovered="69" NumUncovered="0"/>
+</CoverageDailyProjectData>

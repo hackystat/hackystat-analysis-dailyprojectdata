@@ -1,8 +1,21 @@
 package org.hackystat.dailyprojectdata.server;
 
+import static org.hackystat.dailyprojectdata.server.ServerProperties.CONTEXT_ROOT_KEY;
+import static org.hackystat.dailyprojectdata.server.ServerProperties.HOSTNAME_KEY;
+import static org.hackystat.dailyprojectdata.server.ServerProperties.LOGGING_LEVEL_KEY;
+import static org.hackystat.dailyprojectdata.server.ServerProperties.PORT_KEY;
+import static org.hackystat.dailyprojectdata.server.ServerProperties.SENSORBASE_FULLHOST_KEY;
+
 import java.util.Enumeration;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
 
+import javax.xml.bind.JAXBContext;
+
+import org.hackystat.dailyprojectdata.resource.codeissue.CodeIssueResource;
+import org.hackystat.dailyprojectdata.resource.coverage.CoverageResource;
 import org.hackystat.dailyprojectdata.resource.devtime.DevTimeResource;
 import org.hackystat.dailyprojectdata.resource.ping.PingResource;
 import org.hackystat.dailyprojectdata.resource.unittest.UnitTestDPDResource;
@@ -14,18 +27,6 @@ import org.restlet.Guard;
 import org.restlet.Restlet;
 import org.restlet.Router;
 import org.restlet.data.Protocol;
-
-import static org.hackystat.dailyprojectdata.server.ServerProperties.HOSTNAME_KEY;
-import static org.hackystat.dailyprojectdata.server.ServerProperties.PORT_KEY;
-import static org.hackystat.dailyprojectdata.server.ServerProperties.CONTEXT_ROOT_KEY;
-import static org.hackystat.dailyprojectdata.server.ServerProperties.LOGGING_LEVEL_KEY;
-import static org.hackystat.dailyprojectdata.server.ServerProperties.SENSORBASE_FULLHOST_KEY;
-
-import java.util.logging.Level;
-import java.util.logging.LogManager;
-import java.util.logging.Logger;
-
-import javax.xml.bind.JAXBContext;
 
 /**
  * Sets up the HTTP Server process and dispatching to the associated resources. 
@@ -154,6 +155,8 @@ public class Server extends Application {
     authRouter.attach("/devtime/{user}/{project}/{timestamp}", DevTimeResource.class);
     authRouter.attach("/unittest/{user}/{projectname}/{timestamp}", 
         UnitTestDPDResource.class);
+    authRouter.attach("/codeissue/{user}/{project}/{timestamp}", CodeIssueResource.class);
+    authRouter.attach("/coverage/{user}/{project}/{timestamp}/{type}", CoverageResource.class);
     // Here's the Guard that we will place in front of authRouter.
     Guard guard = new Authenticator(getContext(), 
         this.getServerProperties().get(SENSORBASE_FULLHOST_KEY));
