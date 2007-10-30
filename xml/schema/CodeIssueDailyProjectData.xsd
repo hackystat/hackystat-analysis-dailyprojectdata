@@ -4,12 +4,11 @@
 	<xs:attribute name="Project" type="xs:string" />
 	<xs:attribute name="Owner" type="xs:string" />
 	<xs:attribute name="StartTime" type="xs:dateTime" />
-	<xs:attribute name="Tool" type="xs:string" />
-	<xs:attribute name="Category" type="xs:string" />
 	<xs:attribute name="UriPattern" type="xs:anyURI" />
 
 	<xs:attribute name="MemberUri" type="xs:anyURI" />
 	<xs:attribute name="CodeIssues" type="xs:string" />
+	<xs:attribute name="Tool" type="xs:string" />
 
 	<xs:element name="CodeIssueDailyProjectData">
 		<xs:complexType>
@@ -19,8 +18,6 @@
 			<xs:attribute ref="Project" />
 			<xs:attribute ref="Owner" />
 			<xs:attribute ref="StartTime" />
-			<xs:attribute ref="Tool" />
-			<xs:attribute ref="Category" />
 			<xs:attribute ref="UriPattern" />
 		</xs:complexType>
 	</xs:element>
@@ -28,6 +25,8 @@
 	<xs:element name="MemberData">
 		<xs:complexType>
 			<xs:attribute ref="MemberUri" />
+			<xs:attribute ref="Tool" />
+			<xs:attribute name="Category" type="xs:string" use="optional" />
 			<xs:attribute ref="CodeIssues" />
 		</xs:complexType>
 	</xs:element>
