@@ -94,9 +94,14 @@ public class Server extends Application {
     // Create and store the JAXBContext instances on the server context.
     // They are supposed to be thread safe. 
     Map<String, Object> attributes = server.getContext().getAttributes();
+    
     JAXBContext devTimeJAXB = JAXBContext.newInstance(
         org.hackystat.dailyprojectdata.resource.devtime.jaxb.ObjectFactory.class);
     attributes.put("DevTimeJAXB", devTimeJAXB);
+    
+    JAXBContext unitTestJAXB = JAXBContext.newInstance(
+        org.hackystat.dailyprojectdata.resource.unittest.jaxb.ObjectFactory.class);
+    attributes.put("UnitTestJAXB", unitTestJAXB);
     
     // Provide a pointer to this server in the Context so that Resources can get at this server.
     attributes.put("DailyProjectDataServer", server);
@@ -153,7 +158,7 @@ public class Server extends Application {
     // requests will require authentication.
     Router authRouter = new Router(getContext());
     authRouter.attach("/devtime/{user}/{project}/{timestamp}", DevTimeResource.class);
-    authRouter.attach("/unittest/{user}/{projectname}/{timestamp}", 
+    authRouter.attach("/unittest/{user}/{project}/{timestamp}", 
         UnitTestDPDResource.class);
     authRouter.attach("/codeissue/{user}/{project}/{timestamp}", CodeIssueResource.class);
     authRouter.attach("/coverage/{user}/{project}/{timestamp}/{type}", CoverageResource.class);

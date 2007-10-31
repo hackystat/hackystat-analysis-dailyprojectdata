@@ -1,11 +1,34 @@
 package org.hackystat.dailyprojectdata.resource.unittest;
 
+import static org.hackystat.dailyprojectdata.server.ServerProperties.SENSORBASE_FULLHOST_KEY;
+
+import java.io.StringWriter;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Marshaller;
+import javax.xml.datatype.XMLGregorianCalendar;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
 import org.hackystat.dailyprojectdata.resource.dailyprojectdata.DailyProjectDataResource;
+import org.hackystat.dailyprojectdata.resource.unittest.jaxb.MemberData;
+import org.hackystat.dailyprojectdata.resource.unittest.jaxb.UnitTestDailyProjectData;
+import org.hackystat.sensorbase.client.SensorBaseClient;
+import org.hackystat.sensorbase.resource.sensordata.jaxb.SensorDataIndex;
+import org.hackystat.sensorbase.resource.sensordata.jaxb.SensorDataRef;
+import org.hackystat.utilities.stacktrace.StackTrace;
+import org.hackystat.utilities.tstamp.Tstamp;
 import org.restlet.Context;
+import org.restlet.data.MediaType;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.resource.Representation;
 import org.restlet.resource.Variant;
+import org.w3c.dom.Document;
 
 /**
  * Implements the Resource for processing GET {host}/unitetst/{user}/{projectname}/{timestamp}
@@ -25,8 +48,8 @@ public class UnitTestDPDResource extends DailyProjectDataResource {
    * @param response The response object.
    */
   public UnitTestDPDResource(Context context, Request request, Response response) {
+    // Auto-generated constructor stub
     super(context, request, response);
-    // TODO Auto-generated constructor stub
   }
 
   /**
@@ -37,8 +60,74 @@ public class UnitTestDPDResource extends DailyProjectDataResource {
    */
   @Override
   public Representation getRepresentation(Variant variant) {
-    // TODO Auto-generated method stub
+    if (variant.getMediaType().equals(MediaType.TEXT_XML)) {
+      try {
+        // [1] get the SensorBaseClient for the user making this request.
+        SensorBaseClient client = super.getSensorBaseClient();
+        // [2] get a SensorDataIndex of UnitTest sensor data for this Project on the requested day.
+        XMLGregorianCalendar startTime = Tstamp.makeTimestamp(this.timestamp);
+        XMLGregorianCalendar endTime = Tstamp.incrementDays(startTime, 1);
+        SensorDataIndex index = client.getProjectSensorData(authUser, project, startTime, endTime);
+        // [3] look through this index for UnitTest sensor data, and update counters.
+        UnitTestDPDCounter counter = new UnitTestDPDCounter();
+        for (SensorDataRef ref : index.getSensorDataRef()) {
+          if (ref.getSensorDataType().equals("UnitTest")) {
+            // [4] looks like we got some UnitTest data in here - accounting
+            counter.add(client.getSensorData(ref));
+          } // if UnitTest
+        } // for
+
+        // return resulting data
+        UnitTestDailyProjectData unitTestDPD = new UnitTestDailyProjectData();
+        // create the individual MemberData elements.
+        String sensorBaseHost = this.server.getServerProperties().get(SENSORBASE_FULLHOST_KEY);
+        for (String member : counter.getMembers()) {
+          MemberData memberData = new MemberData();
+          memberData.setMemberUri(sensorBaseHost + "users/" + member);
+          memberData.setSuccess(counter.getMemberSuccessCount(member));
+          memberData.setFailure(counter.getMemberFailureCount(member));
+          unitTestDPD.getMemberData().add(memberData);
+        }
+
+        unitTestDPD.setOwner(uriUser);
+        unitTestDPD.setProject(project);
+        unitTestDPD.setStartTime(startTime);
+        unitTestDPD.setUriPattern("**"); // we don't support UriPatterns yet.
+
+        String xmlData = makeUnitTestDPD(unitTestDPD);
+        return super.getStringRepresentation(xmlData);
+
+      }
+      catch (Exception e) {
+        server.getLogger().warning("Error processing unitTest: " + StackTrace.toString(e));
+        return null;
+      }
+    }
     return null;
   }
 
+  /**
+   * Returns the passed UnitTestDPD instance as a String encoding of its XML representation.
+   * 
+   * @param data The UnitTestDPD instance.
+   * @return The XML String representation.
+   * @throws Exception If problems occur during translation.
+   */
+  private String makeUnitTestDPD(UnitTestDailyProjectData data) throws Exception {
+    JAXBContext unitTestJAXB = (JAXBContext) this.server.getContext().getAttributes().get(
+        "UnitTestJAXB");
+    Marshaller marshaller = unitTestJAXB.createMarshaller();
+    DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+    dbf.setNamespaceAware(true);
+    DocumentBuilder documentBuilder = dbf.newDocumentBuilder();
+    Document doc = documentBuilder.newDocument();
+    marshaller.marshal(data, doc);
+    DOMSource domSource = new DOMSource(doc);
+    StringWriter writer = new StringWriter();
+    StreamResult result = new StreamResult(writer);
+    TransformerFactory tf = TransformerFactory.newInstance();
+    Transformer transformer = tf.newTransformer();
+    transformer.transform(domSource, result);
+    return writer.toString();
+  }
 }

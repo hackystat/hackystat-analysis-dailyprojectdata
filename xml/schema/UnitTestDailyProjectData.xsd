@@ -7,8 +7,8 @@
 	<xs:attribute name="UriPattern" type="xs:anyURI" />
 
 	<xs:attribute name="MemberUri" type="xs:anyURI" />
-	<xs:attribute name="success" type="xs:string" />
-	<xs:attribute name="failure" type="xs:string" />
+	<xs:attribute name="success" type="xs:integer" />
+	<xs:attribute name="failure" type="xs:integer" />
 
 	<xs:element name="UnitTestDailyProjectData">
 		<xs:complexType>
