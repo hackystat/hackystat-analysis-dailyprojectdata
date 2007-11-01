@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <!-- Primitive elements and attributes -->
+  <xs:attribute name="Project" type="xs:string"/>
+  <xs:attribute name="Owner" type="xs:string"/>
+  <xs:attribute name="StartTime" type="xs:dateTime"/>
+  <xs:attribute name="SizeMetric" type="xs:string"/>
+  <xs:attribute name="Tool" type="xs:string"/>
+  <xs:attribute name="UriPattern" type="xs:string"/>
+  <xs:attribute name="FileUri" type="xs:anyURI"/>
+  <xs:attribute name="SizeMetricValue" type="xs:integer"/>
+  <xs:attribute name="TotalSizeMetricValue" type="xs:integer"/>
+  
+  <xs:element name="FileMetricDailyProjectData">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="FileData" minOccurs="1" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attribute ref="Project" use="required"/>
+      <xs:attribute ref="Owner" use="required"/>
+      <xs:attribute ref="StartTime" use="required"/>
+      <xs:attribute ref="SizeMetric" use="required"/>
+      <xs:attribute ref="Tool" use="required"/>
+      <xs:attribute ref="UriPattern" use="required"/>
+      <xs:attribute ref="TotalSizeMetricValue" use="required"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="FileData">
+    <xs:complexType>
+      <xs:attribute ref="FileUri" use="required"/>
+      <xs:attribute ref="SizeMetricValue" use="required"/>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
+
+
+
+
+
+
+
+
+
+
+

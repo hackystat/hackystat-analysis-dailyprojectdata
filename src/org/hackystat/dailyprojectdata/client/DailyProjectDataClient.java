@@ -1,12 +1,11 @@
 package org.hackystat.dailyprojectdata.client;
 
 import java.io.StringReader;
-
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.datatype.XMLGregorianCalendar;
-
 import org.hackystat.dailyprojectdata.resource.devtime.jaxb.DevTimeDailyProjectData;
+import org.hackystat.dailyprojectdata.resource.filemetric.jaxb.FileMetricDailyProjectData;
 import org.hackystat.dailyprojectdata.resource.unittest.jaxb.UnitTestDailyProjectData;
 import org.restlet.Client;
 import org.restlet.data.ChallengeResponse;
@@ -32,12 +31,17 @@ public class DailyProjectDataClient {
   private String userEmail;
   /** Holds the password to be associated with this client. */
   private String password;
-  /** The DailyProjectData host, such as "http://localhost:9877/dailyprojectdata". */
+  /**
+   * The DailyProjectData host, such as
+   * "http://localhost:9877/dailyprojectdata".
+   */
   private String dailyProjectDataHost;
   /** The Restlet Client instance used to communicate with the server. */
   private Client client;
   /** DevTime JAXBContext */
   private JAXBContext devTimeJAXB;
+  /** FileMetric JAXBContext */
+  private JAXBContext fileMetricJAXB;
   /** UnitTest JAXBContext */
   private JAXBContext unitTestJAXB;
   /** The http authentication approach. */
@@ -78,8 +82,9 @@ public class DailyProjectDataClient {
           .newInstance(org.hackystat.dailyprojectdata.resource.devtime.jaxb.ObjectFactory.class);
       this.unitTestJAXB = JAXBContext
           .newInstance(org.hackystat.dailyprojectdata.resource.unittest.jaxb.ObjectFactory.class);
-    }
-    catch (Exception e) {
+      this.fileMetricJAXB = JAXBContext
+          .newInstance(org.hackystat.dailyprojectdata.resource.filemetric.jaxb.ObjectFactory.class);
+    } catch (Exception e) {
       throw new RuntimeException("Couldn't create JAXB context instances.", e);
     }
   }
@@ -115,8 +120,7 @@ public class DailyProjectDataClient {
       if (entity != null) {
         try {
           System.out.println(entity.getText());
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
           System.out.println("  Problems with getText() on entity.");
         }
       }
@@ -151,7 +155,8 @@ public class DailyProjectDataClient {
    * @throws DailyProjectDataClientException If authentication is not successful.
    */
   public synchronized DailyProjectDataClient authenticate() throws DailyProjectDataClientException {
-    // Performs authentication by invoking ping with user and password as form params.
+    // Performs authentication by invoking ping with user and password as form
+    // params.
     String uri = "ping?user=" + this.userEmail + "&password=" + this.password;
     Response response = makeRequest(Method.GET, uri, null);
     if (!response.getStatus().isSuccess()) {
@@ -160,8 +165,7 @@ public class DailyProjectDataClient {
     String responseString;
     try {
       responseString = response.getEntity().getText();
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       throw new DailyProjectDataClientException("Bad response", e);
     }
     if (!"DailyProjectData authenticated".equals(responseString)) {
@@ -194,8 +198,7 @@ public class DailyProjectDataClient {
       String xmlData = response.getEntity().getText();
       System.out.println(xmlData);
       devTime = makeDevTimeDailyProjectData(xmlData);
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       throw new DailyProjectDataClientException(response.getStatus(), e);
     }
     return devTime;
@@ -230,7 +233,7 @@ public class DailyProjectDataClient {
     }
     return unitDPD;
   }
-
+  
   /**
    * Takes a String encoding of a UnitTestDailyProjectData in XML format and converts it.
    * 
@@ -265,10 +268,54 @@ public class DailyProjectDataClient {
       Response response = client.handle(request);
       String pingText = response.getEntity().getText();
       return (response.getStatus().isSuccess() && "DailyProjectData".equals(pingText));
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       return false;
     }
   }
 
+  /**
+   * Returns a FileMetricDailyProjectData instance from this server, or throws a DailyProjectData
+   * exception if problems occurred.
+   * 
+   * @param user The user that owns the project.
+   * @param project The project owned by user.
+   * @param timestamp The Timestamp indicating the start of the 24 hour period of DevTime.
+   * @return A FileMetricDailyProjectData instance.
+   * @throws DailyProjectDataClientException If the credentials associated with this instance are
+   *         not valid, or if the underlying SensorBase service cannot be reached, or if one or more
+   *         of the supplied user, password, or timestamp is not valid.
+   */
+  public synchronized FileMetricDailyProjectData getFileMetric(String user, String project,
+      XMLGregorianCalendar timestamp) throws DailyProjectDataClientException {
+    Response response = makeRequest(Method.GET, "filemetric/" + user + "/" + project + "/"
+        + timestamp, null);
+    FileMetricDailyProjectData fileMetric;
+    if (!response.getStatus().isSuccess()) {
+      System.err.println("filemetric/" + user + "/" + project + "/"
+          + timestamp);
+      throw new DailyProjectDataClientException(response.getStatus());
+    }
+    try {
+      String xmlData = response.getEntity().getText();
+      fileMetric = makeFileMetricDailyProjectData(xmlData);
+    } catch (Exception e) {
+      throw new DailyProjectDataClientException(response.getStatus(), e);
+    }
+    return fileMetric;
+  }
+
+
+  /**
+   * Takes a String encoding of a FileMetricDailyProjectData in XML format and
+   * converts it.
+   * 
+   * @param xmlString The XML string representing a DevTimeDailyProjectData.
+   * @return The corresponding DevTimeDailyProjectData instance.
+   * @throws Exception If problems occur during unmarshalling.
+   */
+  private FileMetricDailyProjectData makeFileMetricDailyProjectData(String xmlString)
+      throws Exception {
+    Unmarshaller unmarshaller = this.fileMetricJAXB.createUnmarshaller();
+    return (FileMetricDailyProjectData) unmarshaller.unmarshal(new StringReader(xmlString));
+  }
 }

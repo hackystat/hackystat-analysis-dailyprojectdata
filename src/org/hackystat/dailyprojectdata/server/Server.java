@@ -17,6 +17,7 @@ import javax.xml.bind.JAXBContext;
 import org.hackystat.dailyprojectdata.resource.codeissue.CodeIssueResource;
 import org.hackystat.dailyprojectdata.resource.coverage.CoverageResource;
 import org.hackystat.dailyprojectdata.resource.devtime.DevTimeResource;
+import org.hackystat.dailyprojectdata.resource.filemetric.FileMetricResource;
 import org.hackystat.dailyprojectdata.resource.ping.PingResource;
 import org.hackystat.dailyprojectdata.resource.unittest.UnitTestDPDResource;
 import org.hackystat.sensorbase.client.SensorBaseClient;
@@ -98,6 +99,10 @@ public class Server extends Application {
     JAXBContext devTimeJAXB = JAXBContext.newInstance(
         org.hackystat.dailyprojectdata.resource.devtime.jaxb.ObjectFactory.class);
     attributes.put("DevTimeJAXB", devTimeJAXB);
+    JAXBContext fileMetricJAXB = JAXBContext.newInstance(
+        org.hackystat.dailyprojectdata.resource.filemetric.jaxb.ObjectFactory.class);
+    attributes.put("FileMetricJAXB", fileMetricJAXB);
+
     
     JAXBContext unitTestJAXB = JAXBContext.newInstance(
         org.hackystat.dailyprojectdata.resource.unittest.jaxb.ObjectFactory.class);
@@ -158,10 +163,11 @@ public class Server extends Application {
     // requests will require authentication.
     Router authRouter = new Router(getContext());
     authRouter.attach("/devtime/{user}/{project}/{timestamp}", DevTimeResource.class);
-    authRouter.attach("/unittest/{user}/{project}/{timestamp}", 
-        UnitTestDPDResource.class);
+    authRouter.attach("/filemetric/{user}/{project}/{timestamp}", FileMetricResource.class);
+    authRouter.attach("/unittest/{user}/{project}/{timestamp}", UnitTestDPDResource.class);
     authRouter.attach("/codeissue/{user}/{project}/{timestamp}", CodeIssueResource.class);
     authRouter.attach("/coverage/{user}/{project}/{timestamp}/{type}", CoverageResource.class);
+
     // Here's the Guard that we will place in front of authRouter.
     Guard guard = new Authenticator(getContext(), 
         this.getServerProperties().get(SENSORBASE_FULLHOST_KEY));

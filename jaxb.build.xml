@@ -25,5 +25,8 @@
 		<xjc schema="${basedir}/xml/schema/CoverageDailyProjectData.xsd" destdir="src" package="org.hackystat.dailyprojectdata.resource.coverage.jaxb">
 			<produces dir="${src.dir}/org/hackystat/dailyprojectdata/resource/coverage/jaxb" includes="*" />
 		</xjc>
+       <xjc schema="${basedir}/xml/schema/FileMetricDailyProjectData.xsd" destdir="src" package="org.hackystat.dailyprojectdata.resource.filemetric.jaxb">
+            <produces dir="${src.dir}/org/hackystat/dailyprojectdata/resource/filemetric/jaxb" includes="*" />
+       </xjc>
 	</target>
 </project>
