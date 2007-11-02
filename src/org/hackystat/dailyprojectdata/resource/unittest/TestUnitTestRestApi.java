@@ -1,8 +1,13 @@
 package org.hackystat.dailyprojectdata.resource.unittest;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.math.BigInteger;
+import java.util.List;
+
 import org.hackystat.dailyprojectdata.client.DailyProjectDataClient;
+import org.hackystat.dailyprojectdata.resource.unittest.jaxb.MemberData;
 import org.hackystat.dailyprojectdata.resource.unittest.jaxb.UnitTestDailyProjectData;
 import org.hackystat.dailyprojectdata.test.DailyProjectDataTestHelper;
 import org.hackystat.sensorbase.client.SensorBaseClient;
@@ -53,7 +58,14 @@ public class TestUnitTestRestApi extends DailyProjectDataTestHelper {
     UnitTestDailyProjectData unitDPD = dpdClient.getUnitTestDPD(user, "Default", Tstamp
         .makeTimestamp("2007-04-30"));
     assertTrue("Checking default devTime", user.equalsIgnoreCase(unitDPD.getOwner()));
-    // assertEquals("Checking MemberData size", 1, devTime.getMemberData().size());
+
+    List<MemberData> md = unitDPD.getMemberData();
+    MemberData usrData = md.get(0);
+
+    assertEquals("Checking Failures", BigInteger.valueOf(2), usrData.getFailure());
+
+    assertEquals("Checking Success", BigInteger.valueOf(0), usrData.getSuccess());
+
   }
 
   // Map<String, String> keyValMap = new HashMap<String, String>();

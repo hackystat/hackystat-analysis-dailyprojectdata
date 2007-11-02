@@ -122,7 +122,7 @@ public class UnitTestDPDTestHelper {
 
     property = new Property();
     property.setKey("Result");
-    property.setValue("pass");
+    property.setValue("failure");
     prop.getProperty().add(property);
 
     // optional properties
