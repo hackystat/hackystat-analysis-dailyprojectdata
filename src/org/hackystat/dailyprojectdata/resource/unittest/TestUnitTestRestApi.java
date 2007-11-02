@@ -2,24 +2,19 @@ package org.hackystat.dailyprojectdata.resource.unittest;
 
 import static org.junit.Assert.assertTrue;
 
-import javax.xml.datatype.XMLGregorianCalendar;
-
 import org.hackystat.dailyprojectdata.client.DailyProjectDataClient;
 import org.hackystat.dailyprojectdata.resource.unittest.jaxb.UnitTestDailyProjectData;
 import org.hackystat.dailyprojectdata.test.DailyProjectDataTestHelper;
 import org.hackystat.sensorbase.client.SensorBaseClient;
-import org.hackystat.sensorbase.resource.sensordata.jaxb.Properties;
-import org.hackystat.sensorbase.resource.sensordata.jaxb.Property;
-import org.hackystat.sensorbase.resource.sensordata.jaxb.SensorData;
 import org.hackystat.sensorbase.resource.sensordata.jaxb.SensorDatas;
 import org.hackystat.utilities.tstamp.Tstamp;
 import org.junit.Test;
 
 /**
  * Runs test to exercise DPDResource.
- * 
+ *
  * @author Pavel Senin.
- * 
+ *
  */
 public class TestUnitTestRestApi extends DailyProjectDataTestHelper {
 
@@ -31,17 +26,18 @@ public class TestUnitTestRestApi extends DailyProjectDataTestHelper {
    * test user and sends some sample DevEvent data to the SensorBase. Then, it invokes the GET
    * request and checks to see that it obtains the right answer. Finally, it deletes the data and
    * the user.
-   * 
+   *
    * @throws Exception If problems occur.
    */
   @Test
   public void getDefaultUnitTestDPD() throws Exception {
     // First, create a batch of DevEvent sensor data.
     SensorDatas batchData = new SensorDatas();
-    batchData.getSensorData().add(makeUnitTestEvent("2007-04-30T02:00:00", user));
-    batchData.getSensorData().add(makeUnitTestEvent("2007-04-30T02:10:00", user));
-    batchData.getSensorData().add(makeUnitTestEvent("2007-04-29T23:55:00", user));
-    batchData.getSensorData().add(makeUnitTestEvent("2007-05-01T00:01:00", user));
+    UnitTestDPDTestHelper helper = new UnitTestDPDTestHelper();
+    batchData.getSensorData().add(helper.makeUnitTestEvent("2007-04-30T02:00:00", user));
+    batchData.getSensorData().add(helper.makeUnitTestEvent("2007-04-30T02:10:00", user));
+    batchData.getSensorData().add(helper.makeUnitTestEvent("2007-04-29T23:55:00", user));
+    batchData.getSensorData().add(helper.makeUnitTestEvent("2007-05-01T00:01:00", user));
 
     // Connect to the sensorbase and register the DailyProjectDataDevEvent user.
     SensorBaseClient.registerUser(getSensorBaseHostName(), user);
@@ -58,71 +54,6 @@ public class TestUnitTestRestApi extends DailyProjectDataTestHelper {
         .makeTimestamp("2007-04-30"));
     assertTrue("Checking default devTime", user.equalsIgnoreCase(unitDPD.getOwner()));
     // assertEquals("Checking MemberData size", 1, devTime.getMemberData().size());
-  }
-
-  /**
-   * Creates a sample SensorData UnitTest instance given a timestamp and a user.
-   * 
-   * @param tstampString The timestamp as a string
-   * @param user The user.
-   * @return The new SensorData DevEvent instance.
-   * @throws Exception If problems occur.
-   */
-  private SensorData makeUnitTestEvent(String tstampString, String user) throws Exception {
-    XMLGregorianCalendar tstamp = Tstamp.makeTimestamp(tstampString);
-    String sdt = "UnitTest";
-    SensorData data = new SensorData();
-    String tool = "JUnit";
-    data.setTool(tool);
-    data.setOwner(user);
-    data.setSensorDataType(sdt);
-    data.setTimestamp(tstamp);
-    data.setResource("file://foo/bar/baz.txt");
-    data.setRuntime(tstamp);
-
-    // test count, test time, success, failure
-    Properties prop = new Properties();
-
-    // required properties
-    Property property = new Property();
-    property.setKey("Name");
-    property.setValue("testName");
-    prop.getProperty().add(property);
-
-    property = new Property();
-    property.setKey("Result");
-    property.setValue("pass");
-    prop.getProperty().add(property);
-
-    // optional properties
-    property = new Property();
-    property.setKey("elapsedTime");
-    property.setValue("15");
-    prop.getProperty().add(property);
-
-    property = new Property();
-    property.setKey("testName");
-    property.setValue("org.hackystat.core.installer.util.TestProxyProperty");
-    prop.getProperty().add(property);
-
-    property = new Property();
-    property.setKey("testCaseName");
-    property.setValue("testNormalFunctionality");
-    prop.getProperty().add(property);
-
-    property = new Property();
-    property.setKey("failureString");
-    property.setValue("Value should be the same. expected:<[8]0> but was:<[9]0>");
-    prop.getProperty().add(property);
-
-    property = new Property();
-    property.setKey("errorString");
-    property.setValue("Value of error string");
-    prop.getProperty().add(property);
-
-    data.setProperties(prop);
-
-    return data;
   }
 
   // Map<String, String> keyValMap = new HashMap<String, String>();

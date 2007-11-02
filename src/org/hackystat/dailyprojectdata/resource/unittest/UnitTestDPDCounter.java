@@ -12,9 +12,9 @@ import org.hackystat.sensorbase.resource.sensordata.jaxb.SensorData;
 
 /**
  * Makes easier UnitTest DPD calculation.
- * 
+ *
  * @author Pavel Senin.
- * 
+ *
  */
 public class UnitTestDPDCounter {
 
@@ -30,7 +30,7 @@ public class UnitTestDPDCounter {
 
   /**
    * Does accounting using sensor data provided.
-   * 
+   *
    * @param data unit test sensor data.
    */
   public void add(SensorData data) {
@@ -46,11 +46,11 @@ public class UnitTestDPDCounter {
     Properties props = data.getProperties();
     Boolean err = false;
     for (Property p : props.getProperty()) {
-      if ((p.getKey().equalsIgnoreCase("errorString")) && (p.getKey() != null)) {
+      if ((p.getKey().equalsIgnoreCase("errorString")) && (p.getValue() != null)) {
         error += 1;
         err = true;
       }
-      else if ((p.getKey().equalsIgnoreCase("failureString")) && (p.getKey() != null)) {
+      else if ((p.getKey().equalsIgnoreCase("failureString")) && (p.getValue() != null)) {
         failure += 1;
         err = true;
       }
@@ -72,13 +72,13 @@ public class UnitTestDPDCounter {
 
   /**
    * Returns the UnitTest failure count associated with Member, or zero if member does not exist.
-   * 
+   *
    * @param member The member.
    * @return The member's failure count.
    */
   public BigInteger getMemberFailureCount(String member) {
     if (member2unitTestDPD.containsKey(member)) {
-      return member2unitTestDPD.get(member).getSuccessCount();
+      return member2unitTestDPD.get(member).getFailureCount();
     }
     else {
       return BigInteger.valueOf(0);
@@ -87,7 +87,7 @@ public class UnitTestDPDCounter {
 
   /**
    * Returns a newly created Set containing all of the members in this UnitTestDPDCounter.
-   * 
+   *
    * @return The set of all members in this UnitTestDPDCounter.
    */
   public Set<String> getMembers() {
@@ -98,7 +98,7 @@ public class UnitTestDPDCounter {
 
   /**
    * Returns the UnitTest success count associated with Member, or zero if member does not exist.
-   * 
+   *
    * @param member The member.
    * @return The member's success count.
    */
