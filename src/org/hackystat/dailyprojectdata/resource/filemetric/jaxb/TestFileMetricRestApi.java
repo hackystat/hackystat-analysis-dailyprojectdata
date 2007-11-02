@@ -3,7 +3,6 @@ package org.hackystat.dailyprojectdata.resource.filemetric.jaxb;
 import static org.junit.Assert.assertEquals;
 import javax.xml.datatype.XMLGregorianCalendar;
 import org.hackystat.dailyprojectdata.client.DailyProjectDataClient;
-import org.hackystat.dailyprojectdata.resource.devtime.jaxb.DevTimeDailyProjectData;
 import org.hackystat.dailyprojectdata.test.DailyProjectDataTestHelper;
 import org.hackystat.sensorbase.client.SensorBaseClient;
 import org.hackystat.sensorbase.resource.sensordata.jaxb.Properties;
@@ -23,7 +22,7 @@ public class TestFileMetricRestApi extends DailyProjectDataTestHelper {
    * First, it creates a test user and sends some sample FileMetric data to the
    * SensorBase. Then, it invokes the GET request and checks to see that it
    * obtains the right answer. Finally, it deletes the data and the user.
-   * 
+   *
    * @throws Exception If problems occur.
    */
   @Test
@@ -57,7 +56,7 @@ public class TestFileMetricRestApi extends DailyProjectDataTestHelper {
     DailyProjectDataClient dpdClient = new DailyProjectDataClient(getDailyProjectDataHostName(),
         user, user);
     dpdClient.authenticate();
-    FileMetricDailyProjectData fileMetric = dpdClient.getFileMetric(user, "Default", 
+    FileMetricDailyProjectData fileMetric = dpdClient.getFileMetric(user, "Default",
         Tstamp.makeTimestamp("2007-04-30"));
     assertEquals("Checking default devTime", 570, fileMetric.getTotalSizeMetricValue().intValue());
     assertEquals("Checking MemberData size", 2, fileMetric.getFileData().size());
@@ -66,7 +65,7 @@ public class TestFileMetricRestApi extends DailyProjectDataTestHelper {
 
   /**
    * Creates a sample SensorData DevEvent instance given a timestamp and a user.
-   * 
+   *
    * @param tstampString The timestamp as a string
    * @param user The user.
    * @return The new SensorData DevEvent instance.
