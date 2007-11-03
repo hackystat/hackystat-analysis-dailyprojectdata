@@ -58,9 +58,14 @@ public class TestFileMetricRestApi extends DailyProjectDataTestHelper {
     dpdClient.authenticate();
     FileMetricDailyProjectData fileMetric = dpdClient.getFileMetric(user, "Default",
         Tstamp.makeTimestamp("2007-04-30"));
-    assertEquals("Checking default devTime", 570, fileMetric.getTotalSizeMetricValue().intValue());
+    assertEquals("Checking default fileMetric", 570, fileMetric.getTotalSizeMetricValue().intValue());
     assertEquals("Checking MemberData size", 2, fileMetric.getFileData().size());
-
+    fileMetric = dpdClient.getFileMetric(user, "Default", Tstamp.makeTimestamp("2007-05-01"));
+    // the value should be 0
+    assertEquals("Checking fileMetric day after data", 0, fileMetric.getTotalSizeMetricValue()
+        .intValue());
+    fileMetric = dpdClient.getFileMetric(user, "Default", Tstamp.makeTimestamp("2005-04-12"));
+    assertEquals("Checking fileMetric before any data.", 0 , fileMetric.getTotalSizeMetricValue());
   }
 
   /**
@@ -71,8 +76,8 @@ public class TestFileMetricRestApi extends DailyProjectDataTestHelper {
    * @return The new SensorData DevEvent instance.
    * @throws Exception If problems occur.
    */
-  private SensorData makeFileMetric(String runTstampString, String tstampString, String user, String file, String size)
-      throws Exception {
+  private SensorData makeFileMetric(String runTstampString, String tstampString, String user,
+      String file, String size) throws Exception {
     XMLGregorianCalendar tstamp = Tstamp.makeTimestamp(tstampString);
     XMLGregorianCalendar runStamp = Tstamp.makeTimestamp(runTstampString);
     String sdt = "FileMetric";

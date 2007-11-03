@@ -89,16 +89,16 @@ public class FileMetricResource extends DailyProjectDataResource {
           fileData.setSizeMetricValue(counter.getTotalLines(data));
           fileSize.getFileData().add(fileData);
         }
-         fileSize.setOwner(uriUser);
-         fileSize.setProject(project);
-         fileSize.setUriPattern("**"); // we don't support UriPatterns yet.
-         fileSize.setSizeMetric("LOC");
-         fileSize.setTotalSizeMetricValue(counter.getTotalLines());
-         fileSize.setStartTime(counter.getLastTime());
-         String xmlData = makeFileMetric(fileSize);
-         return super.getStringRepresentation(xmlData);
+        fileSize.setOwner(uriUser);
+        fileSize.setProject(project);
+        fileSize.setUriPattern("**"); // we don't support UriPatterns yet.
+        fileSize.setSizeMetric("LOC");
+        fileSize.setTotalSizeMetricValue(counter.getTotalLines());
+        fileSize.setStartTime(counter.getLastTime());
+        String xmlData = makeFileMetric(fileSize);
+        return super.getStringRepresentation(xmlData);
       } catch (Exception e) {
-        server.getLogger().warning("Error processing devTime: " + StackTrace.toString(e));
+        server.getLogger().warning("Error processing fileMetric: " + StackTrace.toString(e));
         return null;
       }
     }
@@ -106,15 +106,17 @@ public class FileMetricResource extends DailyProjectDataResource {
   }
 
   /**
-   * Returns the passed SensorData instance as a String encoding of its XML representation.
-   * @param data The SensorData instance. 
+   * Returns the passed SensorData instance as a String encoding of its XML
+   * representation.
+   * 
+   * @param data The SensorData instance.
    * @return The XML String representation.
-   * @throws Exception If problems occur during translation. 
+   * @throws Exception If problems occur during translation.
    */
-  private String makeFileMetric (FileMetricDailyProjectData data) throws Exception {
-    JAXBContext fileMetricJAXB = 
-      (JAXBContext)this.server.getContext().getAttributes().get("FileMetricJAXB");
-    Marshaller marshaller = fileMetricJAXB.createMarshaller(); 
+  private String makeFileMetric(FileMetricDailyProjectData data) throws Exception {
+    JAXBContext fileMetricJAXB = (JAXBContext) this.server.getContext().getAttributes().get(
+        "FileMetricJAXB");
+    Marshaller marshaller = fileMetricJAXB.createMarshaller();
     DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
     dbf.setNamespaceAware(true);
     DocumentBuilder documentBuilder = dbf.newDocumentBuilder();
