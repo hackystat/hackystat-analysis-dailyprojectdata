@@ -4,6 +4,8 @@ import java.io.StringReader;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.datatype.XMLGregorianCalendar;
+
+import org.hackystat.dailyprojectdata.resource.codeissue.jaxb.CodeIssueDailyProjectData;
 import org.hackystat.dailyprojectdata.resource.devtime.jaxb.DevTimeDailyProjectData;
 import org.hackystat.dailyprojectdata.resource.filemetric.jaxb.FileMetricDailyProjectData;
 import org.hackystat.dailyprojectdata.resource.unittest.jaxb.UnitTestDailyProjectData;
@@ -44,6 +46,8 @@ public class DailyProjectDataClient {
   private JAXBContext fileMetricJAXB;
   /** UnitTest JAXBContext */
   private JAXBContext unitTestJAXB;
+  /** CodeIssue JAXBContext */
+  private JAXBContext codeIssueJAXB;
   /** The http authentication approach. */
   private ChallengeScheme scheme = ChallengeScheme.HTTP_BASIC;
   /** The preferred representation type. */
@@ -84,6 +88,8 @@ public class DailyProjectDataClient {
           .newInstance(org.hackystat.dailyprojectdata.resource.unittest.jaxb.ObjectFactory.class);
       this.fileMetricJAXB = JAXBContext
           .newInstance(org.hackystat.dailyprojectdata.resource.filemetric.jaxb.ObjectFactory.class);
+      this.codeIssueJAXB = JAXBContext
+      .newInstance(org.hackystat.dailyprojectdata.resource.codeissue.jaxb.ObjectFactory.class);
     } catch (Exception e) {
       throw new RuntimeException("Couldn't create JAXB context instances.", e);
     }
@@ -317,5 +323,80 @@ public class DailyProjectDataClient {
       throws Exception {
     Unmarshaller unmarshaller = this.fileMetricJAXB.createUnmarshaller();
     return (FileMetricDailyProjectData) unmarshaller.unmarshal(new StringReader(xmlString));
+  }
+  
+  /**
+   * Returns a CodeIssueDailyProjectData instance from this server, or throws a DailyProjectData
+   * exception if problems occurred.
+   * 
+   * @param user The user that owns the project.
+   * @param project The project owned by user.
+   * @param timestamp The Timestamp indicating the start of the 24 hour period of CodeIssue data.
+   * @param tool An optional tool for matching CodeIssue data.
+   * @param category An optional category for matching CodeIssue categories.
+   * @return A CodeIssueDailyProjectData instance.
+   * @throws DailyProjectDataClientException If the credentials associated with this instance are
+   *         not valid, or if the underlying SensorBase service cannot be reached, or if one or more
+   *         of the supplied user, password, or timestamp is not valid.
+   */
+  public synchronized CodeIssueDailyProjectData getCodeIssue(String user, String project,
+      XMLGregorianCalendar timestamp, String tool, String category) 
+      throws DailyProjectDataClientException {
+    StringBuilder requestStringBuilder = new StringBuilder("codeissue/");
+    requestStringBuilder.append(user);
+    requestStringBuilder.append("/");
+    requestStringBuilder.append(project);
+    requestStringBuilder.append("/");
+    requestStringBuilder.append(timestamp);
+    
+    boolean questionMarkAppended = false;
+    if (tool != null) {
+      requestStringBuilder.append("?");
+      requestStringBuilder.append("Tool=");
+      requestStringBuilder.append(tool);
+      questionMarkAppended = true;
+    }
+    if (category != null) {
+      if (questionMarkAppended) {
+        requestStringBuilder.append("&");
+      }
+      else {
+        requestStringBuilder.append("?");
+      }
+      requestStringBuilder.append("Category=");
+      requestStringBuilder.append(category);
+    }
+    
+    Response response = makeRequest(Method.GET, requestStringBuilder.toString(), null);
+    
+    CodeIssueDailyProjectData codeIssue;
+    
+    if (!response.getStatus().isSuccess()) {
+      System.err.println(requestStringBuilder.toString());
+      throw new DailyProjectDataClientException(response.getStatus());
+    }
+    try {
+      String xmlData = response.getEntity().getText();
+      codeIssue = makeCodeIssueDailyProjectData(xmlData);
+    } 
+    catch (Exception e) {
+      throw new DailyProjectDataClientException(response.getStatus(), e);
+    }
+    return codeIssue;
+  }
+
+
+  /**
+   * Takes a String encoding of a CodeIssueDailyProjectData in XML format and
+   * converts it.
+   * 
+   * @param xmlString The XML string representing a CodeIssueDailyProjectData.
+   * @return The corresponding CodeIssueDailyProjectData instance.
+   * @throws Exception If problems occur during unmarshalling.
+   */
+  private CodeIssueDailyProjectData makeCodeIssueDailyProjectData(String xmlString)
+      throws Exception {
+    Unmarshaller unmarshaller = this.codeIssueJAXB.createUnmarshaller();
+    return (CodeIssueDailyProjectData) unmarshaller.unmarshal(new StringReader(xmlString));
   }
 }

@@ -108,6 +108,13 @@ public class Server extends Application {
         org.hackystat.dailyprojectdata.resource.unittest.jaxb.ObjectFactory.class);
     attributes.put("UnitTestJAXB", unitTestJAXB);
     
+    JAXBContext codeIssueJAXB = JAXBContext.newInstance(
+        org.hackystat.dailyprojectdata.resource.codeissue.jaxb.ObjectFactory.class);
+    attributes.put("CodeIssueJAXB", codeIssueJAXB);
+    JAXBContext coverageJAXB = JAXBContext.newInstance(
+        org.hackystat.dailyprojectdata.resource.coverage.jaxb.ObjectFactory.class);
+    attributes.put("CoverageJAXB", coverageJAXB);
+    
     // Provide a pointer to this server in the Context so that Resources can get at this server.
     attributes.put("DailyProjectDataServer", server);
     
@@ -166,6 +173,12 @@ public class Server extends Application {
     authRouter.attach("/filemetric/{user}/{project}/{timestamp}", FileMetricResource.class);
     authRouter.attach("/unittest/{user}/{project}/{timestamp}", UnitTestDPDResource.class);
     authRouter.attach("/codeissue/{user}/{project}/{timestamp}", CodeIssueResource.class);
+    authRouter.attach("/codeissue/{user}/{project}/{timestamp}?Tool={Tool}&Category={Category}", 
+        CodeIssueResource.class);
+    authRouter.attach("/codeissue/{user}/{project}/{timestamp}?Tool={Tool}", 
+        CodeIssueResource.class);
+    authRouter.attach("/codeissue/{user}/{project}/{timestamp}?Category={Category}", 
+        CodeIssueResource.class);
     authRouter.attach("/coverage/{user}/{project}/{timestamp}/{type}", CoverageResource.class);
 
     // Here's the Guard that we will place in front of authRouter.

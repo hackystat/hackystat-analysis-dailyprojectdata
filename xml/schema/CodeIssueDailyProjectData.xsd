@@ -7,7 +7,7 @@
 	<xs:attribute name="UriPattern" type="xs:anyURI" />
 
 	<xs:attribute name="MemberUri" type="xs:anyURI" />
-	<xs:attribute name="CodeIssues" type="xs:string" />
+	<xs:attribute name="CodeIssues" type="xs:int" />
 	<xs:attribute name="Tool" type="xs:string" />
 
 	<xs:element name="CodeIssueDailyProjectData">
