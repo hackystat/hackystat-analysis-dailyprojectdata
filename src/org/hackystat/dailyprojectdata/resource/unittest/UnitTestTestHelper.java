@@ -13,7 +13,7 @@ import org.hackystat.utilities.tstamp.Tstamp;
  * @author Pavel Senin.
  *
  */
-public class UnitTestDPDTestHelper {
+public class UnitTestTestHelper {
 
   /**
    * /** Creates a sample SensorData UnitTest instance given a whole set of parameters.
@@ -122,7 +122,7 @@ public class UnitTestDPDTestHelper {
 
     property = new Property();
     property.setKey("Result");
-    property.setValue("failure");
+    property.setValue("pass");
     prop.getProperty().add(property);
 
     // optional properties

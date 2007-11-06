@@ -222,7 +222,7 @@ public class DailyProjectDataClient {
    *         not valid, or if the underlying SensorBase service cannot be reached, or if one or more
    *         of the supplied user, password, or timestamp is not valid.
    */
-  public synchronized UnitTestDailyProjectData getUnitTestDPD(String user, String project,
+  public synchronized UnitTestDailyProjectData getUnitTest(String user, String project,
       XMLGregorianCalendar timestamp) throws DailyProjectDataClientException {
     Response response = makeRequest(Method.GET, "unittest/" + user + "/" + project + "/"
         + timestamp, null);

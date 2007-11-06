@@ -38,7 +38,7 @@ import org.w3c.dom.Document;
  * @author Pavel Senin.
  */
 
-public class UnitTestDPDResource extends DailyProjectDataResource {
+public class UnitTestResource extends DailyProjectDataResource {
 
   /**
    * The standard constructor.
@@ -47,7 +47,7 @@ public class UnitTestDPDResource extends DailyProjectDataResource {
    * @param request The request object.
    * @param response The response object.
    */
-  public UnitTestDPDResource(Context context, Request request, Response response) {
+  public UnitTestResource(Context context, Request request, Response response) {
     // Auto-generated constructor stub
     super(context, request, response);
   }
@@ -69,7 +69,7 @@ public class UnitTestDPDResource extends DailyProjectDataResource {
         XMLGregorianCalendar endTime = Tstamp.incrementDays(startTime, 1);
         SensorDataIndex index = client.getProjectSensorData(authUser, project, startTime, endTime);
         // [3] look through this index for UnitTest sensor data, and update counters.
-        UnitTestDPDCounter counter = new UnitTestDPDCounter();
+        UnitTestCounter counter = new UnitTestCounter();
         for (SensorDataRef ref : index.getSensorDataRef()) {
           if (ref.getSensorDataType().equals("UnitTest")) {
             // [4] looks like we got some UnitTest data in here - accounting

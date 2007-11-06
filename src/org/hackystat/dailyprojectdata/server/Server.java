@@ -19,7 +19,7 @@ import org.hackystat.dailyprojectdata.resource.coverage.CoverageResource;
 import org.hackystat.dailyprojectdata.resource.devtime.DevTimeResource;
 import org.hackystat.dailyprojectdata.resource.filemetric.FileMetricResource;
 import org.hackystat.dailyprojectdata.resource.ping.PingResource;
-import org.hackystat.dailyprojectdata.resource.unittest.UnitTestDPDResource;
+import org.hackystat.dailyprojectdata.resource.unittest.UnitTestResource;
 import org.hackystat.sensorbase.client.SensorBaseClient;
 import org.hackystat.utilities.logger.HackystatLogger;
 import org.restlet.Application;
@@ -171,7 +171,7 @@ public class Server extends Application {
     Router authRouter = new Router(getContext());
     authRouter.attach("/devtime/{user}/{project}/{timestamp}", DevTimeResource.class);
     authRouter.attach("/filemetric/{user}/{project}/{timestamp}", FileMetricResource.class);
-    authRouter.attach("/unittest/{user}/{project}/{timestamp}", UnitTestDPDResource.class);
+    authRouter.attach("/unittest/{user}/{project}/{timestamp}", UnitTestResource.class);
     authRouter.attach("/codeissue/{user}/{project}/{timestamp}", CodeIssueResource.class);
     authRouter.attach("/codeissue/{user}/{project}/{timestamp}?Tool={Tool}&Category={Category}", 
         CodeIssueResource.class);

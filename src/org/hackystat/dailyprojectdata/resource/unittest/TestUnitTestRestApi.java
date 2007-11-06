@@ -38,7 +38,7 @@ public class TestUnitTestRestApi extends DailyProjectDataTestHelper {
   public void getDefaultUnitTestDPD() throws Exception {
     // First, create a batch of DevEvent sensor data.
     SensorDatas batchData = new SensorDatas();
-    UnitTestDPDTestHelper helper = new UnitTestDPDTestHelper();
+    UnitTestTestHelper helper = new UnitTestTestHelper();
     batchData.getSensorData().add(helper.makeUnitTestEvent("2007-04-30T02:00:00", user));
     batchData.getSensorData().add(helper.makeUnitTestEvent("2007-04-30T02:10:00", user));
     batchData.getSensorData().add(helper.makeUnitTestEvent("2007-04-29T23:55:00", user));
@@ -55,7 +55,7 @@ public class TestUnitTestRestApi extends DailyProjectDataTestHelper {
     DailyProjectDataClient dpdClient = new DailyProjectDataClient(getDailyProjectDataHostName(),
         user, user);
     dpdClient.authenticate();
-    UnitTestDailyProjectData unitDPD = dpdClient.getUnitTestDPD(user, "Default", Tstamp
+    UnitTestDailyProjectData unitDPD = dpdClient.getUnitTest(user, "Default", Tstamp
         .makeTimestamp("2007-04-30"));
     assertTrue("Checking default devTime", user.equalsIgnoreCase(unitDPD.getOwner()));
 

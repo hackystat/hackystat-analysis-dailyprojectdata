@@ -16,10 +16,10 @@ import org.junit.Test;
  * @author Pavel Senin.
  *
  */
-public class TestUnitTestDPDCounter {
+public class TestUnitTestCounter {
 
   // counter under the test.
-  private UnitTestDPDCounter counter;
+  private UnitTestCounter counter;
 
   private static final String testClassName = "org.hackystat.core.installer.util.TestProxyProperty";
 
@@ -40,7 +40,7 @@ public class TestUnitTestDPDCounter {
 
   private static final String user2 = "javadude@javafoo.com";
 
-  private UnitTestDPDTestHelper testHelper;
+  private UnitTestTestHelper testHelper;
 
   /**
    * Sets up testing environment.
@@ -49,8 +49,8 @@ public class TestUnitTestDPDCounter {
    */
   @Before
   public void setUp() throws Exception {
-    this.testHelper = new UnitTestDPDTestHelper();
-    this.counter = new UnitTestDPDCounter();
+    this.testHelper = new UnitTestTestHelper();
+    this.counter = new UnitTestCounter();
   }
 
   /**

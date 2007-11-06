@@ -16,7 +16,7 @@ import org.hackystat.sensorbase.resource.sensordata.jaxb.SensorData;
  * @author Pavel Senin.
  *
  */
-public class UnitTestDPDCounter {
+public class UnitTestCounter {
 
   /** The map of member emails to their DevTimeCounter. */
   private Map<String, UnitTestSimpleCounter> member2unitTestDPD;
@@ -24,7 +24,7 @@ public class UnitTestDPDCounter {
   /**
    * Standard constructor does pretty much nothing.
    */
-  public UnitTestDPDCounter() {
+  public UnitTestCounter() {
     member2unitTestDPD = new HashMap<String, UnitTestSimpleCounter>();
   }
 
