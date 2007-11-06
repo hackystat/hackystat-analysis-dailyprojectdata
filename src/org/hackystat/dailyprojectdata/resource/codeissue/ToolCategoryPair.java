@@ -6,7 +6,7 @@ package org.hackystat.dailyprojectdata.resource.codeissue;
  * @author jsakuda
  */
 class ToolCategoryPair {
-  private String tool;
+  private String tool = "";
   private String category;
 
   /**
@@ -43,6 +43,27 @@ class ToolCategoryPair {
   }
 
   /**
+   * Determines if the pair passed in has a category equivalent to the category of this object.
+   * 
+   * @param pair The <code>ToolCategoryPair</code> whose category should be compared to this
+   *          object's category.
+   * @return Returns true if they are equivalent.
+   */
+  private boolean hasEquivalentCategory(ToolCategoryPair pair) {
+    if (this.category == null) {
+      if (pair.getCategory() == null) {
+        return true;
+      }
+      // else just return false
+    }
+    else {
+      // category is not null so just use .equals
+      return this.category.equals(pair.getCategory());
+    }
+    return false;
+  }
+
+  /**
    * Compares two <code>ToolCategoryPair</code>s for equality based on tool and category.
    * 
    * @param obj The <code>ToolCategoryPair</code> to compare with.
@@ -52,10 +73,8 @@ class ToolCategoryPair {
   public boolean equals(Object obj) {
     if (obj instanceof ToolCategoryPair) {
       ToolCategoryPair pair = (ToolCategoryPair) obj;
-      String objCategory = pair.getCategory();
-      if (tool.equals(pair.getTool())
-          && ((category == null && objCategory == null) || category.equals(objCategory))) {
-        return true;
+      if (this.tool.equals(pair.getTool())) {
+        return this.hasEquivalentCategory(pair);
       }
     }
     return false;
