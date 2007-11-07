@@ -65,7 +65,8 @@ public class TestFileMetricRestApi extends DailyProjectDataTestHelper {
     assertEquals("Checking fileMetric day after data", 0, fileMetric.getTotalSizeMetricValue()
         .intValue());
     fileMetric = dpdClient.getFileMetric(user, "Default", Tstamp.makeTimestamp("2005-04-12"));
-    assertEquals("Checking fileMetric before any data.", 0 , fileMetric.getTotalSizeMetricValue());
+    assertEquals("Checking fileMetric before any data.", 0 , fileMetric.getTotalSizeMetricValue()
+        .intValue());
   }
 
   /**
