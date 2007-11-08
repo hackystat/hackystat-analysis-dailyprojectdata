@@ -11,21 +11,24 @@ import org.hackystat.sensorbase.resource.sensordata.jaxb.Property;
 import org.hackystat.sensorbase.resource.sensordata.jaxb.SensorData;
 
 /**
- * Makes easier UnitTest DPD calculation.
+ * A data structure that collects the Unit Test pass and fail counts for each member.
  *
- * @author Pavel Senin.
+ * @author Pavel Senin, Philip Johnson
  *
  */
 public class UnitTestCounter {
 
-  /** The map of member emails to their DevTimeCounter. */
-  private Map<String, UnitTestSimpleCounter> member2unitTestDPD;
+  /** Maps members to the number of successful unit test invocations. */
+  private Map<String, Integer> passCount = new HashMap<String, Integer>();
+  
+  /** Maps members to the number of unsuccessful unit test invocations. */
+  private Map<String, Integer> failCount = new HashMap<String, Integer>();
 
   /**
    * Standard constructor does pretty much nothing.
    */
   public UnitTestCounter() {
-    member2unitTestDPD = new HashMap<String, UnitTestSimpleCounter>();
+    // No need to do anything.
   }
 
   /**
@@ -35,39 +38,39 @@ public class UnitTestCounter {
    */
   public void add(SensorData data) {
 
-    // fixing the test owner (member)
+    // Initialize the maps for this user if necessary.
     String owner = data.getOwner();
-
-    Integer error = 0;
-    Integer failure = 0;
-    Integer passed = 0;
-    Integer tests = 0;
-
-    Properties props = data.getProperties();
-    Boolean err = false;
-    for (Property p : props.getProperty()) {
-      if ((p.getKey().equalsIgnoreCase("errorString")) && (p.getValue() != null)) {
-        error += 1;
-        err = true;
+    if (!passCount.containsKey(owner)) {
+      passCount.put(owner, 0);
+      failCount.put(owner, 0);
+    }
+    
+    // Now update the pass or fail count. 
+    // Result property must exist and must be pass or fail.
+    String result = getValue("Result", data);
+    if ((result != null) && (result.equalsIgnoreCase("pass"))) {
+      passCount.put(owner, (passCount.get(owner) + 1));
+    }
+    if ((result != null) && (result.equalsIgnoreCase("fail"))) {
+      failCount.put(owner, (failCount.get(owner) + 1));
+    }
+  }
+  
+  /**
+   * Returns the (first) value associated with key in Properties, or null if not found.
+   * Assumes that keys are unique.
+   * @param key The key
+   * @param data The Sensor Data instance.
+   * @return The value associated with key, or null if not found. 
+   */
+  private String getValue(String key, SensorData data) {
+    Properties properties = data.getProperties();
+    for (Property property : properties.getProperty()) {
+      if (property.getKey().equals(key)) {
+        return property.getValue();
       }
-      else if ((p.getKey().equalsIgnoreCase("failureString")) && (p.getValue() != null)) {
-        failure += 1;
-        err = true;
-      }
     }
-    if (!err) {
-      passed += 1;
-    }
-    tests += 1;
-
-    // populating member data
-    if (this.member2unitTestDPD.containsKey(owner)) {
-      this.member2unitTestDPD.get(owner).update(error, failure, passed, tests);
-    }
-    else {
-      this.member2unitTestDPD.put(owner, new UnitTestSimpleCounter(error, failure, passed, tests));
-    }
-
+    return null;
   }
 
   /**
@@ -76,39 +79,31 @@ public class UnitTestCounter {
    * @param member The member.
    * @return The member's failure count.
    */
-  public BigInteger getMemberFailureCount(String member) {
-    if (member2unitTestDPD.containsKey(member)) {
-      return member2unitTestDPD.get(member).getFailureCount();
-    }
-    else {
-      return BigInteger.valueOf(0);
-    }
+  public BigInteger getFailCount(String member) {
+    int numFails =  ((failCount.containsKey(member)) ? failCount.get(member) : 0);
+    return BigInteger.valueOf(numFails);
+  }
+  
+  /**
+   * Returns the UnitTest pass count associated with Member, or zero if member does not exist.
+   *
+   * @param member The member.
+   * @return The member's pass count.
+   */
+  public BigInteger getPassCount(String member) {
+    int numSuccess =  ((passCount.containsKey(member)) ? passCount.get(member) : 0);
+    return BigInteger.valueOf(numSuccess);
   }
 
   /**
-   * Returns a newly created Set containing all of the members in this UnitTestDPDCounter.
+   * Returns a newly created Set containing all of the members in this Counter.
    *
    * @return The set of all members in this UnitTestDPDCounter.
    */
   public Set<String> getMembers() {
     Set<String> members = new HashSet<String>();
-    members.addAll(member2unitTestDPD.keySet());
+    members.addAll(failCount.keySet());
     return members;
-  }
-
-  /**
-   * Returns the UnitTest success count associated with Member, or zero if member does not exist.
-   *
-   * @param member The member.
-   * @return The member's success count.
-   */
-  public BigInteger getMemberSuccessCount(String member) {
-    if (member2unitTestDPD.containsKey(member)) {
-      return member2unitTestDPD.get(member).getSuccessCount();
-    }
-    else {
-      return BigInteger.valueOf(0);
-    }
   }
 
 }

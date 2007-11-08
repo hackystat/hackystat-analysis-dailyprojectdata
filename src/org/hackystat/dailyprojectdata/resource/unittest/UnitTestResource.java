@@ -31,11 +31,11 @@ import org.restlet.resource.Variant;
 import org.w3c.dom.Document;
 
 /**
- * Implements the Resource for processing GET {host}/unitetst/{user}/{projectname}/{timestamp}
+ * Implements the Resource for processing GET {host}/unittest/{user}/{projectname}/{timestamp}
  * requests. Requires the authenticated user to be {user} or else the Admin user for the sensorbase
  * connected to this service.
  * 
- * @author Pavel Senin.
+ * @author Pavel Senin, Philip Johnson
  */
 
 public class UnitTestResource extends DailyProjectDataResource {
@@ -48,7 +48,6 @@ public class UnitTestResource extends DailyProjectDataResource {
    * @param response The response object.
    */
   public UnitTestResource(Context context, Request request, Response response) {
-    // Auto-generated constructor stub
     super(context, request, response);
   }
 
@@ -74,8 +73,8 @@ public class UnitTestResource extends DailyProjectDataResource {
           if (ref.getSensorDataType().equals("UnitTest")) {
             // [4] looks like we got some UnitTest data in here - accounting
             counter.add(client.getSensorData(ref));
-          } // if UnitTest
-        } // for
+          } 
+        } 
 
         // return resulting data
         UnitTestDailyProjectData unitTestDPD = new UnitTestDailyProjectData();
@@ -84,8 +83,8 @@ public class UnitTestResource extends DailyProjectDataResource {
         for (String member : counter.getMembers()) {
           MemberData memberData = new MemberData();
           memberData.setMemberUri(sensorBaseHost + "users/" + member);
-          memberData.setSuccess(counter.getMemberSuccessCount(member));
-          memberData.setFailure(counter.getMemberFailureCount(member));
+          memberData.setSuccess(counter.getPassCount(member));
+          memberData.setFailure(counter.getFailCount(member));
           unitTestDPD.getMemberData().add(memberData);
         }
 

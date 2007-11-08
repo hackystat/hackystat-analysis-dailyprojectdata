@@ -23,7 +23,6 @@ public class TimestampComparator implements Comparator<XMLGregorianCalendar>, Se
    * @param cal2 The second timestamp.
    * @return Returns -1 if cal1 < cal2, 1 if cal1 > cal2, otherwise returns 0.
    */
-  @Override
   public int compare(XMLGregorianCalendar cal1, XMLGregorianCalendar cal2) {
     if (Tstamp.lessThan(cal1, cal2)) {
       return -1;

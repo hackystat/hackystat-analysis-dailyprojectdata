@@ -18,29 +18,19 @@ import org.junit.Test;
  */
 public class TestUnitTestCounter {
 
-  // counter under the test.
-  private UnitTestCounter counter;
-
-  private static final String testClassName = "org.hackystat.core.installer.util.TestProxyProperty";
-
+  private static final String testClassName = "org.hackystat.util.TestProxyProperty";
   private static final String testResource = "file://foo/bar/baz.txt";
-
   private static final String testCaseName = "testNormalFunctionality";
-
-  private static final String testFailureResult = "failure";
-
-  private static final String testSuccessResult = "success";
-
-  private static final String testFailureString =
-                                         "Value should be the same. expected:<[8]0> but was:<[9]0>";
-
+  private static final String testFailResult = "fail";
+  private static final String testPassResult = "pass";
+  private static final String testFailureString =  "Value of failure string";
   private static final String testErrorString = "Value of error string";
-
   private static final String user1 = "javadude@javatest.com";
-
   private static final String user2 = "javadude@javafoo.com";
-
+  private static final BigInteger bigOne = BigInteger.valueOf(1);
+  private static final BigInteger bigZero = BigInteger.valueOf(0);
   private UnitTestTestHelper testHelper;
+  private UnitTestCounter counter;
 
   /**
    * Sets up testing environment.
@@ -61,51 +51,35 @@ public class TestUnitTestCounter {
   @Test
   public void addTest() throws Exception {
 
-    // populating testing data
-    SensorData testData1 = this.testHelper.makeUnitTestEvent("2007-04-30T02:00:00", user1,
-        testResource, testClassName, testFailureResult, "50", testCaseName, testFailureString,
+    // Create a passing sensor data item
+    SensorData passData = this.testHelper.makeUnitTestEvent("2007-04-30T02:00:00", user1,
+        testResource, testClassName, testPassResult, "50", testCaseName, testFailureString,
         testErrorString);
 
-    // testing member
-    this.counter.add(testData1);
+    // testing the counter with a passing data instance.
+    this.counter.add(passData);
     Set<String> members = this.counter.getMembers();
     assertTrue("Should return test owner", members.contains(user1));
 
-    // testing failure accounting
-    assertEquals("Should return  failure count", BigInteger.valueOf(1), this.counter
-        .getMemberFailureCount(user1));
-    assertEquals("Should return succcess count", BigInteger.valueOf(0), this.counter
-        .getMemberSuccessCount(user1));
+    // testing accounting.
+    assertEquals("Check failure count", bigZero, this.counter.getFailCount(user1));
+    assertEquals("Check succcess count", bigOne, this.counter.getPassCount(user1));
+    
+    // Create a failing sensor data item
+    SensorData failData = this.testHelper.makeUnitTestEvent("2007-04-30T02:00:00", user1,
+        testResource, testClassName, testFailResult, "50", testCaseName, testFailureString,
+        testErrorString);
 
-    // testing default accounting behavior
-    assertEquals("Should return failure count", BigInteger.valueOf(0), this.counter
-        .getMemberFailureCount(user2));
-    assertEquals("Should  return succcess count", BigInteger.valueOf(0), this.counter
-        .getMemberSuccessCount(user2));
+    // add the failure data instance.
+    this.counter.add(failData);
 
-    // populating testing data for user 2 and updating data for user 1
-    testData1 = this.testHelper.makeUnitTestEvent("2007-04-30T02:10:00", user1, testResource,
-        testClassName, testSuccessResult, "50", testCaseName, null, null);
-    SensorData testData2 = this.testHelper.makeUnitTestEvent("2007-04-30T02:00:00", user2,
-        testResource, testClassName, testSuccessResult, "30", testCaseName, null, null);
+    // test updated counter.
+    assertEquals("Check failure count", bigOne, this.counter.getFailCount(user1));
+    assertEquals("Check succcess count", bigOne, this.counter.getPassCount(user1));
 
-    // testing member data
-    this.counter.add(testData1);
-    this.counter.add(testData2);
-    members = this.counter.getMembers();
-    assertTrue("Should return test owner", members.contains(user1));
-    assertTrue("Should return test owner", members.contains(user2));
-
-    // testing failure accounting
-    assertEquals("Should return failure  count", BigInteger.valueOf(1), this.counter
-        .getMemberFailureCount(user1));
-    assertEquals("Should return succcess  count", BigInteger.valueOf(1), this.counter
-        .getMemberSuccessCount(user1));
-    assertEquals("Should return  failure count", BigInteger.valueOf(0), this.counter
-        .getMemberFailureCount(user2));
-    assertEquals("Should return  succcess count", BigInteger.valueOf(1), this.counter
-        .getMemberSuccessCount(user2));
-
+    // test what happens when passed a missing user. 
+    assertEquals("Checking missing user 1", bigZero, this.counter.getFailCount(user2));
+    assertEquals("Check missing user 2", bigZero, this.counter.getPassCount(user2));
   }
 
 }

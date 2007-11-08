@@ -249,7 +249,6 @@ public class DailyProjectDataClient {
    */
   private UnitTestDailyProjectData makeUnitTestDailyProjectData(String xmlString) throws Exception {
     Unmarshaller unmarshaller = this.unitTestJAXB.createUnmarshaller();
-    System.out.println(xmlString);
     return (UnitTestDailyProjectData) unmarshaller.unmarshal(new StringReader(xmlString));
   }
 

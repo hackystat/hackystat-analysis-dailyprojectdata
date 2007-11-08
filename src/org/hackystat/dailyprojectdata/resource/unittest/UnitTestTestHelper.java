@@ -47,59 +47,30 @@ public class UnitTestTestHelper {
     data.setRuntime(tstamp);
 
     // test count, test time, success, failure
-    Properties prop = new Properties();
-
-    // required properties
-    Property property = new Property();
-    property.setKey("Name");
-    property.setValue(testName);
-    prop.getProperty().add(property);
-
-    property = new Property();
-    property.setKey("Result");
-    property.setValue(result);
-    prop.getProperty().add(property);
-
-    // optional properties
-    property = new Property();
-    property.setKey("elapsedTime");
-    property.setValue(elapsedTime);
-    prop.getProperty().add(property);
-
-    property = new Property();
-    property.setKey("testName");
-    property.setValue(testName);
-    prop.getProperty().add(property);
-
-    property = new Property();
-    property.setKey("testCaseName");
-    property.setValue(testCaseName);
-    prop.getProperty().add(property);
-
-    property = new Property();
-    property.setKey("failureString");
-    property.setValue(failureString);
-    prop.getProperty().add(property);
-
-    property = new Property();
-    property.setKey("errorString");
-    property.setValue(errorString);
-    prop.getProperty().add(property);
-
-    data.setProperties(prop);
+    Properties properties = new Properties();
+    addProperty(properties, "Name", testName);
+    addProperty(properties, "Result", result);
+    addProperty(properties, "ElapsedTime", elapsedTime);
+    addProperty(properties, "TestName", testName);
+    addProperty(properties, "TestCaseName", testCaseName);
+    addProperty(properties, "FailureString", failureString);
+    addProperty(properties, "ErrorString", errorString);
+    data.setProperties(properties);
 
     return data;
   }
 
   /**
-   * Creates a sample SensorData UnitTest instance given a timestamp and a user.
+   * Creates a sample passing SensorData UnitTest instance given a timestamp and a user.
    *
    * @param tstampString The timestamp as a string
    * @param user The user.
+   * @param pass True if passing, false if failing.
    * @return The new SensorData DevEvent instance.
    * @throws Exception If problems occur.
    */
-  public SensorData makeUnitTestEvent(String tstampString, String user) throws Exception {
+  private SensorData makeUnitTestEvent(String tstampString, String user, boolean pass) 
+  throws Exception {
     XMLGregorianCalendar tstamp = Tstamp.makeTimestamp(tstampString);
     String sdt = "UnitTest";
     SensorData data = new SensorData();
@@ -111,49 +82,49 @@ public class UnitTestTestHelper {
     data.setResource("file://foo/bar/baz.txt");
     data.setRuntime(tstamp);
 
-    // test count, test time, success, failure
     Properties prop = new Properties();
-
-    // required properties
-    Property property = new Property();
-    property.setKey("Name");
-    property.setValue("testName");
-    prop.getProperty().add(property);
-
-    property = new Property();
-    property.setKey("Result");
-    property.setValue("pass");
-    prop.getProperty().add(property);
-
-    // optional properties
-    property = new Property();
-    property.setKey("elapsedTime");
-    property.setValue("15");
-    prop.getProperty().add(property);
-
-    property = new Property();
-    property.setKey("testName");
-    property.setValue("org.hackystat.core.installer.util.TestProxyProperty");
-    prop.getProperty().add(property);
-
-    property = new Property();
-    property.setKey("testCaseName");
-    property.setValue("testNormalFunctionality");
-    prop.getProperty().add(property);
-
-    property = new Property();
-    property.setKey("failureString");
-    property.setValue("Value should be the same. expected:<[8]0> but was:<[9]0>");
-    prop.getProperty().add(property);
-
-    property = new Property();
-    property.setKey("errorString");
-    property.setValue("Value of error string");
-    prop.getProperty().add(property);
-
+    addProperty(prop, "Name", "testName");
+    addProperty(prop, "Result", (pass ? "pass" : "fail"));
+    addProperty(prop, "ElapsedTime", "15");
+    addProperty(prop, "TestName", "org.Foo");
+    addProperty(prop, "TestCaseName", "testFoo");
     data.setProperties(prop);
-
     return data;
+  }
+  
+  /**
+   * Returns a Unit Test instance with Result = pass.
+   * @param tstampString The timestamp.
+   * @param user The user. 
+   * @return The UnitTest sensor data instance. 
+   * @throws Exception If problems occur.
+   */
+  public SensorData makePassUnitTest(String tstampString, String user) throws Exception {
+    return makeUnitTestEvent(tstampString, user, true);  
+  }
+  
+  /**
+   * Returns a Unit Test instance with Result = fail.
+   * @param tstampString The timestamp.
+   * @param user The user. 
+   * @return The UnitTest sensor data instance. 
+   * @throws Exception If problems occur.
+   */
+  public SensorData makeFailUnitTest(String tstampString, String user) throws Exception {
+    return makeUnitTestEvent(tstampString, user, false);  
+  }
+  
+  /**
+   * Adds the key value pair to the Properties object.
+   * @param properties The Properties.
+   * @param key The key. 
+   * @param value The value. 
+   */
+  private void addProperty(Properties properties, String key, String value) {
+    Property property = new Property();
+    property.setKey(key);
+    property.setValue(value);
+    properties.getProperty().add(property);
   }
 
 }
