@@ -6,10 +6,8 @@ import static org.hackystat.dailyprojectdata.server.ServerProperties.LOGGING_LEV
 import static org.hackystat.dailyprojectdata.server.ServerProperties.PORT_KEY;
 import static org.hackystat.dailyprojectdata.server.ServerProperties.SENSORBASE_FULLHOST_KEY;
 
-import java.util.Enumeration;
+
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBContext;
@@ -22,6 +20,7 @@ import org.hackystat.dailyprojectdata.resource.ping.PingResource;
 import org.hackystat.dailyprojectdata.resource.unittest.UnitTestResource;
 import org.hackystat.sensorbase.client.SensorBaseClient;
 import org.hackystat.utilities.logger.HackystatLogger;
+import org.hackystat.utilities.logger.RestletLoggerUtil;
 import org.restlet.Application;
 import org.restlet.Component;
 import org.restlet.Guard;
@@ -118,6 +117,9 @@ public class Server extends Application {
     // Provide a pointer to this server in the Context so that Resources can get at this server.
     attributes.put("DailyProjectDataServer", server);
     
+    // Move Restlet Logging into a file. 
+    RestletLoggerUtil.useFileHandler("dailyprojectdata");
+    
     // Now let's open for business. 
     server.logger.warning("Host: " + server.hostName);
     HackystatLogger.setLoggingLevel(server.logger, server.properties.get(LOGGING_LEVEL_KEY));
@@ -129,26 +131,10 @@ public class Server extends Application {
           " NOT AVAILABLE. This service will not run correctly."));
     server.logger.warning("DailyProjectData (Version " + getVersion() + ") now running.");
     server.component.start();
-    String restletLoggingString = server.properties.get(ServerProperties.RESTLET_LOGGING_KEY);
-    if (!(restletLoggingString.equalsIgnoreCase("true"))) {
-      disableRestletLogging();
-    }
+
     return server;
   }
 
-  /**
-   * Disable all loggers from com.noelios and org.restlet. 
-   */
-  private static void disableRestletLogging() {
-    LogManager logManager = LogManager.getLogManager();
-    for (Enumeration<String> e = logManager.getLoggerNames(); e.hasMoreElements() ;) {
-      String logName = e.nextElement();
-      if (logName.startsWith("com.noelios") ||
-          logName.startsWith("org.restlet")) {
-        logManager.getLogger(logName).setLevel(Level.OFF);
-      }
-    }
-  }
   
   /**
    * Starts up the web service.  Control-c to exit. 
