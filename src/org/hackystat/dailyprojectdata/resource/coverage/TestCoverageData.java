@@ -1,6 +1,9 @@
 package org.hackystat.dailyprojectdata.resource.coverage;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 
 import java.util.Date;
 
@@ -19,27 +22,82 @@ import org.junit.Test;
  * 
  */
 public class TestCoverageData {
-  /** The data wrapper class that is tested. */
-  private CoverageData data = null;
+  /** The fields that are tested in this test class. */
+  private CoverageData coverageData = null;
+  private SensorData sensorData = null;
 
   /** Setup this test class. */
   @Before
   public void setUp() {
     XMLGregorianCalendar runtime = Tstamp.makeTimestamp(new Date().getTime());
-    this.data = new CoverageData(this.createData(runtime, "austen@hawaii.edu", "C:\\foo.java",
-        "line", 10.0, 1.0));
+    this.sensorData = this.createData(runtime, "austen@hawaii.edu", "C:\\foo.java", "line",
+        10.0, 1.0);
+    this.coverageData = new CoverageData(this.sensorData);
   }
 
   /** Tests if the correct amount of uncovered coverage entities is returned. */
   @Test
   public void testGetUncovered() {
-    assertEquals("The amount of uncovered lines is incorrect.", 10, this.data.getUncovered());
+    assertEquals("The amount of uncovered lines is incorrect.", 10, this.coverageData
+        .getUncovered());
   }
 
   /** Tests if the correct amount of uncovered coverage entities is returned. */
   @Test
   public void testGetCovered() {
-    assertEquals("The amount of covered lines is incorrect.", 1, this.data.getCovered());
+    assertEquals("The amount of covered lines is incorrect.", 1, this.coverageData
+        .getCovered());
+  }
+
+  /**
+   * Tests if the resource returned from the wrapper class is the same as the
+   * resource in the SensorData instance.
+   */
+  @Test
+  public void testGetResource() {
+    assertEquals("The returned resource is incorrect.", this.sensorData.getResource(),
+        this.coverageData.getResource());
+  }
+
+  /**
+   * Tests if the correct Property is returned or that null is returned if the
+   * property does not exist.
+   */
+  @Test
+  public void testGetCoverageProperty() {
+    // First, let's test an existing property.
+    Property coveredProperty = this.coverageData.getCoverageProperty("Covered");
+    assertEquals("The Covered Property Name is incorrect.", "Covered", coveredProperty
+        .getKey());
+    assertEquals("The Covered Property Value is incorrect.", "1.0", coveredProperty.getValue());
+
+    // Next, let's test if a non-existent property returns null.
+    assertNull("Null was not returned for a non-existent property.", this.coverageData
+        .getCoverageProperty("Foo Property"));
+  }
+
+  /** Tests the overriden .equals method returns the correct values. */
+  @Test
+  public void testEquals() {
+    // First, test equal instances.
+    CoverageData newCoverageData = new CoverageData(this.sensorData);
+    assertTrue("Instances with the same SensorData are equal.", this.coverageData
+        .equals(newCoverageData));
+
+    // Then, test if the same instance returns true.
+    assertTrue("The same instances are equal.", this.coverageData.equals(this.coverageData));
+
+    // Next, test instances with different SensorData objects.
+    XMLGregorianCalendar runtime = Tstamp.makeTimestamp(new Date().getTime() + 10);
+    SensorData sensorData = this.createData(runtime, "austen@hawaii.edu", "C:\\foo.java",
+        "line", 10.0, 1.0);
+    assertFalse("Instances with the differnt SensorData are not equal.", this.coverageData
+        .equals(new CoverageData(sensorData)));
+
+    // Finally, test if different object types are not equal.
+    assertFalse("Instances with the differnt SensorData are not equal.", this.coverageData
+        .equals("Foo String"));
+
   }
 
   /**

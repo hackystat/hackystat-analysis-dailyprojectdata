@@ -28,6 +28,7 @@ public class TestCoverageCounter {
   private CoverageData secondBatch01 = null;
   private CoverageData secondBatch02 = null;
   private static final String GRANULARITY_LINE = "line";
+  private XMLGregorianCalendar secondRuntime = null;
 
   /** Setup each test case with new instances. */
   @Before
@@ -38,10 +39,10 @@ public class TestCoverageCounter {
         GRANULARITY_LINE, 4.0, 0.0);
     SensorData sensorFirstBatch02 = this.createData(firstRuntime, "C:\\XmlDataSensor.java",
         GRANULARITY_LINE, 5.0, 0.0);
-    XMLGregorianCalendar secondRuntime = Tstamp.makeTimestamp(new Date().getTime() + 10);
-    SensorData sensorSecondBatch01 = this.createData(secondRuntime, "C:\\PropertyMap.java",
-        GRANULARITY_LINE, 10.0, 0.0);
-    SensorData sensorSecondBatch02 = this.createData(secondRuntime, "C:\\Option.java",
+    this.secondRuntime = Tstamp.makeTimestamp(new Date().getTime() + 10);
+    SensorData sensorSecondBatch01 = this.createData(this.secondRuntime,
+        "C:\\PropertyMap.java", GRANULARITY_LINE, 10.0, 0.0);
+    SensorData sensorSecondBatch02 = this.createData(this.secondRuntime, "C:\\Option.java",
         GRANULARITY_LINE, 5.0, 1.0);
 
     // Then, add them to the counter class.
@@ -120,5 +121,19 @@ public class TestCoverageCounter {
 
     data.setProperties(props);
     return data;
+  }
+
+  /** Tests if the returned runtime is the last runtime in the counter. */
+  @Test
+  public void testGetLastRuntime() {
+    // Adds a third runtime to the counter.
+    XMLGregorianCalendar thirdRuntime = Tstamp.makeTimestamp(new Date().getTime() + 100);
+    this.createData(thirdRuntime, "C:\\Option.java", GRANULARITY_LINE, 5.0, 1.0);
+    assertEquals("The last runtime is incorrect.", this.secondRuntime, this.counter
+        .getLastRuntime());
+    
+    // Tests if null is returned if there is no data in the counter.
+    CoverageCounter counter = new CoverageCounter();
+    assertNull("Null was not returned when there is no data.", counter.getLastRuntime());
   }
 }
