@@ -26,8 +26,7 @@
 		<xs:complexType>
 			<xs:attribute ref="MemberUri" />
 			<xs:attribute ref="Tool" />
-			<xs:attribute name="Category" type="xs:string" use="optional" />
-			<xs:attribute ref="CodeIssues" />
+			<xs:anyAttribute processContents="lax"/>
 		</xs:complexType>
 	</xs:element>
 

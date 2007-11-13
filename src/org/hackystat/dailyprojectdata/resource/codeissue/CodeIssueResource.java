@@ -3,6 +3,7 @@ package org.hackystat.dailyprojectdata.resource.codeissue;
 import static org.hackystat.dailyprojectdata.server.ServerProperties.SENSORBASE_FULLHOST_KEY;
 
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -11,6 +12,7 @@ import java.util.Map.Entry;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import javax.xml.datatype.XMLGregorianCalendar;
+import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.Transformer;
@@ -49,8 +51,8 @@ public class CodeIssueResource extends DailyProjectDataResource {
   /** The optional code issue tool. */
   private String tool;
 
-  /** The optional category. */
-  private String category;
+  /** The optional type. */
+  private String type;
 
   /**
    * The standard constructor.
@@ -62,7 +64,11 @@ public class CodeIssueResource extends DailyProjectDataResource {
   public CodeIssueResource(Context context, Request request, Response response) {
     super(context, request, response);
     this.tool = (String) request.getAttributes().get("Tool");
-    this.category = (String) request.getAttributes().get("Category");
+    // get the type and remove any spaces
+    this.type = (String) request.getAttributes().get("Type");
+    if (this.type != null) {
+      this.type = type.replaceAll(" ", "");
+    }
   }
 
   /**
@@ -96,25 +102,53 @@ public class CodeIssueResource extends DailyProjectDataResource {
         MemberCodeIssueCounter counter = new MemberCodeIssueCounter();
         List<SensorData> lastestRuntimeCodeIssues = sorter.getLastCodeIssueBatch();
         for (SensorData sensorData : lastestRuntimeCodeIssues) {
-          String issueCategory = this.getPropertyValue("Type", sensorData);
-          counter.addMemberCodeIssue(sensorData.getOwner(), sensorData.getTool(),
-              issueCategory);
+          List<Property> typeProperties = this.getTypeProperties(sensorData);
+          if (typeProperties.isEmpty()) {
+            // no Type: properties, must be zero data, pass null type and 0 count
+            counter.addMemberCodeIssue(sensorData.getOwner(), sensorData.getTool(), null, 0);
+          }
+          else {
+            for (Property property : typeProperties) {
+              counter.addMemberCodeIssue(sensorData.getOwner(), sensorData.getTool(), property
+                  .getKey(), Integer.valueOf(property.getValue()));
+            }
+          }
         }
         // [5] create and return the CodeIssueDailyProjectData
         Set<String> members = counter.getMembers();
         CodeIssueDailyProjectData codeIssue = new CodeIssueDailyProjectData();
         String sensorBaseHost = this.server.getServerProperties().get(SENSORBASE_FULLHOST_KEY);
         for (String member : members) {
-          Map<ToolCategoryPair, Integer> memeberCodeIssueCounts = counter
-              .getMemeberCodeIssueCounts(member);
-          for (Entry<ToolCategoryPair, Integer> entry : memeberCodeIssueCounts.entrySet()) {
+          ToolToTypeCounter toolToTypeCounter = counter.getMemberCodeIssueCounts(member);
+
+          Set<String> tools = toolToTypeCounter.getTools();
+          for (String tool : tools) {
+            // create one MemberData instance per tool
             MemberData memberData = new MemberData();
-            memberData.setTool(entry.getKey().getTool());
-            memberData.setCategory(entry.getKey().getCategory());
-            memberData.setCodeIssues(entry.getValue());
+            memberData.setTool(tool);
             memberData.setMemberUri(sensorBaseHost + "users/" + member);
+
+            Map<String, Integer> typeCounts = toolToTypeCounter.getTypeCounts(tool);
+            for (Entry<String, Integer> entry : typeCounts.entrySet()) {
+              String type = entry.getKey();
+              Integer count = entry.getValue();
+
+              Map<QName, String> attributeMap = memberData.getOtherAttributes();
+              attributeMap.put(new QName(type), count.toString());
+            }
             codeIssue.getMemberData().add(memberData);
           }
+
+          // Map<ToolTypePair, Integer> memeberCodeIssueCounts = counter
+          // .getMemeberCodeIssueCounts(member);
+          // for (Entry<ToolTypePair, Integer> entry : memeberCodeIssueCounts.entrySet()) {
+          // MemberData memberData = new MemberData();
+          // memberData.setTool(entry.getKey().getTool());
+          // memberData.setCategory(entry.getKey().getType());
+          // memberData.setCodeIssues(entry.getValue());
+          // memberData.setMemberUri(sensorBaseHost + "users/" + member);
+          // codeIssue.getMemberData().add(memberData);
+          // }
         }
         codeIssue.setStartTime(sorter.getLastRuntime());
         codeIssue.setOwner(uriUser);
@@ -134,13 +168,13 @@ public class CodeIssueResource extends DailyProjectDataResource {
 
   /**
    * Adds the sensor data to the given sorter only if the sensor data is determined to be valid
-   * with the given tool and category.
+   * with the given tool and type.
    * 
    * @param sorter The sorter to add the issue to if it matches the given criteria.
    * @param sensorData The sensor data to test for validity and add to the sorter.
    */
   private void addSensorDataToSorter(CodeIssueRuntimeSorter sorter, SensorData sensorData) {
-    // add code issue to the sorter if the issue matches the given tool and/or category
+    // add code issue to the sorter if the issue matches the given tool and/or type
     if (isDataValid(sensorData)) {
       sorter.addCodeIssueData(sensorData);
     }
@@ -155,27 +189,25 @@ public class CodeIssueResource extends DailyProjectDataResource {
    * @return Returns true if the data should be processed otherwise false.
    */
   private boolean isDataValid(SensorData sensorData) {
-    // neither tool nor category were specified
-    if (this.tool == null && this.category == null) {
+
+    // neither tool nor type were specified
+    if (this.tool == null && this.type == null) {
       return true;
     }
     // only tool given
-    else if (this.category == null && this.tool != null) {
+    else if (this.type == null && this.tool != null) {
       String issueTool = sensorData.getTool();
       return this.tool.equals(issueTool);
     }
-    // only category given
-    else if (this.tool == null && this.category != null) {
-      // CodeIssue's property named 'Type' contains the category
-      String issueCategory = this.getPropertyValue("Type", sensorData);
-      return this.category.equals(issueCategory);
+    // only type given
+    else if (this.tool == null && this.type != null) {
+      return this.hasTypeProperty(this.type, sensorData);
     }
-    // both tool and category were specified
+    // both tool and type were specified
     else {
       String issueTool = sensorData.getTool();
-      // CodeIssue's property named 'Type' contains the category
-      String issueCategory = this.getPropertyValue("Type", sensorData);
-      if (this.tool.equals(issueTool) && this.category.equals(issueCategory)) {
+      assert (issueTool != null);
+      if (this.tool.equals(issueTool) && this.hasTypeProperty(this.type, sensorData)) {
         return true;
       }
     }
@@ -183,26 +215,41 @@ public class CodeIssueResource extends DailyProjectDataResource {
   }
 
   /**
-   * Gets the value of the specified property out the sensor data's <code>Properties</code>
-   * object.
+   * Determines if the property prefixed with "Type_" exists in the sensor data's properties.
    * 
-   * @param propertyName The name of the property to get the value for.
-   * @param sensorData The sensor data instance to get the property value from.
-   * @return Returns the value of the property or null if the property is not found.
+   * @param propertyName The property prefixed with "Type:".
+   * @param sensorData The sensor data instance to check.
+   * @return Returns true if it exists, otherwise false.
    */
-  private String getPropertyValue(String propertyName, SensorData sensorData) {
-    String value = null;
-    Properties properties = sensorData.getProperties();
-    if (properties != null) {
-      List<Property> propertyList = properties.getProperty();
-      for (Property property : propertyList) {
-        if (propertyName.equals(property.getKey())) {
-          value = property.getValue();
-          break;
-        }
+  private boolean hasTypeProperty(String propertyName, SensorData sensorData) {
+    List<Property> typeProperties = this.getTypeProperties(sensorData);
+    for (Property property : typeProperties) {
+      if (property.getKey().equalsIgnoreCase(propertyName)) {
+        return true;
       }
     }
-    return value;
+    return false;
+  }
+
+  /**
+   * Gets a list of all the property names prefixed with "Type_".
+   * 
+   * @param data The sensor data instance to get type properties from.
+   * @return Returns all the property names prefixed with "Type_".
+   */
+  private List<Property> getTypeProperties(SensorData data) {
+    ArrayList<Property> typePropertyList = new ArrayList<Property>();
+
+    Properties properties = data.getProperties();
+    List<Property> propertyList = properties.getProperty();
+
+    for (Property property : propertyList) {
+      if (property.getKey().startsWith("Type_")) {
+        typePropertyList.add(property);
+      }
+    }
+
+    return typePropertyList;
   }
 
   /**

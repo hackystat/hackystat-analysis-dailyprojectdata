@@ -10,12 +10,12 @@ import java.util.Set;
  * @author jsakuda
  */
 public class MemberCodeIssueCounter {
-  /** Mapping of tool/category to number of occurrences. */
-  private Map<String, Map<ToolCategoryPair, Integer>> memberCodeIssueMap;
+  /** Mapping of tool/type to number of occurrences. */  
+  private Map<String, ToolToTypeCounter> memberCodeIssueMap;
   
   /** Creates and initializes a new counter. */
   public MemberCodeIssueCounter() {
-    this.memberCodeIssueMap = new HashMap<String, Map<ToolCategoryPair,Integer>>();
+    this.memberCodeIssueMap = new HashMap<String, ToolToTypeCounter>();
   }
   
   /**
@@ -23,30 +23,16 @@ public class MemberCodeIssueCounter {
    * 
    * @param member The member the code issue is for.
    * @param tool The tool used by the member to generate the code issue.
-   * @param category The category of the error produced by the given tool.
+   * @param type The type of the error produced by the given tool.
+   * @param count The number of issues of the tool/type pair given.
    */
-  public void addMemberCodeIssue(String member, String tool, String category) {
+  public void addMemberCodeIssue(String member, String tool, String type, int count) {
     if (!this.memberCodeIssueMap.containsKey(member)) {
-      this.memberCodeIssueMap.put(member, new HashMap<ToolCategoryPair, Integer>());
+      this.memberCodeIssueMap.put(member, new ToolToTypeCounter());
     }
     
-    Map<ToolCategoryPair, Integer> toolCategoryMap = this.memberCodeIssueMap.get(member);
-    ToolCategoryPair toolCategoryPair = new ToolCategoryPair(tool, category);
-    if (toolCategoryMap.containsKey(toolCategoryPair)) {
-      // tool/category combination exists, increment count
-      Integer issueCount = toolCategoryMap.get(toolCategoryPair);
-      toolCategoryMap.put(toolCategoryPair, issueCount + 1);
-    }
-    else {
-      if (category == null) {
-        // no entry exists, but only tool is defined so it represents zero data issue
-        toolCategoryMap.put(toolCategoryPair, 0);
-      }
-      else {
-        // no entry exists, but tool/category defined indicates an error
-        toolCategoryMap.put(toolCategoryPair, 1);
-      }
-    }
+    ToolToTypeCounter toolToTypeCounter = this.memberCodeIssueMap.get(member);
+    toolToTypeCounter.add(tool, type, count);
   }
   
   /**
@@ -59,12 +45,12 @@ public class MemberCodeIssueCounter {
   }
   
   /**
-   * Gets the tool/category to issue count mapping for a single member.
+   * Gets the <code>ToolToTypeCounter</code> for the given member.
    * 
-   * @param member The member to get the mapping for.
-   * @return Returns the tool/category to issue count mapping for the given member.
+   * @param member The member to get the counts for.
+   * @return Returns the <code>ToolToTypeCounter</code> for the given member.
    */
-  public Map<ToolCategoryPair, Integer> getMemeberCodeIssueCounts(String member) {
+  public ToolToTypeCounter getMemberCodeIssueCounts(String member) {
     return this.memberCodeIssueMap.get(member);
   }
 }

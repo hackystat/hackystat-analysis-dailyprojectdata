@@ -2,6 +2,7 @@ package org.hackystat.dailyprojectdata.resource.codeissue;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Map;
 import java.util.Set;
@@ -21,44 +22,36 @@ public class TestMemberCodeIssueCounter {
   private String tool1 = "Tool1";
   private String tool2 = "Tool2";
 
-  private String category1 = "Category1";
-  private String category2 = "Category2";
-
-  /** Tool/category pair for test. */
-  private ToolCategoryPair pair1 = new ToolCategoryPair(this.tool1, this.category1);
-  /** Tool/category pair for test. */
-  private ToolCategoryPair pair2 = new ToolCategoryPair(this.tool2, this.category2);
-  /** Tool/category pair for zero data test. */
-  private ToolCategoryPair pair3 = new ToolCategoryPair(this.tool2, null);
+  private String type1 = "Type_Type1";
+  private String type2 = "Type_Type2";
 
   /** Tests the the counter correctly counts issues. */
   @Test
   public void testCounter() {
     MemberCodeIssueCounter counter = new MemberCodeIssueCounter();
-    counter.addMemberCodeIssue(this.member1, this.tool1, this.category1);
-    counter.addMemberCodeIssue(this.member1, this.tool1, this.category1);
-    counter.addMemberCodeIssue(this.member2, this.tool1, this.category1);
-    counter.addMemberCodeIssue(this.member3, this.tool1, this.category1);
+    counter.addMemberCodeIssue(this.member1, this.tool1, this.type1, 2);
+    counter.addMemberCodeIssue(this.member1, this.tool1, this.type1, 4);
+    counter.addMemberCodeIssue(this.member2, this.tool1, this.type1, 1);
+    counter.addMemberCodeIssue(this.member3, this.tool1, this.type1, 1);
 
-    counter.addMemberCodeIssue(this.member1, this.tool2, this.category2);
-    counter.addMemberCodeIssue(this.member2, this.tool2, this.category2);
+    counter.addMemberCodeIssue(this.member1, this.tool2, this.type2, 2);
+    counter.addMemberCodeIssue(this.member2, this.tool2, this.type2, 3);
 
-    counter.addMemberCodeIssue(this.member3, this.tool2, null);
+    counter.addMemberCodeIssue(this.member3, this.tool2, null, 0);
 
     Set<String> members = counter.getMembers();
     assertEquals("Should have 3 memebers in counter.", 3, members.size());
+    
+    ToolToTypeCounter member1CodeIssueCounts = counter.getMemberCodeIssueCounts(this.member1);
+    Map<String, Integer> typeCounts = member1CodeIssueCounts.getTypeCounts(this.tool1);
 
-    Map<ToolCategoryPair, Integer> member1IssueCounts = counter
-        .getMemeberCodeIssueCounts(this.member1);
+    assertSame("Tool1/Type1 should have count 6 for Memeber1.", 6, typeCounts.get(this.type1));
+    
+    typeCounts = member1CodeIssueCounts.getTypeCounts(this.tool2);
+    assertSame("Tool2/Type2 should have count 2 for Memeber1.", 2, typeCounts.get(this.type2));
 
-    assertSame("Tool1/Category1 should have count 2 for Memeber1.", 2, member1IssueCounts
-        .get(this.pair1));
-    assertSame("Tool2/Category2 should have count 1 for Memeber1.", 1, member1IssueCounts
-        .get(this.pair2));
-
-    Map<ToolCategoryPair, Integer> member3IssueCounts = counter
-        .getMemeberCodeIssueCounts(this.member3);
-    assertSame("Should have 0 as the count because no category was given.", 0, member3IssueCounts
-        .get(this.pair3));
+    ToolToTypeCounter member3CodeIssueCounts = counter.getMemberCodeIssueCounts(this.member3);
+    typeCounts = member3CodeIssueCounts.getTypeCounts(this.tool2);
+    assertTrue("Member3 should have no types for tool2", typeCounts.isEmpty());
   }
 }

@@ -361,7 +361,7 @@ public class DailyProjectDataClient {
    * @param timestamp The Timestamp indicating the start of the 24 hour period
    * of CodeIssue data.
    * @param tool An optional tool for matching CodeIssue data.
-   * @param category An optional category for matching CodeIssue categories.
+   * @param type An optional type for matching CodeIssue types.
    * @return A CodeIssueDailyProjectData instance.
    * @throws DailyProjectDataClientException If the credentials associated with
    * this instance are not valid, or if the underlying SensorBase service cannot
@@ -369,8 +369,9 @@ public class DailyProjectDataClient {
    * is not valid.
    */
   public synchronized CodeIssueDailyProjectData getCodeIssue(String user, String project,
-      XMLGregorianCalendar timestamp, String tool, String category)
-    throws DailyProjectDataClientException {
+      XMLGregorianCalendar timestamp, String tool, String type) 
+      throws DailyProjectDataClientException {
+
     StringBuilder requestStringBuilder = new StringBuilder("codeissue/");
     requestStringBuilder.append(user);
     requestStringBuilder.append("/");
@@ -385,15 +386,15 @@ public class DailyProjectDataClient {
       requestStringBuilder.append(tool);
       questionMarkAppended = true;
     }
-    if (category != null) {
+    if (type != null) {
       if (questionMarkAppended) {
         requestStringBuilder.append("&");
       }
       else {
         requestStringBuilder.append("?");
       }
-      requestStringBuilder.append("Category=");
-      requestStringBuilder.append(category);
+      requestStringBuilder.append("Type=");
+      requestStringBuilder.append(type);
     }
 
     Response response = makeRequest(Method.GET, requestStringBuilder.toString(), null);
