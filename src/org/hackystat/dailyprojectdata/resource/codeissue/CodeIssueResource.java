@@ -217,7 +217,7 @@ public class CodeIssueResource extends DailyProjectDataResource {
   /**
    * Determines if the property prefixed with "Type_" exists in the sensor data's properties.
    * 
-   * @param propertyName The property prefixed with "Type:".
+   * @param propertyName The property prefixed with "Type_".
    * @param sensorData The sensor data instance to check.
    * @return Returns true if it exists, otherwise false.
    */
