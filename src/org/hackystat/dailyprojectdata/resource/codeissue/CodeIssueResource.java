@@ -84,19 +84,16 @@ public class CodeIssueResource extends DailyProjectDataResource {
       try {
         // [1] get the SensorBaseClient for the user making this request.
         SensorBaseClient client = super.getSensorBaseClient();
-        // [2] get a SensorDataIndex of all sensor data for this Project on the requested day.
+        // [2] get a SensorDataIndex of all CodeIssue data for this Project on the requested day.
         XMLGregorianCalendar startTime = Tstamp.makeTimestamp(this.timestamp);
         XMLGregorianCalendar endTime = Tstamp.incrementDays(startTime, 1);
         SensorDataIndex index = client.getProjectSensorData(authUser, project, startTime,
-            endTime);
-        // [3] look through this index for CodeIssue sensor data
+            endTime, "CodeIssue");
+        // [3] Add this data to the Sorter.
         CodeIssueRuntimeSorter sorter = new CodeIssueRuntimeSorter();
         for (SensorDataRef ref : index.getSensorDataRef()) {
-          if (ref.getSensorDataType().equals("CodeIssue")) {
-            // tell client to get the SensorData
             SensorData sensorData = client.getSensorData(ref);
             this.addSensorDataToSorter(sorter, sensorData);
-          }
         }
         // [4] process all SensorData with the latest runtime
         MemberCodeIssueCounter counter = new MemberCodeIssueCounter();

@@ -66,14 +66,12 @@ public class UnitTestResource extends DailyProjectDataResource {
         // [2] get a SensorDataIndex of UnitTest sensor data for this Project on the requested day.
         XMLGregorianCalendar startTime = Tstamp.makeTimestamp(this.timestamp);
         XMLGregorianCalendar endTime = Tstamp.incrementDays(startTime, 1);
-        SensorDataIndex index = client.getProjectSensorData(authUser, project, startTime, endTime);
-        // [3] look through this index for UnitTest sensor data, and update counters.
+        SensorDataIndex index = client.getProjectSensorData(authUser, project, startTime, endTime,
+            "UnitTest");
+        // [3] Update the counter with this data.
         UnitTestCounter counter = new UnitTestCounter();
         for (SensorDataRef ref : index.getSensorDataRef()) {
-          if (ref.getSensorDataType().equals("UnitTest")) {
-            // [4] looks like we got some UnitTest data in here - accounting
-            counter.add(client.getSensorData(ref));
-          } 
+          counter.add(client.getSensorData(ref));
         } 
 
         // return resulting data

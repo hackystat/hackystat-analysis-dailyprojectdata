@@ -60,17 +60,16 @@ public class DevTimeResource extends DailyProjectDataResource {
       try {
         // [1] get the SensorBaseClient for the user making this request.
         SensorBaseClient client = super.getSensorBaseClient();
-        // [2] get a SensorDataIndex of all sensor data for this Project on the requested day.
+        // [2] get a SensorDataIndex of all DevEvent data for this Project on the requested day.
         XMLGregorianCalendar startTime = Tstamp.makeTimestamp(this.timestamp);
         XMLGregorianCalendar endTime = Tstamp.incrementDays(startTime, 1);
-        SensorDataIndex index = client.getProjectSensorData(authUser, project, startTime, endTime);
-        // [3] look through this index for DevEvent sensor data, and update the DevTime counter. 
+        SensorDataIndex index = client.getProjectSensorData(authUser, project, startTime, endTime, 
+            "DevEvent");
+        // [3] update the DevTime counter. 
         MemberDevTimeCounter counter = new MemberDevTimeCounter();
         for (SensorDataRef ref : index.getSensorDataRef()) {
-          if (ref.getSensorDataType().equals("DevEvent")) {
-            // If it's a devEvent, get the member and timestamp and update the MemberDevTimeCounter.
-            counter.addMemberDevEvent(ref.getOwner(), ref.getTimestamp());
-          }
+          // Get the member and timestamp and update the MemberDevTimeCounter.
+          counter.addMemberDevEvent(ref.getOwner(), ref.getTimestamp());
         }
         // [4] create and return the DevTimeDailyProjectData
         DevTimeDailyProjectData devTime = new DevTimeDailyProjectData();

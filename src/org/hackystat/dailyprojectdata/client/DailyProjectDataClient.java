@@ -222,7 +222,6 @@ public class DailyProjectDataClient {
     }
     try {
       String xmlData = response.getEntity().getText();
-      System.out.println(xmlData);
       devTime = makeDevTimeDailyProjectData(xmlData);
     }
     catch (Exception e) {

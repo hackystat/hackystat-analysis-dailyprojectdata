@@ -65,18 +65,15 @@ public class CoverageResource extends DailyProjectDataResource {
         CoverageCounter counter = new CoverageCounter();
         // [1] get the SensorBaseClient for the user making this request.
         SensorBaseClient client = super.getSensorBaseClient();
-        // [2] get a SensorDataIndex of all sensor data for this Project on the
+        // [2] get a SensorDataIndex of all Coverage data for this Project on the
         // requested day.
         XMLGregorianCalendar startTime = Tstamp.makeTimestamp(this.timestamp);
         XMLGregorianCalendar endTime = Tstamp.incrementDays(startTime, 1);
         SensorDataIndex index = client.getProjectSensorData(authUser, project, startTime,
-            endTime);
-
-        // [3] Create the CoverageData instances.
+            endTime, "Coverage");
+        // [3] Add the Coverage data to the counter. 
         for (SensorDataRef ref : index.getSensorDataRef()) {
-          if ("Coverage".equals(ref.getSensorDataType())) {
-            counter.addCoverageData(client.getSensorData(ref));
-          }
+          counter.addCoverageData(client.getSensorData(ref));
         }
 
         // [4] Get the latest batch of data for each project member.
