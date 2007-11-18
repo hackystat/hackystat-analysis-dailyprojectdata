@@ -14,10 +14,23 @@ import org.hackystat.sensorbase.resource.sensordata.jaxb.SensorData;
 public class CoverageData {
   /** The wrapped data instance. */
   private final SensorData data;
+  /** The string used to mark the class level granularity of coverage data. */
+  public static final String GRANULARITY_CLASS = "class";
+  /** The string used to mark the block level granularity of coverage data. */
+  public static final String GRANULARITY_BLOCK = "block";
+  /** The string used to mark the method level granularity of coverage data. */
+  public static final String GRANULARITY_METHOD = "method";
+  /** The string used to mark the line level granularity of coverage data. */
+  public static final String GRANULARITY_LINE = "line";
   /** The property name of the "uncovered" coverage values. */
   private static final String UNCOVERED_NAME = "Uncovered";
   /** The property name of the "covered" coverage values. */
   private static final String COVERED_NAME = "Covered";
+  /**
+   * The seperator between the granularity and covered and uncovered data
+   * strings. For example, "line_Uncovered".
+   */
+  private static final String SEPERATOR = "_";
 
   /**
    * Constructs this object with the specified SensorData instance.
@@ -44,19 +57,31 @@ public class CoverageData {
   }
 
   /**
-   * Returns the uncovered coverage value.
+   * Returns the uncovered coverage value. This method assumes that the
+   * uncovered data is stored as a property in the following format:
+   * 'granularity_Uncovered' where granularity is a lower case string.
+   * @param granularity the level of uncovered data to return.
    * @return the uncovered value.
    */
-  public int getUncovered() {
-    return Double.valueOf(this.getCoverageProperty(UNCOVERED_NAME).getValue()).intValue();
+  public int getUncovered(String granularity) {
+    String lowerCaseGranularity = granularity.toLowerCase();
+    String coverageProperty = this.getCoverageProperty(
+        lowerCaseGranularity + SEPERATOR + UNCOVERED_NAME).getValue();
+    return Double.valueOf(coverageProperty).intValue();
   }
 
   /**
-   * Returns the covered coverage value.
+   * Returns the covered coverage value. This method assumes that the covered
+   * data is stored as a property in the following format: 'granularity_Covered'
+   * where granularity is a lower case string.
+   * @param granularity the level of covered data to return.
    * @return the covered value.
    */
-  public int getCovered() {
-    return Double.valueOf(this.getCoverageProperty(COVERED_NAME).getValue()).intValue();
+  public int getCovered(String granularity) {
+    String lowerCaseGranularity = granularity.toLowerCase();
+    String coverageProperty = this.getCoverageProperty(
+        lowerCaseGranularity + SEPERATOR + COVERED_NAME).getValue();
+    return Double.valueOf(coverageProperty).intValue();
   }
 
   /**
@@ -103,12 +128,19 @@ public class CoverageData {
   }
 
   /**
-   * Returns the string representation of this object, which is useful for
+   * Returns the string representation of this data object, which is useful for
    * debugging purposes.
    * @return the string representation.
    */
   public String toString() {
-    return "Owner=" + this.getOwner() + ", Resource=" + this.getResource() + ", Covered="
-        + this.getCovered() + ", Uncovered=" + this.getUncovered();
+    return "Owner=" + this.getOwner() + ", Resource=" + this.getResource() + "line_covered="
+        + this.getCovered(GRANULARITY_LINE) + ", line_uncovered="
+        + this.getUncovered(GRANULARITY_LINE) + ", method_covered="
+        + this.getCovered(GRANULARITY_METHOD) + ", method_uncovered="
+        + this.getUncovered(GRANULARITY_METHOD) + ", block_covered="
+        + this.getCovered(GRANULARITY_BLOCK) + ", block_uncovered="
+        + this.getUncovered(GRANULARITY_BLOCK) + ", class_covered="
+        + this.getCovered(GRANULARITY_CLASS) + ", class_uncovered="
+        + this.getUncovered(GRANULARITY_CLASS);
   }
 }

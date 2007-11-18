@@ -3,7 +3,6 @@ package org.hackystat.dailyprojectdata.resource.coverage;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.hackystat.sensorbase.resource.sensordata.jaxb.Property;
 import org.hackystat.sensorbase.resource.sensordata.jaxb.SensorData;
 
 /**
@@ -41,20 +40,16 @@ public class CoverageDataContainer {
   }
 
   /**
-   * Returns the data that has the specified owner and granularity. If no such
-   * data exists, an empty list is returned.
+   * Returns the data that has the specified owner. If no such data exists, an
+   * empty list is returned.
    * @param owner the owner of the data.
-   * @param granularity the coverage granularity of the data. (line, class,
-   * method, etc).
    * @return the list of coverage data associated with the owner and coverage
    * granularity.
    */
-  public List<CoverageData> getData(String owner, String granularity) {
+  public List<CoverageData> getData(String owner) {
     List<CoverageData> filtereddata = new ArrayList<CoverageData>();
     for (CoverageData data : this.data) {
-      Property property = data.getCoverageProperty("Granularity");
-      if (data.getOwner().equalsIgnoreCase(owner)
-          && property.getValue().equalsIgnoreCase(granularity)) {
+      if (data.getOwner().equalsIgnoreCase(owner)) {
         filtereddata.add(data);
       }
     }

@@ -1,9 +1,10 @@
 package org.hackystat.dailyprojectdata.resource.coverage;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.Date;
 
@@ -30,23 +31,35 @@ public class TestCoverageData {
   @Before
   public void setUp() {
     XMLGregorianCalendar runtime = Tstamp.makeTimestamp(new Date().getTime());
-    this.sensorData = this.createData(runtime, "austen@hawaii.edu", "C:\\foo.java", "line",
-        10.0, 1.0);
+    this.sensorData = createData(runtime.toString(), runtime.toString(), "austen@hawaii.edu",
+        "C:\\foo.java");
     this.coverageData = new CoverageData(this.sensorData);
   }
 
   /** Tests if the correct amount of uncovered coverage entities is returned. */
   @Test
   public void testGetUncovered() {
-    assertEquals("The amount of uncovered lines is incorrect.", 10, this.coverageData
-        .getUncovered());
+    assertEquals("The amount of 'line' uncovered data is incorrect.", 1, this.coverageData
+        .getUncovered(CoverageData.GRANULARITY_LINE));
+    assertEquals("The amount of 'method' uncovered data is incorrect.", 2, this.coverageData
+        .getUncovered(CoverageData.GRANULARITY_METHOD));
+    assertEquals("The amount of 'class' uncovered data is incorrect.", 3, this.coverageData
+        .getUncovered(CoverageData.GRANULARITY_CLASS));
+    assertEquals("The amount of 'block' uncovered data is incorrect.", 4, this.coverageData
+        .getUncovered(CoverageData.GRANULARITY_BLOCK));
   }
 
   /** Tests if the correct amount of uncovered coverage entities is returned. */
   @Test
   public void testGetCovered() {
-    assertEquals("The amount of covered lines is incorrect.", 1, this.coverageData
-        .getCovered());
+    assertEquals("The amount of 'line' covered data is incorrect.", 5, this.coverageData
+        .getCovered(CoverageData.GRANULARITY_LINE));
+    assertEquals("The amount of 'method' covered data is incorrect.", 6, this.coverageData
+        .getCovered(CoverageData.GRANULARITY_METHOD));
+    assertEquals("The amount of 'class' covered data is incorrect.", 7, this.coverageData
+        .getCovered(CoverageData.GRANULARITY_CLASS));
+    assertEquals("The amount of 'block' covered data is incorrect.", 8, this.coverageData
+        .getCovered(CoverageData.GRANULARITY_BLOCK));
   }
 
   /**
@@ -66,10 +79,11 @@ public class TestCoverageData {
   @Test
   public void testGetCoverageProperty() {
     // First, let's test an existing property.
-    Property coveredProperty = this.coverageData.getCoverageProperty("Covered");
-    assertEquals("The Covered Property Name is incorrect.", "Covered", coveredProperty
+    String propertyName = CoverageData.GRANULARITY_LINE + "_Covered";
+    Property coveredProperty = this.coverageData.getCoverageProperty(propertyName);
+    assertEquals("The Covered Property Name is incorrect.", propertyName, coveredProperty
         .getKey());
-    assertEquals("The Covered Property Value is incorrect.", "1.0", coveredProperty.getValue());
+    assertEquals("The Covered Property Value is incorrect.", "5.0", coveredProperty.getValue());
 
     // Next, let's test if a non-existent property returns null.
     assertNull("Null was not returned for a non-existent property.", this.coverageData
@@ -89,53 +103,113 @@ public class TestCoverageData {
 
     // Next, test instances with different SensorData objects.
     XMLGregorianCalendar runtime = Tstamp.makeTimestamp(new Date().getTime() + 10);
-    SensorData sensorData = this.createData(runtime, "austen@hawaii.edu", "C:\\foo.java",
-        "line", 10.0, 1.0);
+    SensorData sensorData = createData(runtime.toString(), runtime.toString(),
+        "austen@hawaii.edu", "C:\\foo.java");
     assertFalse("Instances with the differnt SensorData are not equal.", this.coverageData
         .equals(new CoverageData(sensorData)));
 
     // Finally, test if different object types are not equal.
-    assertFalse("Instances with the differnt SensorData are not equal.", this.coverageData
+    assertFalse("Instances with the different SensorData are not equal.", this.coverageData
         .equals("Foo String"));
+  }
+
+  /**
+   * Tests if the correct coverage data is returned regardless of the
+   * granularity's case.
+   */
+  @Test
+  public void testGranularityCaseInsensitivity() {
+    // Tests the covered data case insensitivity.
+    assertEquals("Incorrect number of covered lines using 'Line'.", 5, this.coverageData
+        .getCovered("Line"));
+    assertEquals("Incorrect number of covered lines using 'LINE'.", 5, this.coverageData
+        .getCovered("LINE"));
+    assertEquals("Incorrect number of covered lines using 'lINE'.", 5, this.coverageData
+        .getCovered("lINE"));
+    assertEquals("Incorrect number of covered lines using 'line'.", 5, this.coverageData
+        .getCovered("line"));
+
+    // Tests the uncovered data case insensitivity.
+    assertEquals("Incorrect number of uncovered lines using 'Line'.", 1, this.coverageData
+        .getUncovered("Line"));
+    assertEquals("Incorrect number of uncovered lines using 'LINE'.", 1, this.coverageData
+        .getUncovered("LINE"));
+    assertEquals("Incorrect number of uncovered lines using 'lINE'.", 1, this.coverageData
+        .getUncovered("lINE"));
+    assertEquals("Incorrect number of uncovered lines using 'line'.", 1, this.coverageData
+        .getUncovered("line"));
 
   }
 
   /**
    * A helper method used to create the SensorData instances used to by this
    * test class.
+   * @param timestamp the timestamp of the created sensor data instance.
    * @param runtime the runtime of the SensorData instance.
    * @param owner the specified owner.
    * @param resource the specified resource.
-   * @param granularity the specified granularity.
-   * @param uncovered the specified amount of uncovered entity types.
-   * @param covered the specified amount of covered entity types.
    * @return the populated SensorData instance.
    */
-  private SensorData createData(XMLGregorianCalendar runtime, String owner, String resource,
-      String granularity, double uncovered, double covered) {
-    SensorData data = new SensorData();
-    data.setOwner(owner);
-    data.setRuntime(runtime);
-    data.setTool("Emma");
-    data.setResource(resource);
+  public static SensorData createData(String timestamp, String runtime, String owner,
+      String resource) {
+    try {
+      SensorData data = new SensorData();
+      data.setOwner(owner);
+      data.setTimestamp(Tstamp.makeTimestamp(timestamp));
+      data.setRuntime(Tstamp.makeTimestamp(runtime));
+      data.setSensorDataType("Coverage");
+      data.setTool("Emma");
+      data.setResource(resource);
 
-    Properties props = new Properties();
-    Property typeProperty = new Property();
-    typeProperty.setKey("Granularity");
-    typeProperty.setValue(granularity);
-    props.getProperty().add(typeProperty);
+      // Sets the uncovered values.
+      Properties props = new Properties();
+      Property lineUncoveredProperty = new Property();
+      lineUncoveredProperty.setKey("line_Uncovered");
+      lineUncoveredProperty.setValue("1.0");
+      props.getProperty().add(lineUncoveredProperty);
 
-    Property uncoveredProperty = new Property();
-    uncoveredProperty.setKey("Uncovered");
-    uncoveredProperty.setValue(Double.valueOf(uncovered).toString());
-    props.getProperty().add(uncoveredProperty);
+      Property methodUncoveredProperty = new Property();
+      methodUncoveredProperty.setKey("method_Uncovered");
+      methodUncoveredProperty.setValue("2.0");
+      props.getProperty().add(methodUncoveredProperty);
 
-    Property coveredProperty = new Property();
-    coveredProperty.setKey("Covered");
-    coveredProperty.setValue(Double.valueOf(covered).toString());
-    props.getProperty().add(coveredProperty);
+      Property classUncoveredProperty = new Property();
+      classUncoveredProperty.setKey("class_Uncovered");
+      classUncoveredProperty.setValue("3.0");
+      props.getProperty().add(classUncoveredProperty);
 
-    data.setProperties(props);
-    return data;
+      Property blockUncoveredProperty = new Property();
+      blockUncoveredProperty.setKey("block_Uncovered");
+      blockUncoveredProperty.setValue("4.0");
+      props.getProperty().add(blockUncoveredProperty);
+
+      // Sets the covered values.
+      Property lineCoveredProperty = new Property();
+      lineCoveredProperty.setKey("line_Covered");
+      lineCoveredProperty.setValue("5.0");
+      props.getProperty().add(lineCoveredProperty);
+
+      Property methodCoveredProperty = new Property();
+      methodCoveredProperty.setKey("method_Covered");
+      methodCoveredProperty.setValue("6.0");
+      props.getProperty().add(methodCoveredProperty);
+
+      Property classCoveredProperty = new Property();
+      classCoveredProperty.setKey("class_Covered");
+      classCoveredProperty.setValue("7.0");
+      props.getProperty().add(classCoveredProperty);
+
+      Property blockCoveredProperty = new Property();
+      blockCoveredProperty.setKey("block_Covered");
+      blockCoveredProperty.setValue("8.0");
+      props.getProperty().add(blockCoveredProperty);
+
+      data.setProperties(props);
+      return data;
+    }
+    catch (Exception e) {
+      fail("Failed to create test data. " + e.getMessage());
+    }
+    return null;
   }
 }

@@ -1,7 +1,6 @@
 package org.hackystat.dailyprojectdata.resource.coverage;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -66,25 +65,7 @@ public class TestCoverageCounter {
     assertTrue("The second batch does not have the second entry.", latestData.getData()
         .contains(this.secondBatch02));
   }
-
-  /** Tests if null is returned when there is no latest batch of data. */
-  @Test
-  public void testGetLatestBatchNoData() {
-    CoverageCounter counter = new CoverageCounter();
-    assertNull("No latest batch does not return null.", counter.getLatestBatch());
-  }
-
-  /** Tests if the counter has data or not. */
-  @Test
-  public void testHasData() {
-    // Tests if there is no data.
-    CoverageCounter counter = new CoverageCounter();
-    assertFalse("There should be no data.", counter.hasData());
-
-    // Tests if data exists.
-    assertTrue("There should be existing data.", this.counter.hasData());
-  }
-
+  
   /**
    * A helper method used to create the SensorData instances used to by this
    * test class.

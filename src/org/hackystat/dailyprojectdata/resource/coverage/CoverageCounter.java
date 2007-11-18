@@ -1,74 +1,52 @@
 package org.hackystat.dailyprojectdata.resource.coverage;
 
-import java.util.SortedMap;
-import java.util.TreeMap;
-
 import javax.xml.datatype.XMLGregorianCalendar;
 
-import org.hackystat.dailyprojectdata.resource.codeissue.TimestampComparator;
 import org.hackystat.sensorbase.resource.sensordata.jaxb.SensorData;
+import org.hackystat.utilities.tstamp.Tstamp;
 
 /**
- * The class managing the mapping of coverage runtimes -> coverage data. The
- * runtime is used to associate Coverage SensorData together.
+ * The class managing the the latest snapshot of coverage data.
  * 
  * @author aito
  * 
  */
 public class CoverageCounter {
-  /** The mapping of data runtime to the tool coverage data. */
-  private SortedMap<XMLGregorianCalendar, CoverageDataContainer> timeToCoverage = 
-    new TreeMap<XMLGregorianCalendar, CoverageDataContainer>(new TimestampComparator());
+  /** The current latest runtime. */
+  private long latestRuntime = 0L;
+  /** The object storing the latest snapshot of coverage data. */
+  private CoverageDataContainer dataContainer = new CoverageDataContainer();
 
   /**
    * Adds the specified data instance to this class.
    * @param data the specified data instance.
    */
   public void addCoverageData(SensorData data) {
-    XMLGregorianCalendar runtime = data.getRuntime();
-    if (this.timeToCoverage.containsKey(runtime)) {
-      CoverageDataContainer coverageData = this.timeToCoverage.get(runtime);
-      coverageData.addCoverageData(data);
+    long runtime = Tstamp.makeTimestamp(data.getRuntime()).getTime();
+
+    if (runtime > this.latestRuntime) {
+      this.latestRuntime = runtime;
+      this.dataContainer = new CoverageDataContainer();
     }
-    else {
-      CoverageDataContainer coverageData = new CoverageDataContainer();
-      coverageData.addCoverageData(data);
-      this.timeToCoverage.put(runtime, coverageData);
-    }
+    this.dataContainer.addCoverageData(data);
   }
 
   /**
-   * Returns true if this class has stored any data.
-   * @return true if data exists, false if not.
-   */
-  public boolean hasData() {
-    if (this.timeToCoverage.keySet().isEmpty()) {
-      return false;
-    }
-    return true;
-  }
-
-  /**
-   * Returns the last runtime with sensor data. Null is returned if no data
-   * exists.
+   * Returns the last runtime with sensor data.
    * @return the last runtime value.
    */
   public XMLGregorianCalendar getLastRuntime() {
-    if (this.hasData()) {
-      return this.timeToCoverage.lastKey();
+    if (this.latestRuntime == 0L) {
+      return null;
     }
-    return null;
+    return Tstamp.makeTimestamp(this.latestRuntime);
   }
 
   /**
-   * Returns the last batch of coverage data stored in this class. Null is
-   * returned if no data exists.
+   * Returns the last batch of coverage data stored in this class.
    * @return the last batch of data.
    */
   public CoverageDataContainer getLatestBatch() {
-    if (hasData()) {
-      return this.timeToCoverage.get(this.timeToCoverage.lastKey());
-    }
-    return null;
+    return this.dataContainer;
   }
 }

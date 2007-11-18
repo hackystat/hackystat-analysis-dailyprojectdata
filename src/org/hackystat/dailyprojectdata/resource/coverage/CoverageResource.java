@@ -62,40 +62,37 @@ public class CoverageResource extends DailyProjectDataResource {
   public Representation getRepresentation(Variant variant) {
     if (variant.getMediaType().equals(MediaType.TEXT_XML)) {
       try {
-        CoverageCounter counter = new CoverageCounter();
         // [1] get the SensorBaseClient for the user making this request.
         SensorBaseClient client = super.getSensorBaseClient();
         // [2] get a SensorDataIndex of all Coverage data for this Project on the
         // requested day.
         XMLGregorianCalendar startTime = Tstamp.makeTimestamp(this.timestamp);
         XMLGregorianCalendar endTime = Tstamp.incrementDays(startTime, 1);
-        SensorDataIndex index = client.getProjectSensorData(authUser, project, startTime,
-            endTime, "Coverage");
-        // [3] Add the Coverage data to the counter. 
+        SensorDataIndex index = client.getProjectSensorData(this.authUser, this.project,
+            startTime, endTime, "Coverage");
+
+        CoverageCounter counter = new CoverageCounter();
         for (SensorDataRef ref : index.getSensorDataRef()) {
           counter.addCoverageData(client.getSensorData(ref));
         }
-
         // [4] Get the latest batch of data for each project member.
         CoverageDailyProjectData coverageData = new CoverageDailyProjectData();
-        if (counter.hasData()) {
-          CoverageDataContainer latestData = counter.getLatestBatch();
-          for (String owner : latestData.getOwners()) {
-            for (CoverageData data : latestData.getData(owner, this.granularity)) {
-              ConstructData constructData = new ConstructData();
-              constructData.setName(data.getResource());
-              constructData.setNumCovered(data.getCovered());
-              constructData.setNumUncovered(data.getUncovered());
-              coverageData.getConstructData().add(constructData);
-            }
+        CoverageDataContainer latestData = counter.getLatestBatch();
+        for (String owner : latestData.getOwners()) {
+          for (CoverageData data : latestData.getData(owner)) {
+            ConstructData constructData = new ConstructData();
+            constructData.setName(data.getResource());
+            constructData.setNumCovered(data.getCovered(this.granularity));
+            constructData.setNumUncovered(data.getUncovered(this.granularity));
+            coverageData.getConstructData().add(constructData);
           }
-
-          coverageData.setStartTime(counter.getLastRuntime());
-          coverageData.setOwner(uriUser);
-          coverageData.setProject(project);
-          String xmlData = this.makeCoverage(coverageData);
-          return super.getStringRepresentation(xmlData);
         }
+
+        coverageData.setStartTime(counter.getLastRuntime());
+        coverageData.setOwner(uriUser);
+        coverageData.setProject(project);
+        String xmlData = this.makeCoverage(coverageData);
+        return super.getStringRepresentation(xmlData);
       }
       catch (Exception e) {
         server.getLogger().warning("Error processing devTime: " + StackTrace.toString(e));
