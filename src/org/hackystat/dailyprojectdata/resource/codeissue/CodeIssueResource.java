@@ -135,17 +135,6 @@ public class CodeIssueResource extends DailyProjectDataResource {
             }
             codeIssue.getMemberData().add(memberData);
           }
-
-          // Map<ToolTypePair, Integer> memeberCodeIssueCounts = counter
-          // .getMemeberCodeIssueCounts(member);
-          // for (Entry<ToolTypePair, Integer> entry : memeberCodeIssueCounts.entrySet()) {
-          // MemberData memberData = new MemberData();
-          // memberData.setTool(entry.getKey().getTool());
-          // memberData.setCategory(entry.getKey().getType());
-          // memberData.setCodeIssues(entry.getValue());
-          // memberData.setMemberUri(sensorBaseHost + "users/" + member);
-          // codeIssue.getMemberData().add(memberData);
-          // }
         }
         codeIssue.setStartTime(sorter.getLastRuntime());
         codeIssue.setOwner(uriUser);
