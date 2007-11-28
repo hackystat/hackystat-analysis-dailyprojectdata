@@ -13,6 +13,7 @@
     <schemavalidate noNamespaceFile="${schema.dir}/UnitTestDailyProjectData.xsd" file="${examples.dir}/unittestdailyprojectdata.example.xml"/>
   	<schemavalidate noNamespaceFile="${schema.dir}/CodeIssueDailyProjectData.xsd" file="${examples.dir}/codeissuedailyprojectdata.example.xml"/>
     <schemavalidate noNamespaceFile="${schema.dir}/CoverageDailyProjectData.xsd" file="${examples.dir}/coveragedailyprojectdata.example.xml"/>
+    <schemavalidate noNamespaceFile="${schema.dir}/BuildDailyProjectData.xsd" file="${examples.dir}/builddailyprojectdata.example.xml"/>
   </target>
 </project>
 

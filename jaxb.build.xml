@@ -28,5 +28,8 @@
        <xjc schema="${basedir}/xml/schema/FileMetricDailyProjectData.xsd" destdir="src" package="org.hackystat.dailyprojectdata.resource.filemetric.jaxb">
             <produces dir="${src.dir}/org/hackystat/dailyprojectdata/resource/filemetric/jaxb" includes="*" />
        </xjc>
+		<xjc schema="${basedir}/xml/schema/BuildDailyProjectData.xsd" destdir="src" package="org.hackystat.dailyprojectdata.resource.build.jaxb">
+			<produces dir="${src.dir}/org/hackystat/dailyprojectdata/resource/build/jaxb" includes="*" />
+		</xjc>
 	</target>
 </project>

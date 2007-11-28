@@ -60,7 +60,7 @@ public class TestCodeIssueRestApi extends DailyProjectDataTestHelper {
    */
   @Test
   public void testGetCodeIssues() throws Exception {
-    // First, create a batch of DevEvent sensor data.
+    // First, create a batch of CodeIssue sensor data.
 
     Map<String, Integer> checkstyleCounts = new HashMap<String, Integer>();
     checkstyleCounts.put(TYPE_AVOID_STAR_IMPORT, 2);

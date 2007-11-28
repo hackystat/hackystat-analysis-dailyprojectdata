@@ -6,6 +6,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.datatype.XMLGregorianCalendar;
 
+import org.hackystat.dailyprojectdata.resource.build.jaxb.BuildDailyProjectData;
 import org.hackystat.dailyprojectdata.resource.codeissue.jaxb.CodeIssueDailyProjectData;
 import org.hackystat.dailyprojectdata.resource.coverage.jaxb.CoverageDailyProjectData;
 import org.hackystat.dailyprojectdata.resource.devtime.jaxb.DevTimeDailyProjectData;
@@ -52,6 +53,8 @@ public class DailyProjectDataClient {
   private JAXBContext codeIssueJAXB;
   /** CodeIssue JAXBContext */
   private JAXBContext coverageJAXB;
+  /** Build JAXB Context. */
+  private JAXBContext buildJAXB;
   /** The http authentication approach. */
   private ChallengeScheme scheme = ChallengeScheme.HTTP_BASIC;
   /** The preferred representation type. */
@@ -97,6 +100,8 @@ public class DailyProjectDataClient {
           .newInstance(org.hackystat.dailyprojectdata.resource.codeissue.jaxb.ObjectFactory.class);
       this.coverageJAXB = JAXBContext
           .newInstance(org.hackystat.dailyprojectdata.resource.coverage.jaxb.ObjectFactory.class);
+      this.buildJAXB = JAXBContext
+          .newInstance(org.hackystat.dailyprojectdata.resource.build.jaxb.ObjectFactory.class);
     }
     catch (Exception e) {
       throw new RuntimeException("Couldn't create JAXB context instances.", e);
@@ -486,5 +491,68 @@ public class DailyProjectDataClient {
     throws Exception {
     Unmarshaller unmarshaller = this.codeIssueJAXB.createUnmarshaller();
     return (CodeIssueDailyProjectData) unmarshaller.unmarshal(new StringReader(xmlString));
+  }
+  
+  /**
+   * Returns a BuildDailyProjectData instance from this server, or throws a
+   * DailyProjectData exception if problems occurred.
+   * 
+   * @param user The user that owns the project.
+   * @param project The project owned by user.
+   * @param timestamp The Timestamp indicating the start of the 24 hour period
+   * of build data.
+   * @param type The type of build to retrieve data for.
+   * @return A BuildDailyProjectData instance.
+   * @throws DailyProjectDataClientException If the credentials associated with
+   * this instance are not valid, or if the underlying SensorBase service cannot
+   * be reached, or if one or more of the supplied user, password, or timestamp
+   * is not valid.
+   */
+  public synchronized BuildDailyProjectData getBuild(String user, String project,
+      XMLGregorianCalendar timestamp, String type) throws DailyProjectDataClientException {
+    
+    StringBuilder requestStringBuilder = new StringBuilder("build/");
+    requestStringBuilder.append(user);
+    requestStringBuilder.append("/");
+    requestStringBuilder.append(project);
+    requestStringBuilder.append("/");
+    requestStringBuilder.append(timestamp);
+    
+    if (type != null) {
+      requestStringBuilder.append("?");
+      requestStringBuilder.append("Type=");
+      requestStringBuilder.append(type);
+    }
+
+    Response response = makeRequest(Method.GET, requestStringBuilder.toString(), null);
+
+    BuildDailyProjectData build;
+
+    if (!response.getStatus().isSuccess()) {
+      System.err.println(requestStringBuilder.toString());
+      throw new DailyProjectDataClientException(response.getStatus());
+    }
+    try {
+      String xmlData = response.getEntity().getText();
+      build = makeBuildDailyProjectData(xmlData);
+    }
+    catch (Exception e) {
+      throw new DailyProjectDataClientException(response.getStatus(), e);
+    }
+    return build;
+  }
+
+  /**
+   * Takes a String encoding of a BuildDailyProjectData in XML format and
+   * converts it.
+   * 
+   * @param xmlString The XML string representing a DevTimeDailyProjectData.
+   * @return The corresponding BuildDailyProjectData instance.
+   * @throws Exception If problems occur during unmarshalling.
+   */
+  private BuildDailyProjectData makeBuildDailyProjectData(String xmlString)
+    throws Exception {
+    Unmarshaller unmarshaller = this.buildJAXB.createUnmarshaller();
+    return (BuildDailyProjectData) unmarshaller.unmarshal(new StringReader(xmlString));
   }
 }
