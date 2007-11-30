@@ -39,7 +39,6 @@ public class SensorDataRefComparator implements Comparator<SensorDataRef>, Seria
    * @return Returns -1, 0, or 1 if the first argument is less than, equal to, or greater than
    *         the second.
    */
-  @Override
   public int compare(SensorDataRef o1, SensorDataRef o2) {
     int result = this.compare(o1.getTimestamp(), o2.getTimestamp());
     

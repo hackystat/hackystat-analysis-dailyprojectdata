@@ -89,6 +89,7 @@ public class CoverageData {
    * @param object the object to test.
    * @return true if equal, false if not.
    */
+  @Override
   public boolean equals(Object object) {
     if (this == object) {
       return true;
@@ -105,6 +106,7 @@ public class CoverageData {
    * Returns the hashcode of this object.
    * @return the hashcode.
    */
+  @Override
   public int hashCode() {
     int result = 17;
     result = 37 * result + this.data.hashCode();
@@ -132,6 +134,7 @@ public class CoverageData {
    * debugging purposes.
    * @return the string representation.
    */
+  @Override
   public String toString() {
     return "Owner=" + this.getOwner() + ", Resource=" + this.getResource() + "line_covered="
         + this.getCovered(GRANULARITY_LINE) + ", line_uncovered="

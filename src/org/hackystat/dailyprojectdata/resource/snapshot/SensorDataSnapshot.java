@@ -275,7 +275,6 @@ public class SensorDataSnapshot implements Iterable<SensorData> {
    * 
    * @return Returns an iterator over the last <code>SensorData</code> snapshot.
    */
-  @Override
   public Iterator<SensorData> iterator() {
     return this.latestSnapshot.iterator();
   }
