@@ -226,7 +226,7 @@ public class SensorDataSnapshot implements Iterable<SensorData> {
       this.prevBucket = snapshotBucket;
       return snapshotBucket;
     }
-    // previous bucket started at the start start of day so it was the last bucket
+    // previous bucket started at the start of day so it was the last bucket
     return null;
   }
 
