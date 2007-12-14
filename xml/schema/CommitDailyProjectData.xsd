@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+	<!-- Primitive elements and attributes -->
+	<xs:attribute name="Project" type="xs:string" />
+	<xs:attribute name="Owner" type="xs:string" />
+	<xs:attribute name="StartTime" type="xs:dateTime" />
+	<xs:attribute name="Type" type="xs:string" />
+	<xs:attribute name="Tool" type="xs:string" />
+
+	<xs:attribute name="MemberUri" type="xs:string" />
+	<xs:attribute name="Commits" type="xs:int" />
+	<xs:attribute name="LinesAdded" type="xs:int" />
+	<xs:attribute name="LinesDeleted" type="xs:int" />
+	<xs:attribute name="LinesChanged" type="xs:int" />
+
+	<xs:element name="CommitDailyProjectData">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="MemberData" minOccurs="1" maxOccurs="unbounded" />
+			</xs:sequence>
+			<xs:attribute ref="Project" />
+			<xs:attribute ref="Owner" />
+			<xs:attribute ref="StartTime" />
+			<xs:attribute ref="Type" />
+			<xs:attribute ref="Tool" />
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="MemberData">
+		<xs:complexType>
+			<xs:attribute ref="MemberUri" />
+			<xs:attribute ref="Commits" />
+			<xs:attribute ref="LinesAdded" />
+			<xs:attribute ref="LinesDeleted" />
+			<xs:attribute ref="LinesChanged" />
+		</xs:complexType>
+	</xs:element>
+
+</xs:schema>

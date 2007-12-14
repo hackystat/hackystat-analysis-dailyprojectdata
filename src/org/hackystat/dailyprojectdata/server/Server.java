@@ -6,7 +6,6 @@ import static org.hackystat.dailyprojectdata.server.ServerProperties.LOGGING_LEV
 import static org.hackystat.dailyprojectdata.server.ServerProperties.PORT_KEY;
 import static org.hackystat.dailyprojectdata.server.ServerProperties.SENSORBASE_FULLHOST_KEY;
 
-
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -14,6 +13,7 @@ import javax.xml.bind.JAXBContext;
 
 import org.hackystat.dailyprojectdata.resource.build.BuildResource;
 import org.hackystat.dailyprojectdata.resource.codeissue.CodeIssueResource;
+import org.hackystat.dailyprojectdata.resource.commit.CommitResource;
 import org.hackystat.dailyprojectdata.resource.coverage.CoverageResource;
 import org.hackystat.dailyprojectdata.resource.devtime.DevTimeResource;
 import org.hackystat.dailyprojectdata.resource.filemetric.FileMetricResource;
@@ -117,6 +117,9 @@ public class Server extends Application {
     JAXBContext buildJAXB = JAXBContext.newInstance(
         org.hackystat.dailyprojectdata.resource.build.jaxb.ObjectFactory.class);
     attributes.put("BuildJAXB", buildJAXB);
+    JAXBContext commitJAXB = JAXBContext.newInstance(
+        org.hackystat.dailyprojectdata.resource.commit.jaxb.ObjectFactory.class);
+    attributes.put("CommitJAXB", commitJAXB);
     
     // Provide a pointer to this server in the Context so that Resources can get at this server.
     attributes.put("DailyProjectDataServer", server);
@@ -172,6 +175,7 @@ public class Server extends Application {
     authRouter.attach("/coverage/{user}/{project}/{timestamp}/{type}", CoverageResource.class);
     authRouter.attach("/build/{user}/{project}/{timestamp}", BuildResource.class);
     authRouter.attach("/build/{user}/{project}/{timestamp}?Type={Type}", BuildResource.class);
+    authRouter.attach("/commit/{user}/{project}/{timestamp}", CommitResource.class);
 
     // Here's the Guard that we will place in front of authRouter.
     Guard guard = new Authenticator(getContext(), 

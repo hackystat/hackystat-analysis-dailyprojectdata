@@ -8,6 +8,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.hackystat.dailyprojectdata.resource.build.jaxb.BuildDailyProjectData;
 import org.hackystat.dailyprojectdata.resource.codeissue.jaxb.CodeIssueDailyProjectData;
+import org.hackystat.dailyprojectdata.resource.commit.jaxb.CommitDailyProjectData;
 import org.hackystat.dailyprojectdata.resource.coverage.jaxb.CoverageDailyProjectData;
 import org.hackystat.dailyprojectdata.resource.devtime.jaxb.DevTimeDailyProjectData;
 import org.hackystat.dailyprojectdata.resource.filemetric.jaxb.FileMetricDailyProjectData;
@@ -53,6 +54,8 @@ public class DailyProjectDataClient {
   private JAXBContext codeIssueJAXB;
   /** CodeIssue JAXBContext */
   private JAXBContext coverageJAXB;
+  /** Commit JAXBContext */
+  private JAXBContext commitJAXB;
   /** Build JAXB Context. */
   private JAXBContext buildJAXB;
   /** The http authentication approach. */
@@ -102,6 +105,8 @@ public class DailyProjectDataClient {
           .newInstance(org.hackystat.dailyprojectdata.resource.coverage.jaxb.ObjectFactory.class);
       this.buildJAXB = JAXBContext
           .newInstance(org.hackystat.dailyprojectdata.resource.build.jaxb.ObjectFactory.class);
+      this.commitJAXB = JAXBContext
+          .newInstance(org.hackystat.dailyprojectdata.resource.commit.jaxb.ObjectFactory.class);
     }
     catch (Exception e) {
       throw new RuntimeException("Couldn't create JAXB context instances.", e);
@@ -373,8 +378,8 @@ public class DailyProjectDataClient {
    * is not valid.
    */
   public synchronized CodeIssueDailyProjectData getCodeIssue(String user, String project,
-      XMLGregorianCalendar timestamp, String tool, String type) 
-      throws DailyProjectDataClientException {
+      XMLGregorianCalendar timestamp, String tool, String type)
+    throws DailyProjectDataClientException {
 
     StringBuilder requestStringBuilder = new StringBuilder("codeissue/");
     requestStringBuilder.append(user);
@@ -469,8 +474,8 @@ public class DailyProjectDataClient {
    * Takes a String encoding of a CoverageDailyProjectData in XML format and
    * converts it.
    * 
-   * @param xmlString The XML string representing a CodeIssueDailyProjectData.
-   * @return The corresponding CodeIssueDailyProjectData instance.
+   * @param xmlString The XML string representing a CoverageDailyProjectData.
+   * @return The corresponding CoverageDailyProjectData instance.
    * @throws Exception If problems occur during unmarshalling.
    */
   private CoverageDailyProjectData makeCoverageDailyProjectData(String xmlString)
@@ -479,6 +484,61 @@ public class DailyProjectDataClient {
     return (CoverageDailyProjectData) unmarshaller.unmarshal(new StringReader(xmlString));
   }
 
+  /**
+   * Returns a CommitDailyProjectData instance from this server, or throws a
+   * DailyProjectData exception if problems occurred.
+   * 
+   * @param user The user that owns the project.
+   * @param project The project owned by user.
+   * @param timestamp The Timestamp indicating the start of the 24 hour period
+   * of CodeIssue data.
+   * @return A CommitDailyProjectData instance.
+   * @throws DailyProjectDataClientException If the credentials associated with
+   * this instance are not valid, or if the underlying SensorBase service cannot
+   * be reached, or if one or more of the supplied user, password, or timestamp
+   * is not valid.
+   */
+  public synchronized CommitDailyProjectData getCommit(String user, String project,
+      XMLGregorianCalendar timestamp)
+    throws DailyProjectDataClientException {
+    StringBuilder requestStringBuilder = new StringBuilder("commit/");
+    requestStringBuilder.append(user);
+    requestStringBuilder.append("/");
+    requestStringBuilder.append(project);
+    requestStringBuilder.append("/");
+    requestStringBuilder.append(timestamp);
+
+    Response response = makeRequest(Method.GET, requestStringBuilder.toString(), null);
+    CommitDailyProjectData commit;
+
+    if (!response.getStatus().isSuccess()) {
+      System.err.println(requestStringBuilder.toString());
+      throw new DailyProjectDataClientException(response.getStatus());
+    }
+    try {
+      String xmlData = response.getEntity().getText();
+      commit = makeCommitDailyProjectData(xmlData);
+    }
+    catch (Exception e) {
+      throw new DailyProjectDataClientException(response.getStatus(), e);
+    }
+    return commit;
+  }
+
+  /**
+   * Takes a String encoding of a CommitDailyProjectData in XML format and
+   * converts it.
+   * 
+   * @param xmlString The XML string representing a CommitDailyProjectData.
+   * @return The corresponding CommitsDailyProjectData instance.
+   * @throws Exception If problems occur during unmarshalling.
+   */
+  private CommitDailyProjectData makeCommitDailyProjectData(String xmlString)
+    throws Exception {
+    Unmarshaller unmarshaller = this.commitJAXB.createUnmarshaller();
+    return (CommitDailyProjectData) unmarshaller.unmarshal(new StringReader(xmlString));
+  }
+  
   /**
    * Takes a String encoding of a CodeIssueDailyProjectData in XML format and
    * converts it.
@@ -492,7 +552,7 @@ public class DailyProjectDataClient {
     Unmarshaller unmarshaller = this.codeIssueJAXB.createUnmarshaller();
     return (CodeIssueDailyProjectData) unmarshaller.unmarshal(new StringReader(xmlString));
   }
-  
+
   /**
    * Returns a BuildDailyProjectData instance from this server, or throws a
    * DailyProjectData exception if problems occurred.
@@ -510,14 +570,14 @@ public class DailyProjectDataClient {
    */
   public synchronized BuildDailyProjectData getBuild(String user, String project,
       XMLGregorianCalendar timestamp, String type) throws DailyProjectDataClientException {
-    
+
     StringBuilder requestStringBuilder = new StringBuilder("build/");
     requestStringBuilder.append(user);
     requestStringBuilder.append("/");
     requestStringBuilder.append(project);
     requestStringBuilder.append("/");
     requestStringBuilder.append(timestamp);
-    
+
     if (type != null) {
       requestStringBuilder.append("?");
       requestStringBuilder.append("Type=");
@@ -550,8 +610,7 @@ public class DailyProjectDataClient {
    * @return The corresponding BuildDailyProjectData instance.
    * @throws Exception If problems occur during unmarshalling.
    */
-  private BuildDailyProjectData makeBuildDailyProjectData(String xmlString)
-    throws Exception {
+  private BuildDailyProjectData makeBuildDailyProjectData(String xmlString) throws Exception {
     Unmarshaller unmarshaller = this.buildJAXB.createUnmarshaller();
     return (BuildDailyProjectData) unmarshaller.unmarshal(new StringReader(xmlString));
   }
