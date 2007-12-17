@@ -44,6 +44,9 @@ public class SensorDataSnapshot implements Iterable<SensorData> {
   /** End of the snapshot day. */
   private XMLGregorianCalendar endOfDay;
 
+  /** The number of buckets retrieved to create the snapshot. */
+  private int bucketsRetrieved = 0;
+
   /**
    * Creates a new snapshot.
    * 
@@ -58,12 +61,7 @@ public class SensorDataSnapshot implements Iterable<SensorData> {
    */
   public SensorDataSnapshot(SensorBaseClient client, String user, String project, String sdt,
       Day day) throws SensorBaseClientException {
-
-    long lastTickOfTheDay = day.getLastTickOfTheDay();
-    long firstTickOfTheDay = day.getFirstTickOfTheDay();
-    this.startOfDay = Tstamp.makeTimestamp(firstTickOfTheDay);
-    this.endOfDay = Tstamp.makeTimestamp(lastTickOfTheDay);
-
+    this.setUpStartEndDay(day);
     this.createLatestSnapshot(client, user, project, sdt);
   }
 
@@ -83,8 +81,9 @@ public class SensorDataSnapshot implements Iterable<SensorData> {
    */
   public SensorDataSnapshot(SensorBaseClient client, String user, String project, String sdt,
       Day day, int bucketSize) throws SensorBaseClientException {
-    this(client, user, project, sdt, day);
     this.bucketSize = bucketSize;
+    this.setUpStartEndDay(day);
+    this.createLatestSnapshot(client, user, project, sdt);
   }
 
   /**
@@ -105,18 +104,25 @@ public class SensorDataSnapshot implements Iterable<SensorData> {
   public SensorDataSnapshot(SensorBaseClient client, String user, String project, String sdt,
       Day day, int bucketSize, String tool) throws SensorBaseClientException {
     this.bucketSize = bucketSize;
-    
-    long lastTickOfTheDay = day.getLastTickOfTheDay();
-    long firstTickOfTheDay = day.getFirstTickOfTheDay();
-    this.startOfDay = Tstamp.makeTimestamp(firstTickOfTheDay);
-    this.endOfDay = Tstamp.makeTimestamp(lastTickOfTheDay);    
-    
+    this.setUpStartEndDay(day);
     this.createLatestToolSnapshot(client, user, project, sdt, tool);
   }
 
   /**
-   * Iterates over intervals of time and queries the server for sensordata to create the
-   * latest snapshot for the specified tool.
+   * Sets up the start and end day time variables used by the snapshot.
+   * 
+   * @param day The day to use at when setting the start and end of day.
+   */
+  private void setUpStartEndDay(Day day) {
+    long lastTickOfTheDay = day.getLastTickOfTheDay();
+    long firstTickOfTheDay = day.getFirstTickOfTheDay();
+    this.startOfDay = Tstamp.makeTimestamp(firstTickOfTheDay);
+    this.endOfDay = Tstamp.makeTimestamp(lastTickOfTheDay);
+  }
+
+  /**
+   * Iterates over intervals of time and queries the server for sensordata to create the latest
+   * snapshot for the specified tool.
    * 
    * @param client The <code>SensorBaseClient</code> to be used for querying for
    *          <code>SensorData</code>.
@@ -129,10 +135,10 @@ public class SensorDataSnapshot implements Iterable<SensorData> {
    */
   private void createLatestToolSnapshot(SensorBaseClient client, String user, String project,
       String sdt, String tool) throws SensorBaseClientException {
-    
+
     SnapshotBucket bucket = this.getNextBucket();
-    
-    // stop checking if older data is seen, or if 
+
+    // stop checking if older data is seen, or if
     // bucket becomes null when the entire day has been iterated through
     while (!this.seenOlderData && bucket != null) {
       SensorDataIndex index = client.getProjectSensorData(user, project,
@@ -157,7 +163,7 @@ public class SensorDataSnapshot implements Iterable<SensorData> {
       }
       bucket = this.getNextBucket();
     }
-    
+
   }
 
   /**
@@ -176,8 +182,8 @@ public class SensorDataSnapshot implements Iterable<SensorData> {
       String sdt) throws SensorBaseClientException {
 
     SnapshotBucket bucket = this.getNextBucket();
-    
-    // stop checking if older data is seen, or if 
+
+    // stop checking if older data is seen, or if
     // bucket becomes null when the entire day has been iterated through
     while (!this.seenOlderData && bucket != null) {
       SensorDataIndex index = client.getProjectSensorData(user, project,
@@ -196,7 +202,9 @@ public class SensorDataSnapshot implements Iterable<SensorData> {
           this.addData(sensorData);
         }
       }
-      bucket = this.getNextBucket();
+      if (!this.seenOlderData) {
+        bucket = this.getNextBucket();
+      }
     }
   }
 
@@ -212,6 +220,7 @@ public class SensorDataSnapshot implements Iterable<SensorData> {
       XMLGregorianCalendar startTime = this.getStartTime(this.endOfDay);
       SnapshotBucket snapshotBucket = new SnapshotBucket(startTime, this.endOfDay);
       this.prevBucket = snapshotBucket;
+      this.bucketsRetrieved++;
       return snapshotBucket;
     }
     else if (this.prevBucket.getStartTime().compare(this.startOfDay) == DatatypeConstants.GREATER) {
@@ -224,6 +233,7 @@ public class SensorDataSnapshot implements Iterable<SensorData> {
 
       SnapshotBucket snapshotBucket = new SnapshotBucket(newStartTime, newEndTime);
       this.prevBucket = snapshotBucket;
+      this.bucketsRetrieved++;
       return snapshotBucket;
     }
     // previous bucket started at the start of day so it was the last bucket
@@ -277,5 +287,15 @@ public class SensorDataSnapshot implements Iterable<SensorData> {
    */
   public Iterator<SensorData> iterator() {
     return this.latestSnapshot.iterator();
+  }
+
+  /**
+   * Gets the number of buckets that were retrieved to create the snapshot. This method is only
+   * meant for testing purposes.
+   * 
+   * @return Returns the number of buckets retrieved during snapshot creation.
+   */
+  int getNumberOfBucketsRetrieved() {
+    return this.bucketsRetrieved;
   }
 }
