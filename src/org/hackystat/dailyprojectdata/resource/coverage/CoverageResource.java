@@ -1,6 +1,7 @@
 package org.hackystat.dailyprojectdata.resource.coverage;
 
 import java.io.StringWriter;
+import java.util.Iterator;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
@@ -15,10 +16,11 @@ import javax.xml.transform.stream.StreamResult;
 import org.hackystat.dailyprojectdata.resource.coverage.jaxb.ConstructData;
 import org.hackystat.dailyprojectdata.resource.coverage.jaxb.CoverageDailyProjectData;
 import org.hackystat.dailyprojectdata.resource.dailyprojectdata.DailyProjectDataResource;
+import org.hackystat.dailyprojectdata.resource.snapshot.SensorDataSnapshot;
 import org.hackystat.sensorbase.client.SensorBaseClient;
-import org.hackystat.sensorbase.resource.sensordata.jaxb.SensorDataIndex;
-import org.hackystat.sensorbase.resource.sensordata.jaxb.SensorDataRef;
+import org.hackystat.sensorbase.resource.sensordata.jaxb.SensorData;
 import org.hackystat.utilities.stacktrace.StackTrace;
+import org.hackystat.utilities.time.period.Day;
 import org.hackystat.utilities.tstamp.Tstamp;
 import org.restlet.Context;
 import org.restlet.data.MediaType;
@@ -64,22 +66,23 @@ public class CoverageResource extends DailyProjectDataResource {
       try {
         // [1] get the SensorBaseClient for the user making this request.
         SensorBaseClient client = super.getSensorBaseClient();
-        // [2] get a SensorDataIndex of all Coverage data for this Project on the
-        // requested day.
-        XMLGregorianCalendar startTime = Tstamp.makeTimestamp(this.timestamp);
-        XMLGregorianCalendar endTime = Tstamp.incrementDays(startTime, 1);
-        SensorDataIndex index = client.getProjectSensorData(this.authUser, this.project,
-            startTime, endTime, "Coverage");
 
-        CoverageCounter counter = new CoverageCounter();
-        for (SensorDataRef ref : index.getSensorDataRef()) {
-          counter.addCoverageData(client.getSensorData(ref));
+        // [2] Get all Coverage data for this Project on the requested day.
+        XMLGregorianCalendar startTime = Tstamp.makeTimestamp(this.timestamp);
+        Day day = Day.getInstance(startTime);
+        SensorDataSnapshot snapshot = new SensorDataSnapshot(client, this.authUser,
+            this.project, "Coverage", day);
+
+        //[3] Load the data into a data container to abstract retrieval.
+        CoverageDataContainer dataContainer = new CoverageDataContainer();
+        for (Iterator<SensorData> i = snapshot.iterator(); i.hasNext();) {
+          dataContainer.addCoverageData(i.next());
         }
+
         // [4] Get the latest batch of data for each project member.
         CoverageDailyProjectData coverageData = new CoverageDailyProjectData();
-        CoverageDataContainer latestData = counter.getLatestBatch();
-        for (String owner : latestData.getOwners()) {
-          for (CoverageData data : latestData.getData(owner)) {
+        for (String owner : dataContainer.getOwners()) {
+          for (CoverageData data : dataContainer.getData(owner)) {
             ConstructData constructData = new ConstructData();
             constructData.setName(data.getResource());
             constructData.setNumCovered(data.getCovered(this.granularity));
@@ -88,7 +91,7 @@ public class CoverageResource extends DailyProjectDataResource {
           }
         }
 
-        coverageData.setStartTime(counter.getLastRuntime());
+        coverageData.setStartTime(dataContainer.getRuntime());
         coverageData.setOwner(uriUser);
         coverageData.setProject(project);
         String xmlData = this.makeCoverage(coverageData);

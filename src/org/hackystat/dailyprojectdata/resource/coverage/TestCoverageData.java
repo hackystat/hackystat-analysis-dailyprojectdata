@@ -26,14 +26,22 @@ public class TestCoverageData {
   /** The fields that are tested in this test class. */
   private CoverageData coverageData = null;
   private SensorData sensorData = null;
+  private XMLGregorianCalendar runtime = null;
 
   /** Setup this test class. */
   @Before
   public void setUp() {
-    XMLGregorianCalendar runtime = Tstamp.makeTimestamp(new Date().getTime());
-    this.sensorData = createData(runtime.toString(), runtime.toString(), "austen@hawaii.edu",
-        "C:\\foo.java");
+    this.runtime = Tstamp.makeTimestamp(new Date().getTime());
+    this.sensorData = createData(this.runtime.toString(), this.runtime.toString(),
+        "austen@hawaii.edu", "C:\\foo.java");
     this.coverageData = new CoverageData(this.sensorData);
+  }
+
+  /** Tests if the correct runtime is returned. */
+  @Test
+  public void testGetRuntime() {
+    assertEquals("The returned runtime is incorrect.", this.runtime, this.coverageData
+        .getRuntime());
   }
 
   /** Tests if the correct amount of uncovered coverage entities is returned. */

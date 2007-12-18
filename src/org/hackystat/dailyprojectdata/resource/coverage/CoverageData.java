@@ -2,6 +2,8 @@ package org.hackystat.dailyprojectdata.resource.coverage;
 
 import java.util.List;
 
+import javax.xml.datatype.XMLGregorianCalendar;
+
 import org.hackystat.sensorbase.resource.sensordata.jaxb.Property;
 import org.hackystat.sensorbase.resource.sensordata.jaxb.SensorData;
 
@@ -127,6 +129,14 @@ public class CoverageData {
       }
     }
     return null;
+  }
+
+  /**
+   * Returns the runtime of this data instance.
+   * @return the runtime of this data.
+   */
+  public XMLGregorianCalendar getRuntime() {
+    return this.data.getRuntime();
   }
 
   /**

@@ -3,13 +3,14 @@ package org.hackystat.dailyprojectdata.resource.coverage;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.xml.datatype.XMLGregorianCalendar;
+
 import org.hackystat.sensorbase.resource.sensordata.jaxb.SensorData;
 
 /**
  * The class wrapping all of SensorData entries that are related. This class
- * enforces no rules on how each SensorData instance is related. The classes
- * that implement this container should specify the contract of what data is
- * stored in each container.
+ * enforces no rules on how each SensorData instance is related. A normal usage
+ * of this class is store data with the same runtime. stored in each container.
  * @author aito
  * 
  */
@@ -63,5 +64,19 @@ public class CoverageDataContainer {
    */
   public List<CoverageData> getData() {
     return new ArrayList<CoverageData>(this.data);
+  }
+
+  /**
+   * Returns the runtime of the data stored in this container. This method
+   * assumes that all of the data stored in this container have the same
+   * runtime. If no data is stored in this container, a runtime exception is
+   * thrown because there is no runtime.
+   * @return the runtime of the data stored in this container.
+   */
+  public XMLGregorianCalendar getRuntime() {
+    if (this.data.isEmpty()) {
+      throw new IllegalStateException("No data stored in this container");
+    }
+    return this.data.get(0).getRuntime();
   }
 }

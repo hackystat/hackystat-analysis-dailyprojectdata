@@ -2,6 +2,7 @@ package org.hackystat.dailyprojectdata.resource.coverage;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.Date;
 import java.util.List;
@@ -27,13 +28,14 @@ public class TestCoverageDataContainer {
   private String userAaron = "kagawaa@hawaii.edu";
   private CoverageData dataAusten01 = null;
   private CoverageData dataAusten02 = null;
+  private XMLGregorianCalendar runtimeCalendar = null;
 
   /** Setup the CoverageData that is tested. */
   @Before
   public void setUp() {
     // First, create the test SensorData instances.
-    XMLGregorianCalendar runtimeCalendar = Tstamp.makeTimestamp(new Date().getTime());
-    String runtimeString = runtimeCalendar.toString();
+    this.runtimeCalendar = Tstamp.makeTimestamp(new Date().getTime());
+    String runtimeString = this.runtimeCalendar.toString();
     SensorData sensorDataAusten01 = TestCoverageData.createData(runtimeString, runtimeString,
         userAusten, "C:\\foo.java");
     SensorData sensorDataAusten02 = TestCoverageData.createData(runtimeString, runtimeString,
@@ -88,5 +90,23 @@ public class TestCoverageDataContainer {
     // Tests a non-existent user.
     List<CoverageData> emptyData = this.data.getData("testUser");
     assertEquals("There should be no data for a non-existent user.", 0, emptyData.size());
+  }
+
+  /** Tests if the correct runtime is returned. */
+  @Test
+  public void testGetRuntime() {
+    assertEquals("The returned runtime is incorrect.", this.runtimeCalendar, this.data
+        .getRuntime());
+  }
+
+  /**
+   * Tests if a runtime exception is thrown if there is no data in a container
+   * when the runtime is retrieved.
+   */
+  @Test(expected = IllegalStateException.class)
+  public void testGetNoDataRuntime() {
+    CoverageDataContainer container = new CoverageDataContainer();
+    container.getRuntime();
+    fail("A runtime exception should be thrown.");
   }
 }
