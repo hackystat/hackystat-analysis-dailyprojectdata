@@ -601,6 +601,25 @@ public class DailyProjectDataClient {
     }
     return build;
   }
+  
+  /**
+   * Returns a BuildDailyProjectData instance from this server, or throws a
+   * DailyProjectData exception if problems occurred.
+   * 
+   * @param user The user that owns the project.
+   * @param project The project owned by user.
+   * @param timestamp The Timestamp indicating the start of the 24 hour period
+   * of build data.
+   * @return A BuildDailyProjectData instance.
+   * @throws DailyProjectDataClientException If the credentials associated with
+   * this instance are not valid, or if the underlying SensorBase service cannot
+   * be reached, or if one or more of the supplied user, password, or timestamp
+   * is not valid.
+   */
+  public synchronized BuildDailyProjectData getBuild(String user, String project,
+      XMLGregorianCalendar timestamp) throws DailyProjectDataClientException {
+    return getBuild(user, project, timestamp, null);
+  }
 
   /**
    * Takes a String encoding of a BuildDailyProjectData in XML format and
