@@ -32,8 +32,9 @@ import org.w3c.dom.Document;
 
 /**
  * Implements the Resource for processing GET {host}/unittest/{user}/{projectname}/{timestamp}
- * requests. Requires the authenticated user to be {user} or else the Admin user for the sensorbase
- * connected to this service.
+ * requests. 
+ * 
+ * Authenticated user must be the uriUser, or Admin, or project member. 
  * 
  * @author Pavel Senin, Philip Johnson
  */
@@ -80,7 +81,7 @@ public class UnitTestResource extends DailyProjectDataResource {
         String sensorBaseHost = this.server.getServerProperties().get(SENSORBASE_FULLHOST_KEY);
         for (String member : counter.getMembers()) {
           MemberData memberData = new MemberData();
-          memberData.setMemberUri(sensorBaseHost + "users/" + member);
+          memberData.setMemberUri(sensorBaseHost + "/users/" + member);
           memberData.setSuccess(counter.getPassCount(member));
           memberData.setFailure(counter.getFailCount(member));
           unitTestDPD.getMemberData().add(memberData);
@@ -96,7 +97,7 @@ public class UnitTestResource extends DailyProjectDataResource {
 
       }
       catch (Exception e) {
-        server.getLogger().warning("Error processing unitTest: " + StackTrace.toString(e));
+        server.getLogger().warning("Error processing UnitTest DPD: " + StackTrace.toString(e));
         return null;
       }
     }

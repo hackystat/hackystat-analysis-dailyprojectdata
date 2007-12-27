@@ -38,8 +38,8 @@ import org.w3c.dom.Document;
 
 /**
  * Implements the Resource for processing GET {host}/build/{user}/{project}/{timestamp}
- * requests. Requires the authenticated user to be {user} or else the Admin user for the
- * sensorbase connected to this service.
+ * requests. 
+ * Authenticated user must be the uriUser, or Admin, or project member. 
  * 
  * @author jsakuda
  */
@@ -76,7 +76,7 @@ public class BuildResource extends DailyProjectDataResource {
         // [2] get a SensorDataIndex of all Build data for this Project on the requested day.
         XMLGregorianCalendar startTime = Tstamp.makeTimestamp(this.timestamp);
         XMLGregorianCalendar endTime = Tstamp.incrementDays(startTime, 1);
-        SensorDataIndex index = client.getProjectSensorData(authUser, project, startTime,
+        SensorDataIndex index = client.getProjectSensorData(uriUser, project, startTime,
             endTime, "Build");
         // [3] update the build data counter
         MemberBuildCounter counter = new MemberBuildCounter();
@@ -101,7 +101,7 @@ public class BuildResource extends DailyProjectDataResource {
         Set<String> members = counter.getMembers();
         for (String member : members) {
           MemberData memberData = new MemberData();
-          memberData.setMemberUri(sensorBaseHost + "users/" + member);
+          memberData.setMemberUri(sensorBaseHost + "/users/" + member);
           Integer failures = failedBuilds.get(member);
           if (failures == null) {
             // no mapping for member in failed builds, means user had no failed builds
@@ -133,7 +133,7 @@ public class BuildResource extends DailyProjectDataResource {
         return super.getStringRepresentation(xmlData);
       }
       catch (Exception e) {
-        server.getLogger().warning("Error processing build: " + StackTrace.toString(e));
+        server.getLogger().warning("Error processing Build DPD: " + StackTrace.toString(e));
         return null;
       }
     }

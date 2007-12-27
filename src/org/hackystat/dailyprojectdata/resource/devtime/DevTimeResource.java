@@ -51,6 +51,7 @@ public class DevTimeResource extends DailyProjectDataResource {
   /**
    * Returns an DevTimeDailyProjectData instance representing the DevTime associated with the 
    * Project data, or null if not authorized. 
+   * Authenticated user must be the uriUser, or Admin, or project member. 
    * @param variant The representational variant requested.
    * @return The representation. 
    */
@@ -63,7 +64,7 @@ public class DevTimeResource extends DailyProjectDataResource {
         // [2] get a SensorDataIndex of all DevEvent data for this Project on the requested day.
         XMLGregorianCalendar startTime = Tstamp.makeTimestamp(this.timestamp);
         XMLGregorianCalendar endTime = Tstamp.incrementDays(startTime, 1);
-        SensorDataIndex index = client.getProjectSensorData(authUser, project, startTime, endTime, 
+        SensorDataIndex index = client.getProjectSensorData(uriUser, project, startTime, endTime, 
             "DevEvent");
         // [3] update the DevTime counter. 
         MemberDevTimeCounter counter = new MemberDevTimeCounter();
@@ -77,7 +78,7 @@ public class DevTimeResource extends DailyProjectDataResource {
         String sensorBaseHost = this.server.getServerProperties().get(SENSORBASE_FULLHOST_KEY);
         for (String member : counter.getMembers()) {
           MemberData memberData = new MemberData();
-          memberData.setMemberUri(sensorBaseHost + "users/" + member);
+          memberData.setMemberUri(sensorBaseHost + "/users/" + member);
           memberData.setDevTime(counter.getMemberDevTime(member));
           devTime.getMemberData().add(memberData);
         }
@@ -89,7 +90,7 @@ public class DevTimeResource extends DailyProjectDataResource {
         return super.getStringRepresentation(xmlData);
       }
       catch (Exception e) {
-        server.getLogger().warning("Error processing devTime: " + StackTrace.toString(e));
+        server.getLogger().warning("Error processing DevTime DPD: " + StackTrace.toString(e));
         return null;
       }
     }

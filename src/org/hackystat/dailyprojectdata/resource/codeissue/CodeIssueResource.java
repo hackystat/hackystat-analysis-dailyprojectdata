@@ -41,8 +41,9 @@ import org.w3c.dom.Document;
 
 /**
  * Implements the Resource for processing GET {host}/codeissue/{user}/{project}/{timestamp}
- * requests. Requires the authenticated user to be {user} or else the Admin user for the
- * sensorbase connected to this service.
+ * requests. 
+ * 
+ * Authenticated user must be the uriUser, or Admin, or project member. 
  * 
  * @author jsakuda
  */
@@ -123,7 +124,7 @@ public class CodeIssueResource extends DailyProjectDataResource {
             // create one MemberData instance per tool
             MemberData memberData = new MemberData();
             memberData.setTool(tool);
-            memberData.setMemberUri(sensorBaseHost + "users/" + member);
+            memberData.setMemberUri(sensorBaseHost + "/users/" + member);
 
             Map<String, Integer> typeCounts = toolToTypeCounter.getTypeCounts(tool);
             for (Entry<String, Integer> entry : typeCounts.entrySet()) {
@@ -145,7 +146,7 @@ public class CodeIssueResource extends DailyProjectDataResource {
         return super.getStringRepresentation(xmlData);
       }
       catch (Exception e) {
-        server.getLogger().warning("Error processing CodeIssues: " + StackTrace.toString(e));
+        server.getLogger().warning("Error processing CodeIssue DPD: " + StackTrace.toString(e));
         return null;
       }
     }

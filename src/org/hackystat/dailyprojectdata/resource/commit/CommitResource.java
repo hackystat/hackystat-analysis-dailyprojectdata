@@ -1,5 +1,7 @@
 package org.hackystat.dailyprojectdata.resource.commit;
 
+import static org.hackystat.dailyprojectdata.server.ServerProperties.SENSORBASE_FULLHOST_KEY;
+
 import java.io.StringWriter;
 
 import javax.xml.bind.JAXBContext;
@@ -30,9 +32,9 @@ import org.w3c.dom.Document;
 
 /**
  * Implements the Resource for processing GET
- * {host}/commit/{user}/{project}/{timestamp}/ requests. Requires the
- * authenticated user to be {user} or else the Admin user for the sensorbase
- * connected to this service.
+ * {host}/commit/{user}/{project}/{timestamp}/ requests. 
+ * 
+ * Authenticated user must be the uriUser, or Admin, or project member. 
  * 
  * @author jsakuda
  * @author austen
@@ -75,9 +77,11 @@ public class CommitResource extends DailyProjectDataResource {
         }
 
         // [4] Get the aggregate data for each project member.
+        String sensorBaseHost = this.server.getServerProperties().get(SENSORBASE_FULLHOST_KEY);
         CommitDailyProjectData commitData = new CommitDailyProjectData();
         for (String owner : container.getOwners()) {
           MemberData memberData = new MemberData();
+          memberData.setMemberUri(sensorBaseHost + "/users/" + owner);
           memberData.setCommits(container.getCommits(owner));
           memberData.setLinesAdded(container.getLinesAdded(owner));
           memberData.setLinesDeleted(container.getLinesDeleted(owner));
@@ -92,7 +96,7 @@ public class CommitResource extends DailyProjectDataResource {
         return super.getStringRepresentation(xmlData);
       }
       catch (Exception e) {
-        server.getLogger().warning("Error processing devTime: " + StackTrace.toString(e));
+        server.getLogger().warning("Error processing Commit DPD: " + StackTrace.toString(e));
         return null;
       }
     }

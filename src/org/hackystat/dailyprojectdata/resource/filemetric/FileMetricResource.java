@@ -54,6 +54,7 @@ public class FileMetricResource extends DailyProjectDataResource {
   /**
    * Returns an DevTimeDailyProjectData instance representing the FileMetric
    * associated with the Project data, or null if not authorized.
+   * Authenticated user must be the uriUser, or Admin, or project member. 
    * 
    * @param variant The representational variant requested.
    * @return The representation.
@@ -94,7 +95,7 @@ public class FileMetricResource extends DailyProjectDataResource {
         String xmlData = makeFileMetric(fileSize);
         return super.getStringRepresentation(xmlData);
       } catch (Exception e) {
-        server.getLogger().warning("Error processing fileMetric: " + StackTrace.toString(e));
+        server.getLogger().warning("Error processing FileMetric DPD: " + StackTrace.toString(e));
         return null;
       }
     }

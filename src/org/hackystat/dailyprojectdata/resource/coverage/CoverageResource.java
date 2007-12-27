@@ -32,9 +32,9 @@ import org.w3c.dom.Document;
 
 /**
  * Implements the Resource for processing GET
- * {host}/coverage/{user}/{project}/{timestamp}/{type} requests. Requires the
- * authenticated user to be {user} or else the Admin user for the sensorbase
- * connected to this service.
+ * {host}/coverage/{user}/{project}/{timestamp}/{type} requests. 
+ * 
+ * Authenticated user must be the uriUser, or Admin, or project member. 
  * 
  * @author jsakuda
  * @author austen
@@ -98,7 +98,7 @@ public class CoverageResource extends DailyProjectDataResource {
         return super.getStringRepresentation(xmlData);
       }
       catch (Exception e) {
-        server.getLogger().warning("Error processing devTime: " + StackTrace.toString(e));
+        server.getLogger().warning("Error processing Coverage DPD: " + StackTrace.toString(e));
         return null;
       }
     }

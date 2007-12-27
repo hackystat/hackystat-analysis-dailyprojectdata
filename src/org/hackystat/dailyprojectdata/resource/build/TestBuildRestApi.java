@@ -36,7 +36,7 @@ public class TestBuildRestApi extends DailyProjectDataTestHelper {
   private String user = "TestBuild@hackystat.org";
 
   /**
-   * Test that GET {host}/build/{user}/default/{starttime} works properly. First, it creates a
+   * Test that GET {host}/build/{user}/Default/{starttime} works properly. First, it creates a
    * test user and sends some sample Build data to the SensorBase. Then, it invokes the GET
    * request and checks to see that it obtains the right answer. Finally, it deletes the data
    * and the user.
