@@ -1,6 +1,6 @@
 package org.hackystat.dailyprojectdata.resource.coverage;
 
-import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertEquals;
 
 import javax.xml.datatype.XMLGregorianCalendar;
 
@@ -24,11 +24,11 @@ public class TestCoverageRestApi extends DailyProjectDataTestHelper {
   /** Constant for Project. */
   private static final String PROJECT = "Default";
   /** The user for this test case. */
-  private String user = "TestCodeIssue@hackystat.org";
+  private String user = "TestCoverageDpd@hackystat.org";
 
   /**
-   * Test that GET {host}/codeissue/{user}/default/{starttime} works properly.
-   * First, it creates a test user and sends some sample CodeIssue data to the
+   * Test that GET {host}/coverage/{user}/Default/{starttime} works properly.
+   * First, it creates a test user and sends some sample Coverage data to the
    * SensorBase. Then, it invokes the GET request and checks to see that it
    * obtains the right answer. Finally, it deletes the data and the user.
    * 
@@ -61,16 +61,18 @@ public class TestCoverageRestApi extends DailyProjectDataTestHelper {
         getDailyProjectDataHostName(), user, user);
     dpdClient.authenticate();
 
-    XMLGregorianCalendar requestTstamp = Tstamp.makeTimestamp("2007-10-30");
-    CoverageDailyProjectData lineCoverage = dpdClient.getCoverage(user, PROJECT,
-        requestTstamp, "line");
-    assertSame("Checking for 4 coverage entries with a 'line' granularity.", 4, lineCoverage
-        .getConstructData().size());
+    XMLGregorianCalendar tstamp = Tstamp.makeTimestamp("2007-10-30");
+    CoverageDailyProjectData lineCoverage = dpdClient.getCoverage(user, PROJECT, tstamp, "line");
+    assertEquals("Checking 'line' granularity.", 4, lineCoverage.getConstructData().size());
 
-    CoverageDailyProjectData classCoverage = dpdClient.getCoverage(user, PROJECT,
-        requestTstamp, "class");
-    assertSame("Checking for 4 coverage entries with a 'class' granularity.", 4, classCoverage
-        .getConstructData().size());
+    CoverageDailyProjectData classCoverage = dpdClient.getCoverage(user, PROJECT, tstamp, "class");
+    assertEquals("Checking 'class' granularity.", 4, classCoverage.getConstructData().size());
+    
+    // Now see that getting data for a day in which no data exists works OK.
+    XMLGregorianCalendar emptyDay = Tstamp.incrementDays(tstamp, -1);
+    CoverageDailyProjectData noCoverage = dpdClient.getCoverage(user, PROJECT, emptyDay, "class");
+    assertEquals("Checking empty day.", 0, noCoverage.getConstructData().size());
+
 
     // Then, delete all sensor data sent by this user.
     SensorDataIndex index = client.getSensorDataIndex(user);

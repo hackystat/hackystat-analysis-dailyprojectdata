@@ -18,7 +18,42 @@ import org.hackystat.utilities.time.period.Day;
 import org.hackystat.utilities.tstamp.Tstamp;
 
 /**
- * Data structure for obtaining the latest snapshot of sensor data.
+ * SensorDataSnapshot provides a generic means to retrieve and return the set of SensorData of a
+ * given SDT with the most recent 'runtime' value. It does this by retrieving "buckets" of data for
+ * a given interval size (defaulting to 30 minutes), starting at 11:30pm on the given day and
+ * working backward until a complete 'snapshot' has been achieved.
+ * 
+ * The Snapshot algorithm is based upon a number of assumptions that may or may not be true in
+ * practice:
+ * <ul>
+ * <li> When sending data with a given runtime, that "batch" will provide all of the data required
+ * for all projects. The snapshot algorithm does not provide any way to "combine" data from multiple
+ * runs with different timestamps, each for a separate resource in the project.
+ * 
+ * <li> This algorithm depends upon the runtime and tstamp fields being "covariant". More precisely,
+ * given two SensorData instances for a given day called A and B, if runtime(A) is greater than
+ * runtime(B), then tstamp(A) must also be greater than tstamp(B). This assumption enables us to
+ * retrieve SensorData by timestamp in reverse chronological order, and stop as soon as we have a
+ * complete snapshot of runtime values.
+ * 
+ * <li> Finally, this Snapshot is based upon the combined SensorData from all users in a Project.
+ * Thus, results can be unpredictable when SensorData from multiple users (with overlapping
+ * timestamps) is sent at around the same time.
+ * </ul>
+ * 
+ * An alternative algorithm would return a data structure that provides a single entry for every
+ * resource found across all of the users, but using only the latest runtime when multiple entries
+ * for a single resource exist. The problem with this approach is that if a resource is deleted
+ * during a day, it will still be in the snapshot. This can cause bad data when a major refactoring
+ * occurs, resulting in many resources being renamed. In this case, many resources will be
+ * represented twice in the resulting snapshot--once with their old name and once with their new
+ * name.
+ * 
+ * A potentially helpful extension would be to enable retrieval of a snapshot using only data that
+ * contains a property called "DailyProjectDataSnapshot" with a user defined value. This would
+ * enable users to define a daily process that creates "complete" versions of project data with a
+ * common runtime. This process could run at any time and all other data from other users,
+ * regardless of their runtime value, would be ignored.
  * 
  * @author jsakuda
  */
@@ -52,7 +87,7 @@ public class SensorDataSnapshot implements Iterable<SensorData> {
    * 
    * @param client The <code>SensorBaseClient</code> to be used for querying for
    *          <code>SensorData</code>.
-   * @param user The Hackystat user to obtain data for.
+   * @param user The Hackystat user that owns the Project whose data is being retrieved.
    * @param project The project to obtain data for.
    * @param sdt The sensor data type to get data for.
    * @param day The day to get the latest snapshot for.
@@ -70,7 +105,7 @@ public class SensorDataSnapshot implements Iterable<SensorData> {
    * 
    * @param client The <code>SensorBaseClient</code> to be used for querying for
    *          <code>SensorData</code>.
-   * @param user The Hackystat user to obtain data for.
+   * @param user The Hackystat user that owns the Project whose data is being retrieved.
    * @param project The project to obtain data for.
    * @param sdt The sensor data type to get data for.
    * @param day The day to get the latest snapshot for.
@@ -91,7 +126,7 @@ public class SensorDataSnapshot implements Iterable<SensorData> {
    * 
    * @param client The <code>SensorBaseClient</code> to be used for querying for
    *          <code>SensorData</code>.
-   * @param user The Hackystat user to obtain data for.
+   * @param user The Hackystat user that owns the Project whose data is being retrieved.
    * @param project The project to obtain data for.
    * @param sdt The sensor data type to get data for.
    * @param day The day to get the latest snapshot for.
@@ -226,8 +261,8 @@ public class SensorDataSnapshot implements Iterable<SensorData> {
     else if (this.prevBucket.getStartTime().compare(this.startOfDay) == DatatypeConstants.GREATER) {
       // previous bucket did not start at the beginning of the day so,
       // more buckets can still be obtained
-      // decrement old start time by 1 second to prevent overlap
-      XMLGregorianCalendar newEndTime = Tstamp.incrementSeconds(
+      // decrement old start time by 1 millisecont to prevent overlap
+      XMLGregorianCalendar newEndTime = Tstamp.incrementMilliseconds(
           this.prevBucket.getStartTime(), -1);
       XMLGregorianCalendar newStartTime = this.getStartTime(newEndTime);
 
@@ -289,6 +324,36 @@ public class SensorDataSnapshot implements Iterable<SensorData> {
     return this.latestSnapshot.iterator();
   }
 
+  /**
+   * Returns the Owner responsible for the Snapshot data, or null if there is no Snapshot data.
+   * @return The owner, or null. 
+   */
+  public String getOwner() {
+    for (SensorData data : this.latestSnapshot) {
+      return data.getOwner();
+    }
+    return null;
+  }
+
+  /**
+   * Returns the Tool responsible for the Snapshot data, or null if there is no Snapshot data.
+   * @return The owner, or null. 
+   */
+  public String getTool() {
+    for (SensorData data : this.latestSnapshot) {
+      return data.getTool();
+    }
+    return null;
+  }
+  
+  /**
+   * Returns true if the Snapshot contains no data. 
+   * @return True if the Snapshot contains no data. 
+   */
+  public boolean isEmpty() {
+    return this.latestSnapshot.isEmpty();
+  }
+  
   /**
    * Gets the number of buckets that were retrieved to create the snapshot. This method is only
    * meant for testing purposes.

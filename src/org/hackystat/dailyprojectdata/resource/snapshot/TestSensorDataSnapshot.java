@@ -25,11 +25,8 @@ import org.junit.Test;
 public class TestSensorDataSnapshot {
 
   private static final String CODE_ISSUE = "CodeIssue";
-
   private static final String DEFAULT = "Default";
-
   private static final String CHECKSTYLE = "Checkstyle";
-
   private static final String PMD = "PMD";
 
   /** The test user. */
@@ -38,7 +35,7 @@ public class TestSensorDataSnapshot {
   private static Server server;
 
   /**
-   * Starts the server going for these tests, and makes sure our test user is registered.
+   * Starts the server, creates the user, and sends the data.
    * 
    * @throws Exception If problems occur setting up the server.
    */
@@ -49,20 +46,18 @@ public class TestSensorDataSnapshot {
     TestSensorDataSnapshot.server = Server.newInstance(properties);
     TestSensorDataSnapshot.host = TestSensorDataSnapshot.server.getHostName();
     SensorBaseClient.registerUser(host, user);
+    addSensorData();
   }
 
   /**
-   * Gets rid of the sent sensor data and the user.
+   * Deletes the sensordata and the user. 
    * 
    * @throws Exception If problems occur setting up the server.
    */
   @AfterClass
   public static void teardownServer() throws Exception {
-    // Now delete all data sent by this user.
     SensorBaseClient client = new SensorBaseClient(host, user, user);
-    // First, delete all sensor data sent by this user.
     client.deleteSensorData(user);
-    // Now delete the user too.
     client.deleteUser(user);
   }
 
@@ -73,25 +68,18 @@ public class TestSensorDataSnapshot {
    */
   @Test
   public void testSnapshot() throws Exception {
-    addSensorData();
-    
     SensorBaseClient client = new SensorBaseClient(host, user, user);
     Day day = Day.getInstance("30-Oct-2007");
-
     SensorDataSnapshot snapshot = new SensorDataSnapshot(client, user, DEFAULT, CODE_ISSUE,
         day, 30);
     Iterator<SensorData> iterator = snapshot.iterator();
-
     int dataCount = 0;
     while (iterator.hasNext()) {
       SensorData sensorData = iterator.next();
       assertEquals("Checking tool.", CHECKSTYLE, sensorData.getTool());
       dataCount++;
     }
-
     assertEquals("Should have 3 data entries.", 3, dataCount);
-    
-    client.deleteSensorData(user);
   }
 
   /**
@@ -101,7 +89,6 @@ public class TestSensorDataSnapshot {
    */
   @Test
   public void testSnapshotWithTool() throws Exception {
-    addSensorData();
     
     SensorBaseClient client = new SensorBaseClient(host, user, user);
     Day day = Day.getInstance("30-Oct-2007");
@@ -123,8 +110,6 @@ public class TestSensorDataSnapshot {
       dataCount++;
     }
     assertEquals("Should have 2 data entries.", 2, dataCount);
-    
-    client.deleteSensorData(user);
   }
 
   /**
@@ -171,7 +156,7 @@ public class TestSensorDataSnapshot {
     snapshot = new SensorDataSnapshot(client, user, DEFAULT, CODE_ISSUE, day, 120);
     assertEquals("Bucket count should be 1.", 1, snapshot.getNumberOfBucketsRetrieved());
     
-    client.deleteSensorData(user);
+    //client.deleteSensorData(user);
   }
 
   /**

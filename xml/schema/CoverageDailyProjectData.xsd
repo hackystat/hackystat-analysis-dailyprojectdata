@@ -4,7 +4,7 @@
 	<xs:attribute name="Project" type="xs:string" />
 	<xs:attribute name="Owner" type="xs:string" />
 	<xs:attribute name="StartTime" type="xs:dateTime" />
-	<xs:attribute name="Type" type="xs:string" />
+	<xs:attribute name="Granularity" type="xs:string" />
 	<xs:attribute name="Tool" type="xs:string" />
 
 	<xs:attribute name="Name" type="xs:string" />
@@ -14,12 +14,12 @@
 	<xs:element name="CoverageDailyProjectData">
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element ref="ConstructData" minOccurs="1" maxOccurs="unbounded" />
+				<xs:element ref="ConstructData" minOccurs="0" maxOccurs="unbounded" />
 			</xs:sequence>
 			<xs:attribute ref="Project" />
 			<xs:attribute ref="Owner" />
 			<xs:attribute ref="StartTime" />
-			<xs:attribute ref="Type" />
+			<xs:attribute ref="Granularity" />
 			<xs:attribute ref="Tool" />
 		</xs:complexType>
 	</xs:element>

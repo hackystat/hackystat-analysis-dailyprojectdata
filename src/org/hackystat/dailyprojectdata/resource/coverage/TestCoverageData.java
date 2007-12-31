@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import java.util.Date;
 
@@ -28,9 +27,12 @@ public class TestCoverageData {
   private SensorData sensorData = null;
   private XMLGregorianCalendar runtime = null;
 
-  /** Setup this test class. */
+  /** 
+   * Setup this test class.
+   * @throws Exception If problems occur.  
+   */
   @Before
-  public void setUp() {
+  public void setUp() throws Exception {
     this.runtime = Tstamp.makeTimestamp(new Date().getTime());
     this.sensorData = createData(this.runtime.toString(), this.runtime.toString(),
         "austen@hawaii.edu", "C:\\foo.java");
@@ -91,16 +93,19 @@ public class TestCoverageData {
     Property coveredProperty = this.coverageData.getCoverageProperty(propertyName);
     assertEquals("The Covered Property Name is incorrect.", propertyName, coveredProperty
         .getKey());
-    assertEquals("The Covered Property Value is incorrect.", "5.0", coveredProperty.getValue());
+    assertEquals("The Covered Property Value is incorrect.", "5", coveredProperty.getValue());
 
     // Next, let's test if a non-existent property returns null.
     assertNull("Null was not returned for a non-existent property.", this.coverageData
         .getCoverageProperty("Foo Property"));
   }
 
-  /** Tests the overriden .equals method returns the correct values. */
+  /** 
+   * Tests the overridden .equals method returns the correct values. 
+   * @throws Exception if problems occur
+   */
   @Test
-  public void testEquals() {
+  public void testEquals() throws Exception {
     // First, test equal instances.
     CoverageData newCoverageData = new CoverageData(this.sensorData);
     assertTrue("Instances with the same SensorData are equal.", this.coverageData
@@ -157,10 +162,10 @@ public class TestCoverageData {
    * @param owner the specified owner.
    * @param resource the specified resource.
    * @return the populated SensorData instance.
+   * @throws Exception if problems occur.
    */
   public static SensorData createData(String timestamp, String runtime, String owner,
-      String resource) {
-    try {
+      String resource) throws Exception {
       SensorData data = new SensorData();
       data.setOwner(owner);
       data.setTimestamp(Tstamp.makeTimestamp(timestamp));
@@ -173,51 +178,46 @@ public class TestCoverageData {
       Properties props = new Properties();
       Property lineUncoveredProperty = new Property();
       lineUncoveredProperty.setKey("line_Uncovered");
-      lineUncoveredProperty.setValue("1.0");
+      lineUncoveredProperty.setValue("1");
       props.getProperty().add(lineUncoveredProperty);
 
       Property methodUncoveredProperty = new Property();
       methodUncoveredProperty.setKey("method_Uncovered");
-      methodUncoveredProperty.setValue("2.0");
+      methodUncoveredProperty.setValue("2");
       props.getProperty().add(methodUncoveredProperty);
 
       Property classUncoveredProperty = new Property();
       classUncoveredProperty.setKey("class_Uncovered");
-      classUncoveredProperty.setValue("3.0");
+      classUncoveredProperty.setValue("3");
       props.getProperty().add(classUncoveredProperty);
 
       Property blockUncoveredProperty = new Property();
       blockUncoveredProperty.setKey("block_Uncovered");
-      blockUncoveredProperty.setValue("4.0");
+      blockUncoveredProperty.setValue("4");
       props.getProperty().add(blockUncoveredProperty);
 
       // Sets the covered values.
       Property lineCoveredProperty = new Property();
       lineCoveredProperty.setKey("line_Covered");
-      lineCoveredProperty.setValue("5.0");
+      lineCoveredProperty.setValue("5");
       props.getProperty().add(lineCoveredProperty);
 
       Property methodCoveredProperty = new Property();
       methodCoveredProperty.setKey("method_Covered");
-      methodCoveredProperty.setValue("6.0");
+      methodCoveredProperty.setValue("6");
       props.getProperty().add(methodCoveredProperty);
 
       Property classCoveredProperty = new Property();
       classCoveredProperty.setKey("class_Covered");
-      classCoveredProperty.setValue("7.0");
+      classCoveredProperty.setValue("7");
       props.getProperty().add(classCoveredProperty);
 
       Property blockCoveredProperty = new Property();
       blockCoveredProperty.setKey("block_Covered");
-      blockCoveredProperty.setValue("8.0");
+      blockCoveredProperty.setValue("8");
       props.getProperty().add(blockCoveredProperty);
 
       data.setProperties(props);
       return data;
-    }
-    catch (Exception e) {
-      fail("Failed to create test data. " + e.getMessage());
-    }
-    return null;
   }
 }

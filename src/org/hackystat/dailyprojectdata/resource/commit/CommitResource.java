@@ -67,7 +67,7 @@ public class CommitResource extends DailyProjectDataResource {
         // the requested day.
         XMLGregorianCalendar startTime = Tstamp.makeTimestamp(this.timestamp);
         XMLGregorianCalendar endTime = Tstamp.incrementDays(startTime, 1);
-        SensorDataIndex index = client.getProjectSensorData(this.authUser, this.project,
+        SensorDataIndex index = client.getProjectSensorData(this.uriUser, this.project,
             startTime, endTime, "Commit");
 
         // [3] Add all of the appropriate data to the data container.
