@@ -91,7 +91,7 @@ public class CoverageResource extends DailyProjectDataResource {
             String uncoveredKey = this.granularity.toLowerCase() + "_Uncovered";
             Integer covered = this.getCoverageValue(data, coveredKey);
             Integer uncovered = this.getCoverageValue(data, uncoveredKey);
-            if ((covered != null) && (uncovered != null)) {
+            if ((covered != null) && (uncovered != null)) { //NOPMD
               ConstructData construct = new ConstructData();
               construct.setName(data.getResource());
               construct.setNumCovered(covered);
@@ -169,7 +169,7 @@ public class CoverageResource extends DailyProjectDataResource {
     try {
       coverageNum = Integer.parseInt(prop);
     }
-    catch(Exception e) {
+    catch (Exception e) { //NOPMD
       // Don't do anything, ok to drop through.
     }
     return coverageNum;
