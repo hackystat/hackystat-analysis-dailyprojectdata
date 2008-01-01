@@ -4,5 +4,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="var" path="HACKYSTAT_SENSORBASE_HOME/sensorbase.jar" sourcepath="/HACKYSTAT_SENSORBASE_HOME/src"/>
+	<classpathentry kind="var" path="JAVAMAIL_HOME/mail.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

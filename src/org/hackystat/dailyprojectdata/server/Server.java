@@ -163,7 +163,8 @@ public class Server extends Application {
     // requests will require authentication.
     Router authRouter = new Router(getContext());
     authRouter.attach("/devtime/{user}/{project}/{timestamp}", DevTimeResource.class);
-    authRouter.attach("/filemetric/{user}/{project}/{timestamp}", FileMetricResource.class);
+    authRouter.attach("/filemetric/{user}/{project}/{timestamp}/{sizemetric}", 
+        FileMetricResource.class);
     authRouter.attach("/unittest/{user}/{project}/{timestamp}", UnitTestResource.class);
     authRouter.attach("/codeissue/{user}/{project}/{timestamp}", CodeIssueResource.class);
     authRouter.attach("/codeissue/{user}/{project}/{timestamp}?Tool={Tool}&Type={Type}", 
@@ -172,7 +173,8 @@ public class Server extends Application {
         CodeIssueResource.class);
     authRouter.attach("/codeissue/{user}/{project}/{timestamp}?Type={Type}", 
         CodeIssueResource.class);
-    authRouter.attach("/coverage/{user}/{project}/{timestamp}/{type}", CoverageResource.class);
+    authRouter.attach("/coverage/{user}/{project}/{timestamp}/{granularity}", 
+        CoverageResource.class);
     authRouter.attach("/build/{user}/{project}/{timestamp}", BuildResource.class);
     authRouter.attach("/build/{user}/{project}/{timestamp}?Type={Type}", BuildResource.class);
     authRouter.attach("/commit/{user}/{project}/{timestamp}", CommitResource.class);

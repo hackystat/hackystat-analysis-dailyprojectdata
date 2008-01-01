@@ -52,7 +52,7 @@ public class CoverageResource extends DailyProjectDataResource {
    */
   public CoverageResource(Context context, Request request, Response response) {
     super(context, request, response);
-    this.granularity = (String) request.getAttributes().get("type");
+    this.granularity = (String) request.getAttributes().get("granularity");
   }
 
   /**

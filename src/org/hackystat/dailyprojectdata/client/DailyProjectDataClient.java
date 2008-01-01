@@ -322,6 +322,7 @@ public class DailyProjectDataClient {
    * @param project The project owned by user.
    * @param timestamp The Timestamp indicating the start of the 24 hour period
    * of DevTime.
+   * @param sizeMetric The size metric to be retrieved.
    * @return A FileMetricDailyProjectData instance.
    * @throws DailyProjectDataClientException If the credentials associated with
    * this instance are not valid, or if the underlying SensorBase service cannot
@@ -329,12 +330,12 @@ public class DailyProjectDataClient {
    * is not valid.
    */
   public synchronized FileMetricDailyProjectData getFileMetric(String user, String project,
-      XMLGregorianCalendar timestamp) throws DailyProjectDataClientException {
+      XMLGregorianCalendar timestamp, String sizeMetric) throws DailyProjectDataClientException {
     Response response = makeRequest(Method.GET, "filemetric/" + user + "/" + project + "/"
-        + timestamp, null);
+        + timestamp + "/" + sizeMetric, null);
     FileMetricDailyProjectData fileMetric;
     if (!response.getStatus().isSuccess()) {
-      System.err.println("filemetric/" + user + "/" + project + "/" + timestamp);
+      System.err.println("filemetric/" + user + "/" + project + "/" + timestamp + "/" + sizeMetric);
       throw new DailyProjectDataClientException(response.getStatus());
     }
     try {

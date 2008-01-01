@@ -105,7 +105,7 @@ public class ServerProperties {
     properties.setProperty(HOSTNAME_KEY, properties.getProperty(TEST_HOSTNAME_KEY));
     properties.setProperty(PORT_KEY, properties.getProperty(TEST_PORT_KEY));
     properties.setProperty(SENSORBASE_FULLHOST_KEY, 
-        properties.getProperty(TEST_SENSORBASE_FULLHOST_KEY));
+    properties.getProperty(TEST_SENSORBASE_FULLHOST_KEY));
     properties.setProperty(TEST_INSTALL_KEY, "true");
   }
 
