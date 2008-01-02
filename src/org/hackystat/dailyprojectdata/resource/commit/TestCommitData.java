@@ -32,7 +32,7 @@ public class TestCommitData {
   public void setUp() {
     XMLGregorianCalendar runtime = Tstamp.makeTimestamp(new Date().getTime());
     this.sensorData = createData(runtime.toString(), runtime.toString(), "austen@hawaii.edu",
-        "C:\\foo.java", "4", "10", "255");
+        "C:\\foo.java", "4", "10");
     this.commitData = new CommitData(this.sensorData);
   }
 
@@ -50,14 +50,8 @@ public class TestCommitData {
         .getLinesDeleted());
   }
 
-  /** Tests if the commit data returns the correct amount of lines changed. */
-  @Test
-  public void testGetLinesChanged() {
-    assertEquals("The amount of lines changed is incorrect.", 255, this.commitData
-        .getLinesChanged());
-  }
 
-  /** Tests the overriden .equals method returns the correct values. */
+  /** Tests the overridden .equals method returns the correct values. */
   @Test
   public void testEquals() {
     // First, test equal instances.
@@ -71,7 +65,7 @@ public class TestCommitData {
     // Next, test instances with different SensorData objects.
     XMLGregorianCalendar runtime = Tstamp.makeTimestamp(new Date().getTime() + 10);
     SensorData sensorData = createData(runtime.toString(), runtime.toString(),
-        "austen@hawaii.edu", "C:\\foo.java", "1", "2", "100");
+        "austen@hawaii.edu", "C:\\foo.java", "1", "2");
     assertFalse("Instances with the differnt SensorData are not equal.", this.commitData
         .equals(new CoverageData(sensorData)));
 
@@ -89,11 +83,10 @@ public class TestCommitData {
    * @param resource the specified resource.
    * @param linesAdded the total lines added in returned data instance.
    * @param linesDeleted the total lines deleted in returned data instance.
-   * @param linesChanged the total lines changed in returned data instance.
    * @return the populated SensorData instance.
    */
   public static SensorData createData(String timestamp, String runtime, String owner,
-      String resource, String linesAdded, String linesDeleted, String linesChanged) {
+      String resource, String linesAdded, String linesDeleted) {
     try {
       SensorData data = new SensorData();
       data.setOwner(owner);
@@ -115,12 +108,6 @@ public class TestCommitData {
       linesDeletedProperty.setKey("linesDeleted");
       linesDeletedProperty.setValue(linesDeleted);
       props.getProperty().add(linesDeletedProperty);
-
-      // Sets the lines changed property.
-      Property linesChangedProperty = new Property();
-      linesChangedProperty.setKey("totalLines");
-      linesChangedProperty.setValue(linesChanged);
-      props.getProperty().add(linesChangedProperty);
 
       data.setProperties(props);
       return data;

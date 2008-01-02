@@ -42,18 +42,18 @@ public class TestCommitRestApi extends DailyProjectDataTestHelper {
     SensorDatas batchData = new SensorDatas();
     batchData.getSensorData().add(
         TestCommitData.createData("2007-10-30T02:10:00", runtime, user, "C:\\foo.java", "10",
-            "20", "30"));
+            "20"));
     batchData.getSensorData().add(
         TestCommitData.createData("2007-10-30T02:11:00", runtime, user, "C:\\foo2.java", "40",
-            "50", "60"));
+            "50"));
 
     // Then, create a batch of unrelated data.
     batchData.getSensorData().add(
         TestCommitData.createData("2007-11-30T02:15:00", "2007-11-30T02:15:00", user,
-            "C:\\foo3.java", "70", "80", "90"));
+            "C:\\foo3.java", "70", "80"));
     batchData.getSensorData().add(
         TestCommitData.createData("2007-11-30T02:16:00", "2007-11-30T02:15:00", user,
-            "C:\\foo4.java", "100", "110", "120"));
+            "C:\\foo4.java", "100", "110"));
 
     // Connect to the sensorbase and register the DailyProjectDataCodeIssue
     // user.
@@ -78,8 +78,6 @@ public class TestCommitRestApi extends DailyProjectDataTestHelper {
         .getLinesAdded());
     assertEquals("The amount of lines deleted is incorrect.", Integer.valueOf(70), memberData
         .getLinesDeleted());
-    assertEquals("The amount of lines changed is incorrect.", Integer.valueOf(90), memberData
-        .getLinesChanged());
 
     // Then, delete all sensor data sent by this user.
     SensorDataIndex index = client.getSensorDataIndex(user);

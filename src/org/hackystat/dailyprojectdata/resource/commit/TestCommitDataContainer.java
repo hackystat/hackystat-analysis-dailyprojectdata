@@ -34,15 +34,15 @@ public class TestCommitDataContainer {
     XMLGregorianCalendar runtimeCalendar = Tstamp.makeTimestamp(new Date().getTime());
     String runtimeString = runtimeCalendar.toString();
     SensorData sensorDataAusten01 = TestCommitData.createData(runtimeString, runtimeString,
-        userAusten, "C:\\foo.java", "10", "100", "999");
+        userAusten, "C:\\foo.java", "10", "100");
     SensorData sensorDataAusten02 = TestCommitData.createData(runtimeString, runtimeString,
-        userAusten, "C:\\foo2.java", "11", "12", "999");
+        userAusten, "C:\\foo2.java", "11", "12");
     SensorData sensorDataJulie01 = TestCommitData.createData(runtimeString, runtimeString,
-        userJulie, "C:\\foo3.java", "10", "1", "14");
+        userJulie, "C:\\foo3.java", "10", "1");
     SensorData sensorDataJulie02 = TestCommitData.createData(runtimeString, runtimeString,
-        userJulie, "C:\\foo4.java", "12", "100", "4");
+        userJulie, "C:\\foo4.java", "12", "100");
     SensorData sensorDataAaron01 = TestCommitData.createData(runtimeString, runtimeString,
-        userAaron, "C:\\foo5.java", "99", "33", "45");
+        userAaron, "C:\\foo5.java", "99", "33");
 
     // Second, adds the sensor.
     this.data.addCommitData(sensorDataAusten01);
@@ -66,12 +66,6 @@ public class TestCommitDataContainer {
         .getLinesDeleted(this.userAusten));
   }
 
-  /** Tests if the correct amount of lines deleted are returned. */
-  @Test
-  public void testGetLinesChanged() {
-    assertEquals("The total lines changed is incorrect.", 1998, this.data
-        .getLinesChanged(this.userAusten));
-  }
 
   /** Tests if the correct amount of commits by a user is returned. */
   @Test

@@ -86,7 +86,7 @@ public class CommitData {
 
   /**
    * Returns the Property instance with the specified property name. If no
-   * property exists, false is returned.
+   * property exists, null is returned.
    * @param propertyName the property name to search for.
    * @return the property with the specified name or null.
    */

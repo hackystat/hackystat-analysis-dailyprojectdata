@@ -18,6 +18,7 @@ import org.junit.Test;
 
 /**
  * Tests if the CoverageData wraps a SensorData instance as intended.
+ * 
  * @author aito
  * 
  */
@@ -27,9 +28,10 @@ public class TestCoverageData {
   private SensorData sensorData = null;
   private XMLGregorianCalendar runtime = null;
 
-  /** 
+  /**
    * Setup this test class.
-   * @throws Exception If problems occur.  
+   * 
+   * @throws Exception If problems occur.
    */
   @Before
   public void setUp() throws Exception {
@@ -42,8 +44,7 @@ public class TestCoverageData {
   /** Tests if the correct runtime is returned. */
   @Test
   public void testGetRuntime() {
-    assertEquals("The returned runtime is incorrect.", this.runtime, this.coverageData
-        .getRuntime());
+    assertEquals("Returned runtime is incorrect.", this.runtime, this.coverageData.getRuntime());
   }
 
   /** Tests if the correct amount of uncovered coverage entities is returned. */
@@ -73,8 +74,8 @@ public class TestCoverageData {
   }
 
   /**
-   * Tests if the resource returned from the wrapper class is the same as the
-   * resource in the SensorData instance.
+   * Tests if the resource returned from the wrapper class is the same as the resource in the
+   * SensorData instance.
    */
   @Test
   public void testGetResource() {
@@ -83,16 +84,15 @@ public class TestCoverageData {
   }
 
   /**
-   * Tests if the correct Property is returned or that null is returned if the
-   * property does not exist.
+   * Tests if the correct Property is returned or that null is returned if the property does not
+   * exist.
    */
   @Test
   public void testGetCoverageProperty() {
     // First, let's test an existing property.
     String propertyName = CoverageData.GRANULARITY_LINE + "_Covered";
     Property coveredProperty = this.coverageData.getCoverageProperty(propertyName);
-    assertEquals("The Covered Property Name is incorrect.", propertyName, coveredProperty
-        .getKey());
+    assertEquals("The Covered Property Name is incorrect.", propertyName, coveredProperty.getKey());
     assertEquals("The Covered Property Value is incorrect.", "5", coveredProperty.getValue());
 
     // Next, let's test if a non-existent property returns null.
@@ -100,8 +100,9 @@ public class TestCoverageData {
         .getCoverageProperty("Foo Property"));
   }
 
-  /** 
-   * Tests the overridden .equals method returns the correct values. 
+  /**
+   * Tests the overridden .equals method returns the correct values.
+   * 
    * @throws Exception if problems occur
    */
   @Test
@@ -116,8 +117,8 @@ public class TestCoverageData {
 
     // Next, test instances with different SensorData objects.
     XMLGregorianCalendar runtime = Tstamp.makeTimestamp(new Date().getTime() + 10);
-    SensorData sensorData = createData(runtime.toString(), runtime.toString(),
-        "austen@hawaii.edu", "C:\\foo.java");
+    SensorData sensorData = createData(runtime.toString(), runtime.toString(), "austen@hawaii.edu",
+        "C:\\foo.java");
     assertFalse("Instances with the differnt SensorData are not equal.", this.coverageData
         .equals(new CoverageData(sensorData)));
 
@@ -127,8 +128,7 @@ public class TestCoverageData {
   }
 
   /**
-   * Tests if the correct coverage data is returned regardless of the
-   * granularity's case.
+   * Tests if the correct coverage data is returned regardless of the granularity's case.
    */
   @Test
   public void testGranularityCaseInsensitivity() {
@@ -155,8 +155,8 @@ public class TestCoverageData {
   }
 
   /**
-   * A helper method used to create the SensorData instances used to by this
-   * test class.
+   * A helper method used to create the SensorData instances used to by this test class.
+   * 
    * @param timestamp the timestamp of the created sensor data instance.
    * @param runtime the runtime of the SensorData instance.
    * @param owner the specified owner.
@@ -166,58 +166,58 @@ public class TestCoverageData {
    */
   public static SensorData createData(String timestamp, String runtime, String owner,
       String resource) throws Exception {
-      SensorData data = new SensorData();
-      data.setOwner(owner);
-      data.setTimestamp(Tstamp.makeTimestamp(timestamp));
-      data.setRuntime(Tstamp.makeTimestamp(runtime));
-      data.setSensorDataType("Coverage");
-      data.setTool("Emma");
-      data.setResource(resource);
+    SensorData data = new SensorData();
+    data.setOwner(owner);
+    data.setTimestamp(Tstamp.makeTimestamp(timestamp));
+    data.setRuntime(Tstamp.makeTimestamp(runtime));
+    data.setSensorDataType("Coverage");
+    data.setTool("Emma");
+    data.setResource(resource);
 
-      // Sets the uncovered values.
-      Properties props = new Properties();
-      Property lineUncoveredProperty = new Property();
-      lineUncoveredProperty.setKey("line_Uncovered");
-      lineUncoveredProperty.setValue("1");
-      props.getProperty().add(lineUncoveredProperty);
+    // Sets the uncovered values.
+    Properties props = new Properties();
+    Property lineUncoveredProperty = new Property();
+    lineUncoveredProperty.setKey("line_Uncovered");
+    lineUncoveredProperty.setValue("1");
+    props.getProperty().add(lineUncoveredProperty);
 
-      Property methodUncoveredProperty = new Property();
-      methodUncoveredProperty.setKey("method_Uncovered");
-      methodUncoveredProperty.setValue("2");
-      props.getProperty().add(methodUncoveredProperty);
+    Property methodUncoveredProperty = new Property();
+    methodUncoveredProperty.setKey("method_Uncovered");
+    methodUncoveredProperty.setValue("2");
+    props.getProperty().add(methodUncoveredProperty);
 
-      Property classUncoveredProperty = new Property();
-      classUncoveredProperty.setKey("class_Uncovered");
-      classUncoveredProperty.setValue("3");
-      props.getProperty().add(classUncoveredProperty);
+    Property classUncoveredProperty = new Property();
+    classUncoveredProperty.setKey("class_Uncovered");
+    classUncoveredProperty.setValue("3");
+    props.getProperty().add(classUncoveredProperty);
 
-      Property blockUncoveredProperty = new Property();
-      blockUncoveredProperty.setKey("block_Uncovered");
-      blockUncoveredProperty.setValue("4");
-      props.getProperty().add(blockUncoveredProperty);
+    Property blockUncoveredProperty = new Property();
+    blockUncoveredProperty.setKey("block_Uncovered");
+    blockUncoveredProperty.setValue("4");
+    props.getProperty().add(blockUncoveredProperty);
 
-      // Sets the covered values.
-      Property lineCoveredProperty = new Property();
-      lineCoveredProperty.setKey("line_Covered");
-      lineCoveredProperty.setValue("5");
-      props.getProperty().add(lineCoveredProperty);
+    // Sets the covered values.
+    Property lineCoveredProperty = new Property();
+    lineCoveredProperty.setKey("line_Covered");
+    lineCoveredProperty.setValue("5");
+    props.getProperty().add(lineCoveredProperty);
 
-      Property methodCoveredProperty = new Property();
-      methodCoveredProperty.setKey("method_Covered");
-      methodCoveredProperty.setValue("6");
-      props.getProperty().add(methodCoveredProperty);
+    Property methodCoveredProperty = new Property();
+    methodCoveredProperty.setKey("method_Covered");
+    methodCoveredProperty.setValue("6");
+    props.getProperty().add(methodCoveredProperty);
 
-      Property classCoveredProperty = new Property();
-      classCoveredProperty.setKey("class_Covered");
-      classCoveredProperty.setValue("7");
-      props.getProperty().add(classCoveredProperty);
+    Property classCoveredProperty = new Property();
+    classCoveredProperty.setKey("class_Covered");
+    classCoveredProperty.setValue("7");
+    props.getProperty().add(classCoveredProperty);
 
-      Property blockCoveredProperty = new Property();
-      blockCoveredProperty.setKey("block_Covered");
-      blockCoveredProperty.setValue("8");
-      props.getProperty().add(blockCoveredProperty);
+    Property blockCoveredProperty = new Property();
+    blockCoveredProperty.setKey("block_Covered");
+    blockCoveredProperty.setValue("8");
+    props.getProperty().add(blockCoveredProperty);
 
-      data.setProperties(props);
-      return data;
+    data.setProperties(props);
+    return data;
   }
 }

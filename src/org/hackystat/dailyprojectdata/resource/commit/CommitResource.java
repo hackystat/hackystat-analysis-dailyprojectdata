@@ -85,7 +85,6 @@ public class CommitResource extends DailyProjectDataResource {
           memberData.setCommits(container.getCommits(owner));
           memberData.setLinesAdded(container.getLinesAdded(owner));
           memberData.setLinesDeleted(container.getLinesDeleted(owner));
-          memberData.setLinesChanged(container.getLinesChanged(owner));
           commitData.getMemberData().add(memberData);
         }
 
