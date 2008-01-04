@@ -11,12 +11,11 @@
 	<xs:attribute name="Commits" type="xs:int" />
 	<xs:attribute name="LinesAdded" type="xs:int" />
 	<xs:attribute name="LinesDeleted" type="xs:int" />
-	<xs:attribute name="LinesChanged" type="xs:int" />
 
 	<xs:element name="CommitDailyProjectData">
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element ref="MemberData" minOccurs="1" maxOccurs="unbounded" />
+				<xs:element ref="MemberData" minOccurs="0" maxOccurs="unbounded" />
 			</xs:sequence>
 			<xs:attribute ref="Project" />
 			<xs:attribute ref="Owner" />
@@ -32,7 +31,6 @@
 			<xs:attribute ref="Commits" />
 			<xs:attribute ref="LinesAdded" />
 			<xs:attribute ref="LinesDeleted" />
-			<xs:attribute ref="LinesChanged" />
 		</xs:complexType>
 	</xs:element>
 

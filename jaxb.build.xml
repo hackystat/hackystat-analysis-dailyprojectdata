@@ -38,5 +38,8 @@
     <xjc target="${env.JAXB_TARGET}" schema="${basedir}/xml/schema/BuildDailyProjectData.xsd" destdir="src" package="org.hackystat.dailyprojectdata.resource.build.jaxb">
       <produces dir="${basedir}/src/org/hackystat/dailyprojectdata/resource/build/jaxb" includes="*" />
     </xjc>
+    <xjc target="${env.JAXB_TARGET}" schema="${basedir}/xml/schema/CommitDailyProjectData.xsd" destdir="src" package="org.hackystat.dailyprojectdata.resource.commit.jaxb">
+      <produces dir="${basedir}/src/org/hackystat/dailyprojectdata/resource/commit/jaxb" includes="*" />
+    </xjc>
   </target>
 </project>

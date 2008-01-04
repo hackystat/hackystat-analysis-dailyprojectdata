@@ -1,6 +1,8 @@
 package org.hackystat.dailyprojectdata.client;
 
 import java.io.StringReader;
+import java.util.Date;
+import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
@@ -13,6 +15,7 @@ import org.hackystat.dailyprojectdata.resource.coverage.jaxb.CoverageDailyProjec
 import org.hackystat.dailyprojectdata.resource.devtime.jaxb.DevTimeDailyProjectData;
 import org.hackystat.dailyprojectdata.resource.filemetric.jaxb.FileMetricDailyProjectData;
 import org.hackystat.dailyprojectdata.resource.unittest.jaxb.UnitTestDailyProjectData;
+import org.hackystat.utilities.logger.HackystatLogger;
 import org.restlet.Client;
 import org.restlet.data.ChallengeResponse;
 import org.restlet.data.ChallengeScheme;
@@ -64,6 +67,8 @@ public class DailyProjectDataClient {
   private Preference<MediaType> xmlMedia = new Preference<MediaType>(MediaType.TEXT_XML);
   /** To facilitate debugging of problems using this system. */
   private boolean isTraceEnabled = false;
+  /** For logging. */
+  private Logger logger;
 
   /**
    * Initializes a new DailyProjectDataClient, given the host, userEmail, and
@@ -78,6 +83,9 @@ public class DailyProjectDataClient {
    * @param password The password used for authentication.
    */
   public DailyProjectDataClient(String host, String email, String password) {
+    this.logger = HackystatLogger.getLogger(
+        "org.hackystat.dailyprojectdata.client.DailyProjectDataClient", "dailyprojectdata", false);
+    this.logger.info("Instantiating client for: " + host + " " + email);
     validateArg(host);
     validateArg(email);
     validateArg(password);
@@ -224,8 +232,9 @@ public class DailyProjectDataClient {
    */
   public synchronized DevTimeDailyProjectData getDevTime(String user, String project,
       XMLGregorianCalendar timestamp) throws DailyProjectDataClientException {
-    Response response = makeRequest(Method.GET, "devtime/" + user + "/" + project + "/"
-        + timestamp, null);
+    Date startTime = new Date();
+    String uri = "devtime/" + user + "/" + project + "/" + timestamp;
+    Response response = makeRequest(Method.GET, uri, null);
     DevTimeDailyProjectData devTime;
     if (!response.getStatus().isSuccess()) {
       throw new DailyProjectDataClientException(response.getStatus());
@@ -235,8 +244,10 @@ public class DailyProjectDataClient {
       devTime = makeDevTimeDailyProjectData(xmlData);
     }
     catch (Exception e) {
+      logElapsedTime(uri, startTime, e);
       throw new DailyProjectDataClientException(response.getStatus(), e);
     }
+    logElapsedTime(uri, startTime);
     return devTime;
   }
 
@@ -256,8 +267,9 @@ public class DailyProjectDataClient {
    */
   public synchronized UnitTestDailyProjectData getUnitTest(String user, String project,
       XMLGregorianCalendar timestamp) throws DailyProjectDataClientException {
-    Response response = makeRequest(Method.GET, "unittest/" + user + "/" + project + "/"
-        + timestamp, null);
+    Date startTime = new Date();
+    String uri = "unittest/" + user + "/" + project + "/" + timestamp;
+    Response response = makeRequest(Method.GET, uri, null);
     UnitTestDailyProjectData unitDPD;
     if (!response.getStatus().isSuccess()) {
       throw new DailyProjectDataClientException(response.getStatus());
@@ -267,8 +279,10 @@ public class DailyProjectDataClient {
       unitDPD = makeUnitTestDailyProjectData(xmlData);
     }
     catch (Exception e) {
+      logElapsedTime(uri, startTime, e);
       throw new DailyProjectDataClientException(response.getStatus(), e);
     }
+    logElapsedTime(uri, startTime);
     return unitDPD;
   }
 
@@ -331,8 +345,9 @@ public class DailyProjectDataClient {
    */
   public synchronized FileMetricDailyProjectData getFileMetric(String user, String project,
       XMLGregorianCalendar timestamp, String sizeMetric) throws DailyProjectDataClientException {
-    Response response = makeRequest(Method.GET, "filemetric/" + user + "/" + project + "/"
-        + timestamp + "/" + sizeMetric, null);
+    Date startTime = new Date();
+    String uri = "filemetric/" + user + "/" + project + "/" + timestamp + "/" + sizeMetric;
+    Response response = makeRequest(Method.GET, uri, null);
     FileMetricDailyProjectData fileMetric;
     if (!response.getStatus().isSuccess()) {
       System.err.println("filemetric/" + user + "/" + project + "/" + timestamp + "/" + sizeMetric);
@@ -343,8 +358,10 @@ public class DailyProjectDataClient {
       fileMetric = makeFileMetricDailyProjectData(xmlData);
     }
     catch (Exception e) {
+      logElapsedTime(uri, startTime, e);
       throw new DailyProjectDataClientException(response.getStatus(), e);
     }
+    logElapsedTime(uri, startTime);
     return fileMetric;
   }
 
@@ -381,7 +398,7 @@ public class DailyProjectDataClient {
   public synchronized CodeIssueDailyProjectData getCodeIssue(String user, String project,
       XMLGregorianCalendar timestamp, String tool, String type)
     throws DailyProjectDataClientException {
-
+    Date startTime = new Date();
     StringBuilder requestStringBuilder = new StringBuilder("codeissue/");
     requestStringBuilder.append(user);
     requestStringBuilder.append("/");
@@ -406,13 +423,13 @@ public class DailyProjectDataClient {
       requestStringBuilder.append("Type=");
       requestStringBuilder.append(type);
     }
-
-    Response response = makeRequest(Method.GET, requestStringBuilder.toString(), null);
+    String uri = requestStringBuilder.toString();
+    Response response = makeRequest(Method.GET, uri, null);
 
     CodeIssueDailyProjectData codeIssue;
 
     if (!response.getStatus().isSuccess()) {
-      System.err.println(requestStringBuilder.toString());
+      logElapsedTime(uri, startTime);
       throw new DailyProjectDataClientException(response.getStatus());
     }
     try {
@@ -420,8 +437,10 @@ public class DailyProjectDataClient {
       codeIssue = makeCodeIssueDailyProjectData(xmlData);
     }
     catch (Exception e) {
+      logElapsedTime(uri, startTime, e);
       throw new DailyProjectDataClientException(response.getStatus(), e);
     }
+    logElapsedTime(uri, startTime);
     return codeIssue;
   }
 
@@ -443,6 +462,7 @@ public class DailyProjectDataClient {
   public synchronized CoverageDailyProjectData getCoverage(String user, String project,
       XMLGregorianCalendar timestamp, String granularity)
     throws DailyProjectDataClientException {
+    Date startTime = new Date();
     StringBuilder requestStringBuilder = new StringBuilder("coverage/");
     requestStringBuilder.append(user);
     requestStringBuilder.append("/");
@@ -454,11 +474,13 @@ public class DailyProjectDataClient {
       requestStringBuilder.append("/");
       requestStringBuilder.append(granularity);
     }
-    Response response = makeRequest(Method.GET, requestStringBuilder.toString(), null);
+    
+    String uri = requestStringBuilder.toString();
+    Response response = makeRequest(Method.GET, uri, null);
     CoverageDailyProjectData coverage;
 
     if (!response.getStatus().isSuccess()) {
-      System.err.println(requestStringBuilder.toString());
+      logElapsedTime(uri, startTime);
       throw new DailyProjectDataClientException(response.getStatus());
     }
     try {
@@ -466,8 +488,10 @@ public class DailyProjectDataClient {
       coverage = makeCoverageDailyProjectData(xmlData);
     }
     catch (Exception e) {
+      logElapsedTime(uri, startTime, e);
       throw new DailyProjectDataClientException(response.getStatus(), e);
     }
+    logElapsedTime(uri, startTime);
     return coverage;
   }
 
@@ -502,6 +526,7 @@ public class DailyProjectDataClient {
   public synchronized CommitDailyProjectData getCommit(String user, String project,
       XMLGregorianCalendar timestamp)
     throws DailyProjectDataClientException {
+    Date startTime = new Date();
     StringBuilder requestStringBuilder = new StringBuilder("commit/");
     requestStringBuilder.append(user);
     requestStringBuilder.append("/");
@@ -509,11 +534,12 @@ public class DailyProjectDataClient {
     requestStringBuilder.append("/");
     requestStringBuilder.append(timestamp);
 
-    Response response = makeRequest(Method.GET, requestStringBuilder.toString(), null);
+    String uri = requestStringBuilder.toString();
+    Response response = makeRequest(Method.GET, uri, null);
     CommitDailyProjectData commit;
 
     if (!response.getStatus().isSuccess()) {
-      System.err.println(requestStringBuilder.toString());
+      logElapsedTime(uri, startTime);
       throw new DailyProjectDataClientException(response.getStatus());
     }
     try {
@@ -521,8 +547,10 @@ public class DailyProjectDataClient {
       commit = makeCommitDailyProjectData(xmlData);
     }
     catch (Exception e) {
+      logElapsedTime(uri, startTime, e);
       throw new DailyProjectDataClientException(response.getStatus(), e);
     }
+    logElapsedTime(uri, startTime);
     return commit;
   }
 
@@ -571,6 +599,7 @@ public class DailyProjectDataClient {
    */
   public synchronized BuildDailyProjectData getBuild(String user, String project,
       XMLGregorianCalendar timestamp, String type) throws DailyProjectDataClientException {
+    Date startTime = new Date();
 
     StringBuilder requestStringBuilder = new StringBuilder("build/");
     requestStringBuilder.append(user);
@@ -585,12 +614,13 @@ public class DailyProjectDataClient {
       requestStringBuilder.append(type);
     }
 
-    Response response = makeRequest(Method.GET, requestStringBuilder.toString(), null);
+    String uri = requestStringBuilder.toString();
+    Response response = makeRequest(Method.GET, uri, null);
 
     BuildDailyProjectData build;
 
     if (!response.getStatus().isSuccess()) {
-      System.err.println(requestStringBuilder.toString());
+      logElapsedTime(uri, startTime);
       throw new DailyProjectDataClientException(response.getStatus());
     }
     try {
@@ -598,8 +628,10 @@ public class DailyProjectDataClient {
       build = makeBuildDailyProjectData(xmlData);
     }
     catch (Exception e) {
+      logElapsedTime(uri, startTime, e);
       throw new DailyProjectDataClientException(response.getStatus(), e);
     }
+    logElapsedTime(uri, startTime);
     return build;
   }
   
@@ -633,5 +665,26 @@ public class DailyProjectDataClient {
   private BuildDailyProjectData makeBuildDailyProjectData(String xmlString) throws Exception {
     Unmarshaller unmarshaller = this.buildJAXB.createUnmarshaller();
     return (BuildDailyProjectData) unmarshaller.unmarshal(new StringReader(xmlString));
+  }
+  
+  /**
+   * Logs info to the logger about the elapsed time for this request. 
+   * @param uri The URI requested.
+   * @param startTime The startTime of the call.
+   * @param e The exception thrown, or null if no exception. 
+   */
+  private void logElapsedTime (String uri, Date startTime, Exception e) {
+    long millis = (new Date()).getTime() - startTime.getTime();
+    String msg = millis + " millis: " + uri + ((e == null) ? "" : " " + e);
+    this.logger.info(msg);
+  }
+  
+  /**
+   * Logs info to the logger about the elapsed time for this request. 
+   * @param uri The URI requested.
+   * @param startTime The startTime of the call.
+   */
+  private void logElapsedTime (String uri, Date startTime) {
+    logElapsedTime(uri, startTime, null);
   }
 }

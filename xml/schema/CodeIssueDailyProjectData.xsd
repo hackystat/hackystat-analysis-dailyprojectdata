@@ -13,7 +13,7 @@
 	<xs:element name="CodeIssueDailyProjectData">
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element ref="MemberData" minOccurs="1" maxOccurs="unbounded" />
+				<xs:element ref="MemberData" minOccurs="0" maxOccurs="unbounded" />
 			</xs:sequence>
 			<xs:attribute ref="Project" />
 			<xs:attribute ref="Owner" />
