@@ -6,14 +6,14 @@
 	<xs:attribute name="StartTime" type="xs:dateTime" />
 	<xs:attribute name="UriPattern" type="xs:anyURI" />
 
-	<xs:attribute name="MemberUri" type="xs:anyURI" />
-	<xs:attribute name="CodeIssues" type="xs:int" />
 	<xs:attribute name="Tool" type="xs:string" />
+	<xs:attribute name="IssueType" type="xs:string" />
+	<xs:attribute name="NumIssues" type="xs:int" />
 
 	<xs:element name="CodeIssueDailyProjectData">
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element ref="MemberData" minOccurs="0" maxOccurs="unbounded" />
+				<xs:element ref="CodeIssueData" minOccurs="0" maxOccurs="unbounded" />
 			</xs:sequence>
 			<xs:attribute ref="Project" />
 			<xs:attribute ref="Owner" />
@@ -22,11 +22,11 @@
 		</xs:complexType>
 	</xs:element>
 
-	<xs:element name="MemberData">
+	<xs:element name="CodeIssueData">
 		<xs:complexType>
-			<xs:attribute ref="MemberUri" />
 			<xs:attribute ref="Tool" />
-			<xs:anyAttribute processContents="lax"/>
+			<xs:attribute ref="IssueType" />
+			<xs:attribute ref="NumIssues" />
 		</xs:complexType>
 	</xs:element>
 

@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <CodeIssueDailyProjectData Project="Default" Owner="johnson@hawaii.edu" StartTime="2006-01-31T00:00:00.000"  UriPattern="**">
-  <MemberData MemberUri="http://hackystat.ics.hawaii.edu/sensorbase/users/johnson@hawaii.edu" Tool="Checkstyle" Type_JavaDoc="4"/>
-  <MemberData MemberUri="http://hackystat.ics.hawaii.edu/sensorbase/users/johnson@hawaii.edu" Tool="Checkstyle" Type_Naming="8"/>
-  <MemberData MemberUri="http://hackystat.ics.hawaii.edu/sensorbase/users/johnson@hawaii.edu" Tool="PMD"/>
+  <CodeIssueData Tool="Checkstyle" IssueType="JavaDoc" NumIssues="4"/>
+  <CodeIssueData Tool="Checkstyle" IssueType="Indentation" NumIssues="6"/>
+  <CodeIssueData Tool="FindBugs" IssueType="NullPointerDereference" NumIssues="8"/>
 </CodeIssueDailyProjectData>
