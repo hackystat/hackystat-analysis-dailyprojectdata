@@ -85,6 +85,8 @@ public class ServerProperties {
         stream.close();
       }
     }
+    
+    trimProperties(properties);
     // make sure that SENSORBASE_HOST always has a final slash.
     String sensorBaseHost = (String) properties.get(SENSORBASE_FULLHOST_KEY);
     if (!sensorBaseHost.endsWith("/")) {
@@ -107,6 +109,7 @@ public class ServerProperties {
     properties.setProperty(SENSORBASE_FULLHOST_KEY, 
     properties.getProperty(TEST_SENSORBASE_FULLHOST_KEY));
     properties.setProperty(TEST_INSTALL_KEY, "true");
+    trimProperties(properties);
   }
 
   /**
@@ -133,6 +136,17 @@ public class ServerProperties {
    */
   public String get(String key) {
     return this.properties.getProperty(key);
+  }
+  
+  /**
+   * Ensures that the there is no leading or trailing whitespace in the property values.
+   * The fact that we need to do this indicates a bug in Java's Properties implementation to me. 
+   * @param properties The properties. 
+   */
+  private void trimProperties(Properties properties) {
+    for (String propName : properties.stringPropertyNames()) {
+      properties.setProperty(propName, properties.getProperty(propName).trim());
+    }
   }
   
   /**
