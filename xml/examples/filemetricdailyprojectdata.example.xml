@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<FileMetricDailyProjectData Project="Default" Owner="johnson@hawaii.edu" Total="227.0" StartTime="2006-01-31T00:00:00.000" SizeMetric="TotalLines" Tool="SCLC" UriPattern="**">
+ <FileData FileUri="file://users/johnson/Foo.java" SizeMetricValue="67.0"/>
+ <FileData FileUri="file://users/johnson/Bar.java" SizeMetricValue="73.0"/>
+ <FileData FileUri="file://users/johnson/Baz.java" SizeMetricValue="87"/>
+</FileMetricDailyProjectData>
