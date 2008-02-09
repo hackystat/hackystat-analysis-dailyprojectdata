@@ -33,6 +33,12 @@ public class ServerProperties {
   public static final String TEST_HOSTNAME_KEY =    "dailyprojectdata.test.hostname";
   /** The test installation key. */
   public static final String TEST_SENSORBASE_FULLHOST_KEY = "dailyprojectdata.test.sensorbase.host";
+  /** Indicates whether SensorBaseClient caching is enabled. */
+  public static final String CACHE_ENABLED = "dailyprojectdata.cache.enabled";
+  /** The maxLife in seconds for each instance in each SensorBaseClient cache. */
+  public static final String CACHE_MAX_LIFE = "dailyprojectdata.cache.max.life";
+  /** The in-memory capacity of each SensorBaseClient cache. */
+  public static final String CACHE_CAPACITY = "dailyprojectdata.cache.capacity";
 
   /** Where we store the properties. */
   private Properties properties; 
@@ -46,7 +52,7 @@ public class ServerProperties {
       initializeProperties();
     }
     catch (Exception e) {
-      System.out.println("Error initializing server properties.");
+      System.out.println("Error initializing server properties: " + e.getMessage());
     }
   }
   
@@ -72,11 +78,14 @@ public class ServerProperties {
     properties.setProperty(TEST_HOSTNAME_KEY, "localhost");
     properties.setProperty(TEST_SENSORBASE_FULLHOST_KEY, "http://localhost:9976/sensorbase");
     properties.setProperty(TEST_INSTALL_KEY, "false");
+    properties.setProperty(CACHE_ENABLED, "true");
+    properties.setProperty(CACHE_MAX_LIFE, "86400");
+    properties.setProperty(CACHE_CAPACITY, "50000");
     FileInputStream stream = null;
     try {
       stream = new FileInputStream(propFile);
-      properties.load(stream);
       System.out.println("Loading DailyProjectData properties from: " + propFile);
+      properties.load(stream);
     }
     catch (IOException e) {
       System.out.println(propFile + " not found. Using default dailyprojectdata properties.");
@@ -110,6 +119,7 @@ public class ServerProperties {
     properties.setProperty(SENSORBASE_FULLHOST_KEY, 
     properties.getProperty(TEST_SENSORBASE_FULLHOST_KEY));
     properties.setProperty(TEST_INSTALL_KEY, "true");
+    properties.setProperty(CACHE_ENABLED, "false");
     trimProperties(properties);
   }
 
@@ -127,7 +137,10 @@ public class ServerProperties {
       pad + CONTEXT_ROOT_KEY  + eq + get(CONTEXT_ROOT_KEY) + cr +
       pad + PORT_KEY          + eq + get(PORT_KEY) + cr +
       pad + LOGGING_LEVEL_KEY + eq + get(LOGGING_LEVEL_KEY) + cr +
-      pad + TEST_INSTALL_KEY + eq + get(TEST_INSTALL_KEY);
+      pad + TEST_INSTALL_KEY + eq + get(TEST_INSTALL_KEY) + cr +
+      pad + CACHE_ENABLED + eq + get(CACHE_ENABLED) + cr +
+      pad + CACHE_MAX_LIFE + eq + get(CACHE_MAX_LIFE) + cr +
+      pad + CACHE_CAPACITY + eq + get(CACHE_CAPACITY);
   }
   
   /**
@@ -158,6 +171,50 @@ public class ServerProperties {
    */
   public String getFullHost() {
     return "http://" + get(HOSTNAME_KEY) + ":" + get(PORT_KEY) + "/" + get(CONTEXT_ROOT_KEY) + "/";
+  }
+  
+  /**
+   * Returns true if caching is enabled in this service. 
+   * @return True if caching enabled.
+   */
+  public boolean isCacheEnabled() {
+    return Boolean.valueOf(this.properties.getProperty(CACHE_ENABLED));
+  }
+  
+  /**
+   * Returns the caching max life as a long.
+   * If the property has an illegal value, then return the default. 
+   * @return The max life of each instance in the cache.
+   */
+  public long getCacheMaxLife() {
+    String maxLifeString = this.properties.getProperty(CACHE_MAX_LIFE);
+    long maxLife = 0;
+    try {
+      maxLife = Long.valueOf(maxLifeString);
+    }
+    catch (Exception e) {
+      System.out.println("Illegal cache max life: " + maxLifeString + ". Using default.");
+      maxLife = 86400L;
+    }
+    return maxLife;
+  }
+  
+  /**
+   * Returns the in-memory capacity for each cache.
+   * If the property has an illegal value, then return the default. 
+   * @return The in-memory capacity.
+   */
+  public long getCacheCapacity() {
+    String capacityString = this.properties.getProperty(CACHE_CAPACITY);
+    long capacity = 0;
+    try {
+      capacity = Long.valueOf(capacityString);
+    }
+    catch (Exception e) {
+      System.out.println("Illegal cache capacity: " + capacityString + ". Using default.");
+      capacity = 50000L;
+    }
+    return capacity;
   }
 
 }

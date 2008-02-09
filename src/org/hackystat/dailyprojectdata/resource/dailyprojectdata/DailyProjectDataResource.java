@@ -1,5 +1,6 @@
 package org.hackystat.dailyprojectdata.resource.dailyprojectdata;
 
+import java.util.Date;
 import java.util.Map;
 
 import org.hackystat.dailyprojectdata.server.Server;
@@ -50,6 +51,9 @@ public abstract class DailyProjectDataResource extends Resource {
   /** The standard error message returned from invalid authentication. */
   protected String badAuth = "User is not admin and authenticated user does not not match URI user";
   
+  /** Records the time at which each HTTP request was initiated. */
+  protected long requestStartTime = new Date().getTime();
+  
   /**
    * Provides the following representational variants: TEXT_XML.
    * @param context The context.
@@ -97,6 +101,17 @@ public abstract class DailyProjectDataResource extends Resource {
       (Map<String, SensorBaseClient>)this.server.getContext()
       .getAttributes().get(AUTHENTICATOR_SENSORBASECLIENTS_KEY);
     return userClientMap.get(this.authUser);
+  }
+  
+  /**
+   * Generates a log message indicating the type of request, the elapsed time required, 
+   * the user who requested the data, and the day.
+   * @param requestType The type of DPD request, such as "Commit", "FileMetric", etc.
+   */
+  protected void logRequest(String requestType) {
+    long elapsed = new Date().getTime() - requestStartTime;
+    String msg = elapsed + " ms: " + requestType + " " + uriUser + " " + this.timestamp;
+    server.getLogger().info(msg);
   }
 
 }

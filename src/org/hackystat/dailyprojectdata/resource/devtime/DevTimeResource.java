@@ -1,7 +1,6 @@
 package org.hackystat.dailyprojectdata.resource.devtime;
 
 import java.io.StringWriter;
-
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import javax.xml.datatype.XMLGregorianCalendar;
@@ -87,6 +86,7 @@ public class DevTimeResource extends DailyProjectDataResource {
         devTime.setUriPattern("**"); // we don't support UriPatterns yet. 
         devTime.setTotalDevTime(counter.getTotalDevTime());
         String xmlData = makeDevTime(devTime);
+        logRequest("DevTime");
         return super.getStringRepresentation(xmlData);
       }
       catch (Exception e) {

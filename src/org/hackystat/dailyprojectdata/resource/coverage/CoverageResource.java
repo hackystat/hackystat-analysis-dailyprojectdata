@@ -103,6 +103,7 @@ public class CoverageResource extends DailyProjectDataResource {
         
         // Now return the CoverageDPD instance. 
         String xmlData = this.makeCoverage(coverageData);
+        logRequest("Coverage");
         return super.getStringRepresentation(xmlData);
       }
       catch (Exception e) {

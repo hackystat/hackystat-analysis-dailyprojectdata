@@ -67,7 +67,15 @@ public class Authenticator extends Guard {
     if (isRegistered) {
       // Credentials are good, so save them and create a sensorbase client for this user. 
       credentials.put(identifier, secret);
-      userClientMap.put(identifier, new SensorBaseClient(sensorBaseHost, identifier, secret));
+      SensorBaseClient client = new SensorBaseClient(sensorBaseHost, identifier, secret);
+      // Get the ServerProperties instance so we can determine if caching is enabled.
+      Server server = (Server)getContext().getAttributes().get("DailyProjectDataServer");
+      ServerProperties props = server.getServerProperties();
+      if (props.isCacheEnabled()) {
+        client.enableCaching(identifier, "dailyprojectdata", 
+            props.getCacheMaxLife(), props.getCacheCapacity());
+      }
+      userClientMap.put(identifier, client);
     }
     return isRegistered;
   }

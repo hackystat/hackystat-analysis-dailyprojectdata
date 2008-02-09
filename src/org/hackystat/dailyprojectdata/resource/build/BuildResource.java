@@ -130,6 +130,7 @@ public class BuildResource extends DailyProjectDataResource {
         }
         
         String xmlData = this.makeBuild(build);
+        logRequest("Build");
         return super.getStringRepresentation(xmlData);
       }
       catch (Exception e) {

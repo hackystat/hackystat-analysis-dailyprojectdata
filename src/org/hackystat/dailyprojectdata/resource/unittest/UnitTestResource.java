@@ -3,7 +3,6 @@ package org.hackystat.dailyprojectdata.resource.unittest;
 import static org.hackystat.dailyprojectdata.server.ServerProperties.SENSORBASE_FULLHOST_KEY;
 
 import java.io.StringWriter;
-
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import javax.xml.datatype.XMLGregorianCalendar;
@@ -93,6 +92,7 @@ public class UnitTestResource extends DailyProjectDataResource {
         unitTestDPD.setUriPattern("**"); // we don't support UriPatterns yet.
 
         String xmlData = makeUnitTestDPD(unitTestDPD);
+        logRequest("UnitTest");
         return super.getStringRepresentation(xmlData);
 
       }

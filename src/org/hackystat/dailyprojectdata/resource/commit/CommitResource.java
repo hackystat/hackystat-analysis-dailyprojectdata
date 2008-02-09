@@ -3,7 +3,6 @@ package org.hackystat.dailyprojectdata.resource.commit;
 import static org.hackystat.dailyprojectdata.server.ServerProperties.SENSORBASE_FULLHOST_KEY;
 
 import java.io.StringWriter;
-
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import javax.xml.datatype.XMLGregorianCalendar;
@@ -92,6 +91,7 @@ public class CommitResource extends DailyProjectDataResource {
         commitData.setOwner(this.uriUser);
         commitData.setProject(this.project);
         String xmlData = this.makeCommit(commitData);
+        logRequest("Commit");
         return super.getStringRepresentation(xmlData);
       }
       catch (Exception e) {
