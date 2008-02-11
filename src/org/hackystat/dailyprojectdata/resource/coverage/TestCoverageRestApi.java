@@ -2,8 +2,6 @@ package org.hackystat.dailyprojectdata.resource.coverage;
 
 import static org.junit.Assert.assertEquals;
 
-import java.util.Date;
-
 import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.hackystat.dailyprojectdata.client.DailyProjectDataClient;
@@ -83,27 +81,5 @@ public class TestCoverageRestApi extends DailyProjectDataTestHelper {
     }
     // Now delete the user too.
     client.deleteUser(user);
-  }
-  
-  /**
-   * Test that GET {host}/coverage/{user}/Default/{starttime} works properly.
-   * First, it creates a test user and sends some sample Coverage data to the
-   * SensorBase. Then, it invokes the GET request and checks to see that it
-   * obtains the right answer. Finally, it deletes the data and the user.
-   * 
-   * @throws Exception If problems occur.
-   */
-  @Test
-  public void testSimDataCoverage() throws Exception {
-    String dpdHost = "http://localhost:9977/dailyprojectdata/";
-    String user = "joe.simpletelemetry@hackystat.org";
-    String project = "simpletelemetry";
-    XMLGregorianCalendar day = Tstamp.makeTimestamp("2007-07-02");
-    String granularity = "line";
-    DailyProjectDataClient dpdClient = new DailyProjectDataClient(dpdHost, user, user);
-    dpdClient.authenticate();
-    System.out.println("Started at: " + new Date());
-    dpdClient.getCoverage(user, project, day, granularity);
-    System.out.println("Finished at: " + new Date());
   }
 }

@@ -5,7 +5,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-
 import javax.xml.datatype.DatatypeConstants;
 import javax.xml.datatype.XMLGregorianCalendar;
 
@@ -18,6 +17,8 @@ import org.hackystat.utilities.time.period.Day;
 import org.hackystat.utilities.tstamp.Tstamp;
 
 /**
+ * This class is deprecated, you should use the SensorBase REST API to retrieve snapshots. 
+ * 
  * SensorDataSnapshot provides a generic means to retrieve and return the set of SensorData of a
  * given SDT with the most recent 'runtime' value. It does this by retrieving "buckets" of data for
  * a given interval size (defaulting to 30 minutes), starting at 11:30pm on the given day and
@@ -81,7 +82,7 @@ public class SensorDataSnapshot implements Iterable<SensorData> {
 
   /** The number of buckets retrieved to create the snapshot. */
   private int bucketsRetrieved = 0;
-
+  
   /**
    * Creates a new snapshot.
    * 
@@ -170,12 +171,12 @@ public class SensorDataSnapshot implements Iterable<SensorData> {
    */
   private void createLatestToolSnapshot(SensorBaseClient client, String user, String project,
       String sdt, String tool) throws SensorBaseClientException {
-
     SnapshotBucket bucket = this.getNextBucket();
 
     // stop checking if older data is seen, or if
     // bucket becomes null when the entire day has been iterated through
     while (!this.seenOlderData && bucket != null) {
+      
       SensorDataIndex index = client.getProjectSensorData(user, project,
           bucket.getStartTime(), bucket.getEndTime(), sdt);
 
@@ -261,7 +262,7 @@ public class SensorDataSnapshot implements Iterable<SensorData> {
     else if (this.prevBucket.getStartTime().compare(this.startOfDay) == DatatypeConstants.GREATER) {
       // previous bucket did not start at the beginning of the day so,
       // more buckets can still be obtained
-      // decrement old start time by 1 millisecont to prevent overlap
+      // decrement old start time by 1 millisecond to prevent overlap
       XMLGregorianCalendar newEndTime = Tstamp.incrementMilliseconds(
           this.prevBucket.getStartTime(), -1);
       XMLGregorianCalendar newStartTime = this.getStartTime(newEndTime);

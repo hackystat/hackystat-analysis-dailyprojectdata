@@ -16,12 +16,12 @@ import javax.xml.transform.stream.StreamResult;
 import org.hackystat.dailyprojectdata.resource.coverage.jaxb.ConstructData;
 import org.hackystat.dailyprojectdata.resource.coverage.jaxb.CoverageDailyProjectData;
 import org.hackystat.dailyprojectdata.resource.dailyprojectdata.DailyProjectDataResource;
-import org.hackystat.dailyprojectdata.resource.snapshot.SensorDataSnapshot;
 import org.hackystat.sensorbase.client.SensorBaseClient;
 import org.hackystat.sensorbase.resource.sensordata.jaxb.Property;
 import org.hackystat.sensorbase.resource.sensordata.jaxb.SensorData;
+import org.hackystat.sensorbase.resource.sensordata.jaxb.SensorDataIndex;
+import org.hackystat.sensorbase.resource.sensordata.jaxb.SensorDataRef;
 import org.hackystat.utilities.stacktrace.StackTrace;
-import org.hackystat.utilities.time.period.Day;
 import org.hackystat.utilities.tstamp.Tstamp;
 import org.restlet.Context;
 import org.restlet.data.MediaType;
@@ -70,11 +70,11 @@ public class CoverageResource extends DailyProjectDataResource {
 
         // [2] Get the latest snapshot of Coverage data for this Project on the requested day.
         XMLGregorianCalendar startTime = Tstamp.makeTimestamp(this.timestamp);
-        // Not sure if we want to make this into a Day. Will create timezone issues. 
-        Day day = Day.getInstance(startTime);
-        SensorDataSnapshot snapshot = new SensorDataSnapshot(client, this.uriUser,
-            this.project, "Coverage", day);
-
+        XMLGregorianCalendar endTime = Tstamp.incrementDays(startTime, 1);
+        SensorDataIndex snapshot = 
+          client.getProjectSensorDataSnapshot(this.uriUser, this.project, startTime, endTime, 
+              "Coverage");
+        
         // [3] Create the Coverage DPD.
         CoverageDailyProjectData coverageData = new CoverageDailyProjectData();
         coverageData.setProject(this.project);
@@ -82,11 +82,12 @@ public class CoverageResource extends DailyProjectDataResource {
         coverageData.setGranularity(this.granularity);
         
         // [4] If data, then add ConstructData instances for required granularity.
-        if (!snapshot.isEmpty()) {
-          coverageData.setOwner(snapshot.getOwner()); 
-          coverageData.setTool(snapshot.getTool()); 
+        if (!snapshot.getSensorDataRef().isEmpty()) {
           // Add a ConstructData instance if this sensor data contains the appropriate granularity.
-          for (SensorData data : snapshot) {
+          for (SensorDataRef ref : snapshot.getSensorDataRef()) {
+            SensorData data = client.getSensorData(ref);
+            coverageData.setOwner(data.getOwner()); 
+            coverageData.setTool(data.getTool()); 
             String coveredKey = this.granularity.toLowerCase() + "_Covered";
             String uncoveredKey = this.granularity.toLowerCase() + "_Uncovered";
             Integer covered = this.getCoverageValue(data, coveredKey);
@@ -100,7 +101,6 @@ public class CoverageResource extends DailyProjectDataResource {
             }
           }
         }
-        
         // Now return the CoverageDPD instance. 
         String xmlData = this.makeCoverage(coverageData);
         logRequest("Coverage");

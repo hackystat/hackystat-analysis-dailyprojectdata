@@ -14,12 +14,12 @@ import javax.xml.transform.stream.StreamResult;
 import org.hackystat.dailyprojectdata.resource.dailyprojectdata.DailyProjectDataResource;
 import org.hackystat.dailyprojectdata.resource.filemetric.jaxb.FileData;
 import org.hackystat.dailyprojectdata.resource.filemetric.jaxb.FileMetricDailyProjectData;
-import org.hackystat.dailyprojectdata.resource.snapshot.SensorDataSnapshot;
 import org.hackystat.sensorbase.client.SensorBaseClient;
 import org.hackystat.sensorbase.resource.sensordata.jaxb.Property;
 import org.hackystat.sensorbase.resource.sensordata.jaxb.SensorData;
+import org.hackystat.sensorbase.resource.sensordata.jaxb.SensorDataIndex;
+import org.hackystat.sensorbase.resource.sensordata.jaxb.SensorDataRef;
 import org.hackystat.utilities.stacktrace.StackTrace;
-import org.hackystat.utilities.time.period.Day;
 import org.hackystat.utilities.tstamp.Tstamp;
 import org.restlet.Context;
 import org.restlet.data.MediaType;
@@ -69,9 +69,10 @@ public class FileMetricResource extends DailyProjectDataResource {
         
         // [2] Get the Snapshot containing the last sent FileMetric data for this Project.
         XMLGregorianCalendar startTime = Tstamp.makeTimestamp(this.timestamp);
-        Day day = Day.getInstance(startTime);
-        SensorDataSnapshot snapshot = new SensorDataSnapshot(client, this.uriUser,
-            this.project, "FileMetric", day);
+        XMLGregorianCalendar endTime = Tstamp.incrementDays(startTime, 1);
+        SensorDataIndex snapshot = 
+          client.getProjectSensorDataSnapshot(this.uriUser, this.project, startTime, endTime, 
+              "FileMetric");
         
         // [3] create and return the FileMetricDailyProjectData instance.
         double total = 0;
@@ -81,10 +82,11 @@ public class FileMetricResource extends DailyProjectDataResource {
         fileDpd.setStartTime(startTime);
         fileDpd.setSizeMetric(this.sizeMetric);
         
-        if (!snapshot.isEmpty()) {
-          fileDpd.setOwner(snapshot.getOwner());
-          fileDpd.setTool(snapshot.getTool());
-          for (SensorData data : snapshot) {
+        if (!snapshot.getSensorDataRef().isEmpty()) {
+          for (SensorDataRef ref : snapshot.getSensorDataRef()) {
+            SensorData data = client.getSensorData(ref);
+            fileDpd.setOwner(data.getOwner());
+            fileDpd.setTool(data.getTool());
             Double value = getNumberProperty(data, this.sizeMetric);
             if (value != null) { //NOPMD
               FileData fileData = new FileData();
