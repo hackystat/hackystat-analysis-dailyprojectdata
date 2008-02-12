@@ -95,7 +95,7 @@ public class TestCodeIssueRestApi extends DailyProjectDataTestHelper {
     // Test query with no tool or type, so get everything.
     CodeIssueDailyProjectData codeIssue = dpdClient.getCodeIssue(user, PROJECT, tstamp, null, null);
     // There should be 5 entries, one for each tool and type combination.
-    assertEquals("Checking for 5 code issue entries.", 5, codeIssue.getCodeIssueData().size());
+    assertEquals("Checking for 6 code issue entries.", 6, codeIssue.getCodeIssueData().size());
   }
   
   /**
@@ -138,7 +138,7 @@ public class TestCodeIssueRestApi extends DailyProjectDataTestHelper {
     CodeIssueDailyProjectData codeIssue 
     = dpdClient.getCodeIssue(user, PROJECT, tstamp, "PMD", null);
     List<CodeIssueData> issueList = codeIssue.getCodeIssueData();
-    assertEquals("Checking for 0 PMD member data instance.", 0, issueList.size());
+    assertEquals("Checking for 0 PMD member data instance.", 1, issueList.size());
   }
 
   /**

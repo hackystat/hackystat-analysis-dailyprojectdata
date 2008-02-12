@@ -2,6 +2,7 @@ package org.hackystat.dailyprojectdata.resource.codeissue;
 
 import java.io.StringWriter;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
@@ -72,6 +73,7 @@ public class CodeIssueResource extends DailyProjectDataResource {
    */
   @Override
   public Representation getRepresentation(Variant variant) {
+    Logger logger = this.server.getLogger();
     if (variant.getMediaType().equals(MediaType.TEXT_XML)) {
       try {
         // [1] get the SensorBaseClient for the user making this request.
@@ -97,9 +99,13 @@ public class CodeIssueResource extends DailyProjectDataResource {
         if ((this.tool == null ) && (this.type == null)) {
           for (String tool : snapshot.getTools()) {
             Set<SensorData> toolSnapshot = snapshot.getSensorData(tool);
-            IssueTypeCounter counter = new IssueTypeCounter(toolSnapshot, this.getLogger());
+            IssueTypeCounter counter = new IssueTypeCounter(toolSnapshot, logger);
             for (String issueType : counter.getTypes()) {
               codeIssue.getCodeIssueData().add(makeCodeIssueData(tool, issueType, counter));
+            }
+            // Add a zero entry if necessary.
+            if (counter.getTypes().isEmpty()) { //NOPMD
+              codeIssue.getCodeIssueData().add(makeZeroCodeIssueData(tool));
             }
           }
         }
@@ -110,6 +116,10 @@ public class CodeIssueResource extends DailyProjectDataResource {
           IssueTypeCounter counter = new IssueTypeCounter(toolSnapshot, this.getLogger());
           for (String issueType : counter.getTypes()) {
             codeIssue.getCodeIssueData().add(makeCodeIssueData(this.tool, issueType, counter));
+          }
+          // Add a zero entry if we have data for this tool, but no issues.
+          if (!toolSnapshot.isEmpty() && counter.getTypes().isEmpty()) { //NOPMD
+            codeIssue.getCodeIssueData().add(makeZeroCodeIssueData(tool));
           }
         }
         
@@ -124,6 +134,7 @@ public class CodeIssueResource extends DailyProjectDataResource {
               }
             }
           }
+          // Not sure how to indicate 'zero' in this case.  So don't try.
         }
         
         // [4.4] Case 4: tool and type are specified.  Add entry for this tool and this type.
@@ -134,6 +145,10 @@ public class CodeIssueResource extends DailyProjectDataResource {
             if (this.type.equals(issueType)) { //NOPMD
               codeIssue.getCodeIssueData().add(makeCodeIssueData(this.tool, issueType, counter));
             }
+          }
+          // Add a zero entry if we have data for this tool, but no issues of that type
+          if (!toolSnapshot.isEmpty() && !counter.getTypes().contains(this.type)) { //NOPMD
+            codeIssue.getCodeIssueData().add(makeZeroCodeIssueData(tool));
           }
         }
         
@@ -168,6 +183,18 @@ public class CodeIssueResource extends DailyProjectDataResource {
     issueData.setTool(tool);
     issueData.setIssueType(issueType);
     issueData.setNumIssues(counter.getCount(issueType));
+    return issueData;
+  }
+  
+  /**
+   * Creates a zero CodeIssueData entry for the specified tool.
+   * @param tool The tool with zero issues. 
+   * @return The "zero" CodeIssueData entry for this tool.
+   */
+  private CodeIssueData makeZeroCodeIssueData(String tool) {
+    CodeIssueData issueData = new CodeIssueData();
+    issueData.setTool(tool);
+    issueData.setNumIssues(0);
     return issueData;
   }
 
