@@ -20,25 +20,25 @@
 
   <target name="jaxb" description="Runs the XJC compiler.">
     <echo message="Compiling using ${env.JAXB_HOME} for target version ${env.JAXB_TARGET}."/>
-    <xjc target="${env.JAXB_TARGET}" schema="${basedir}/xml/schema/DevTimeDailyProjectData.xsd" destdir="src" package="org.hackystat.dailyprojectdata.resource.devtime.jaxb">
+    <xjc extension="true" target="${env.JAXB_TARGET}" schema="${basedir}/xml/schema/DevTimeDailyProjectData.xsd" destdir="src" package="org.hackystat.dailyprojectdata.resource.devtime.jaxb">
       <produces dir="${basedir}/src/org/hackystat/dailyprojectdata/resource/devtime/jaxb" includes="*" />
     </xjc>
-    <xjc target="${env.JAXB_TARGET}" schema="${basedir}/xml/schema/UnitTestDailyProjectData.xsd" destdir="src" package="org.hackystat.dailyprojectdata.resource.unittest.jaxb">
+    <xjc extension="true" target="${env.JAXB_TARGET}" schema="${basedir}/xml/schema/UnitTestDailyProjectData.xsd" destdir="src" package="org.hackystat.dailyprojectdata.resource.unittest.jaxb">
       <produces dir="${basedir}/src/org/hackystat/dailyprojectdata/resource/unittest/jaxb" includes="*" />
     </xjc>
-    <xjc target="${env.JAXB_TARGET}" schema="${basedir}/xml/schema/CodeIssueDailyProjectData.xsd" destdir="src" package="org.hackystat.dailyprojectdata.resource.codeissue.jaxb">
+    <xjc extension="true" target="${env.JAXB_TARGET}" schema="${basedir}/xml/schema/CodeIssueDailyProjectData.xsd" destdir="src" package="org.hackystat.dailyprojectdata.resource.codeissue.jaxb">
       <produces dir="${basedir}/src/org/hackystat/dailyprojectdata/resource/codeissue/jaxb" includes="*" />
     </xjc>
-    <xjc target="${env.JAXB_TARGET}" schema="${basedir}/xml/schema/CoverageDailyProjectData.xsd" destdir="src" package="org.hackystat.dailyprojectdata.resource.coverage.jaxb">
+    <xjc extension="true" target="${env.JAXB_TARGET}" schema="${basedir}/xml/schema/CoverageDailyProjectData.xsd" destdir="src" package="org.hackystat.dailyprojectdata.resource.coverage.jaxb">
       <produces dir="${basedir}/src/org/hackystat/dailyprojectdata/resource/coverage/jaxb" includes="*" />
     </xjc>
-    <xjc target="${env.JAXB_TARGET}" schema="${basedir}/xml/schema/FileMetricDailyProjectData.xsd" destdir="src" package="org.hackystat.dailyprojectdata.resource.filemetric.jaxb">
+    <xjc extension="true" target="${env.JAXB_TARGET}" schema="${basedir}/xml/schema/FileMetricDailyProjectData.xsd" destdir="src" package="org.hackystat.dailyprojectdata.resource.filemetric.jaxb">
       <produces dir="${basedir}/src/org/hackystat/dailyprojectdata/resource/filemetric/jaxb" includes="*" />
     </xjc>
-    <xjc target="${env.JAXB_TARGET}" schema="${basedir}/xml/schema/BuildDailyProjectData.xsd" destdir="src" package="org.hackystat.dailyprojectdata.resource.build.jaxb">
+    <xjc extension="true" target="${env.JAXB_TARGET}" schema="${basedir}/xml/schema/BuildDailyProjectData.xsd" destdir="src" package="org.hackystat.dailyprojectdata.resource.build.jaxb">
       <produces dir="${basedir}/src/org/hackystat/dailyprojectdata/resource/build/jaxb" includes="*" />
     </xjc>
-    <xjc target="${env.JAXB_TARGET}" schema="${basedir}/xml/schema/CommitDailyProjectData.xsd" destdir="src" package="org.hackystat.dailyprojectdata.resource.commit.jaxb">
+    <xjc extension="true" target="${env.JAXB_TARGET}" schema="${basedir}/xml/schema/CommitDailyProjectData.xsd" destdir="src" package="org.hackystat.dailyprojectdata.resource.commit.jaxb">
       <produces dir="${basedir}/src/org/hackystat/dailyprojectdata/resource/commit/jaxb" includes="*" />
     </xjc>
   </target>

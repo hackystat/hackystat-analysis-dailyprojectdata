@@ -7,5 +7,9 @@
   <Match>
     <Bug pattern="MS_CANNOT_BE_FINAL" />
   </Match>
+  <Match>
+    <Package name="~.*\.jaxb" />
+    <Bug pattern="SE_BAD_FIELD" />
+  </Match>
 </FindBugsFilter>
 

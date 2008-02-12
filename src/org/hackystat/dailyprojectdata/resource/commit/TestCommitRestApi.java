@@ -72,12 +72,9 @@ public class TestCommitRestApi extends DailyProjectDataTestHelper {
     CommitDailyProjectData commitDpd = dpdClient.getCommit(user, PROJECT, requestTstamp);
     assertSame("Checking for 1 commit entries", 1, commitDpd.getMemberData().size());
     MemberData memberData = commitDpd.getMemberData().get(0);
-    assertEquals("The amount of commits is incorrect.", Integer.valueOf(2), memberData
-        .getCommits());
-    assertEquals("The amount of lines added is incorrect.", Integer.valueOf(50), memberData
-        .getLinesAdded());
-    assertEquals("The amount of lines deleted is incorrect.", Integer.valueOf(70), memberData
-        .getLinesDeleted());
+    assertEquals("The amount of commits is incorrect.", 2, memberData.getCommits());
+    assertEquals("The amount of lines added is incorrect.", 50, memberData.getLinesAdded());
+    assertEquals("The amount of lines deleted is incorrect.", 70, memberData.getLinesDeleted());
 
     // Then, delete all sensor data sent by this user.
     SensorDataIndex index = client.getSensorDataIndex(user);

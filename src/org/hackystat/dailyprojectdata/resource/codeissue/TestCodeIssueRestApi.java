@@ -112,7 +112,7 @@ public class TestCodeIssueRestApi extends DailyProjectDataTestHelper {
     CodeIssueData data = issueList.get(0);
     assertEquals("Tool should be FindBugs.", "FindBugs", data.getTool());
     assertEquals("Issue should be CORRECTNESS_RV.", CORRECTNESS_RV, data.getIssueType());
-    assertEquals("Count should be 8", 8, data.getNumIssues().intValue());
+    assertEquals("Count should be 8", 8, data.getNumIssues());
   }
 
   /**

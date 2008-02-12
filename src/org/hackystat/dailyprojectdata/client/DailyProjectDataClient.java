@@ -16,6 +16,7 @@ import org.hackystat.dailyprojectdata.resource.devtime.jaxb.DevTimeDailyProjectD
 import org.hackystat.dailyprojectdata.resource.filemetric.jaxb.FileMetricDailyProjectData;
 import org.hackystat.dailyprojectdata.resource.unittest.jaxb.UnitTestDailyProjectData;
 import org.hackystat.utilities.logger.HackystatLogger;
+import org.hackystat.utilities.uricache.NewUriCache;
 import org.restlet.Client;
 import org.restlet.data.ChallengeResponse;
 import org.restlet.data.ChallengeScheme;
@@ -69,6 +70,12 @@ public class DailyProjectDataClient {
   private boolean isTraceEnabled = false;
   /** For logging. */
   private Logger logger;
+  
+  /** An associated UriCache to improve responsiveness. */
+  private NewUriCache uriCache;
+  
+  /** Indicates whether or not cache is enabled. */
+  private boolean isCacheEnabled = false;
 
   /**
    * Initializes a new DailyProjectDataClient, given the host, userEmail, and
@@ -233,15 +240,27 @@ public class DailyProjectDataClient {
   public synchronized DevTimeDailyProjectData getDevTime(String user, String project,
       XMLGregorianCalendar timestamp) throws DailyProjectDataClientException {
     Date startTime = new Date();
-    String uri = "devtime/" + user + "/" + project + "/" + timestamp;
-    Response response = makeRequest(Method.GET, uri, null);
     DevTimeDailyProjectData devTime;
+    String uri = "devtime/" + user + "/" + project + "/" + timestamp;
+    // Check the cache, and return the instance from it if available. 
+    if (this.isCacheEnabled) {
+      devTime = (DevTimeDailyProjectData)this.uriCache.get(uri);
+      if (devTime != null) {
+        return devTime;
+      }
+    }
+    // Otherwise get it from the DPD service. 
+    Response response = makeRequest(Method.GET, uri, null);
     if (!response.getStatus().isSuccess()) {
       throw new DailyProjectDataClientException(response.getStatus());
     }
     try {
       String xmlData = response.getEntity().getText();
       devTime = makeDevTimeDailyProjectData(xmlData);
+      // Add it to the cache if we're using one.
+      if (this.isCacheEnabled) {
+        this.uriCache.put(uri, devTime);
+      }
     }
     catch (Exception e) {
       logElapsedTime(uri, startTime, e);
@@ -269,14 +288,25 @@ public class DailyProjectDataClient {
       XMLGregorianCalendar timestamp) throws DailyProjectDataClientException {
     Date startTime = new Date();
     String uri = "unittest/" + user + "/" + project + "/" + timestamp;
-    Response response = makeRequest(Method.GET, uri, null);
     UnitTestDailyProjectData unitDPD;
+    // Check the cache, and return the instance from it if available. 
+    if (this.isCacheEnabled) {
+      unitDPD = (UnitTestDailyProjectData)this.uriCache.get(uri);
+      if (unitDPD != null) {
+        return unitDPD;
+      }
+    }
+    Response response = makeRequest(Method.GET, uri, null);
     if (!response.getStatus().isSuccess()) {
       throw new DailyProjectDataClientException(response.getStatus());
     }
     try {
       String xmlData = response.getEntity().getText();
       unitDPD = makeUnitTestDailyProjectData(xmlData);
+      // Add it to the cache if we're using one.
+      if (this.isCacheEnabled) {
+        this.uriCache.put(uri, unitDPD);
+      }
     }
     catch (Exception e) {
       logElapsedTime(uri, startTime, e);
@@ -346,9 +376,16 @@ public class DailyProjectDataClient {
   public synchronized FileMetricDailyProjectData getFileMetric(String user, String project,
       XMLGregorianCalendar timestamp, String sizeMetric) throws DailyProjectDataClientException {
     Date startTime = new Date();
-    String uri = "filemetric/" + user + "/" + project + "/" + timestamp + "/" + sizeMetric;
-    Response response = makeRequest(Method.GET, uri, null);
     FileMetricDailyProjectData fileMetric;
+    String uri = "filemetric/" + user + "/" + project + "/" + timestamp + "/" + sizeMetric;
+    // Check the cache, and return the instance from it if available. 
+    if (this.isCacheEnabled) {
+      fileMetric = (FileMetricDailyProjectData)this.uriCache.get(uri);
+      if (fileMetric != null) {
+        return fileMetric;
+      }
+    }
+    Response response = makeRequest(Method.GET, uri, null);
     if (!response.getStatus().isSuccess()) {
       System.err.println("filemetric/" + user + "/" + project + "/" + timestamp + "/" + sizeMetric);
       throw new DailyProjectDataClientException(response.getStatus());
@@ -356,6 +393,10 @@ public class DailyProjectDataClient {
     try {
       String xmlData = response.getEntity().getText();
       fileMetric = makeFileMetricDailyProjectData(xmlData);
+      // Add it to the cache if we're using one.
+      if (this.isCacheEnabled) {
+        this.uriCache.put(uri, fileMetric);
+      }
     }
     catch (Exception e) {
       logElapsedTime(uri, startTime, e);
@@ -398,6 +439,7 @@ public class DailyProjectDataClient {
   public synchronized CodeIssueDailyProjectData getCodeIssue(String user, String project,
       XMLGregorianCalendar timestamp, String tool, String type)
     throws DailyProjectDataClientException {
+    CodeIssueDailyProjectData codeIssue;
     Date startTime = new Date();
     StringBuilder requestStringBuilder = new StringBuilder("codeissue/");
     requestStringBuilder.append(user);
@@ -424,9 +466,14 @@ public class DailyProjectDataClient {
       requestStringBuilder.append(type);
     }
     String uri = requestStringBuilder.toString();
+    // Check the cache, and return the instance from it if available. 
+    if (this.isCacheEnabled) {
+      codeIssue = (CodeIssueDailyProjectData)this.uriCache.get(uri);
+      if (codeIssue != null) {
+        return codeIssue;
+      }
+    }
     Response response = makeRequest(Method.GET, uri, null);
-
-    CodeIssueDailyProjectData codeIssue;
 
     if (!response.getStatus().isSuccess()) {
       logElapsedTime(uri, startTime);
@@ -435,6 +482,10 @@ public class DailyProjectDataClient {
     try {
       String xmlData = response.getEntity().getText();
       codeIssue = makeCodeIssueDailyProjectData(xmlData);
+      // Add it to the cache if we're using one.
+      if (this.isCacheEnabled) {
+        this.uriCache.put(uri, codeIssue);
+      }
     }
     catch (Exception e) {
       logElapsedTime(uri, startTime, e);
@@ -476,8 +527,15 @@ public class DailyProjectDataClient {
     }
     
     String uri = requestStringBuilder.toString();
-    Response response = makeRequest(Method.GET, uri, null);
     CoverageDailyProjectData coverage;
+    // Check the cache, and return the instance from it if available. 
+    if (this.isCacheEnabled) {
+      coverage = (CoverageDailyProjectData)this.uriCache.get(uri);
+      if (coverage != null) {
+        return coverage;
+      }
+    }
+    Response response = makeRequest(Method.GET, uri, null);
 
     if (!response.getStatus().isSuccess()) {
       logElapsedTime(uri, startTime);
@@ -486,6 +544,10 @@ public class DailyProjectDataClient {
     try {
       String xmlData = response.getEntity().getText();
       coverage = makeCoverageDailyProjectData(xmlData);
+      // Add it to the cache if we're using one.
+      if (this.isCacheEnabled) {
+        this.uriCache.put(uri, coverage);
+      }
     }
     catch (Exception e) {
       logElapsedTime(uri, startTime, e);
@@ -535,8 +597,15 @@ public class DailyProjectDataClient {
     requestStringBuilder.append(timestamp);
 
     String uri = requestStringBuilder.toString();
-    Response response = makeRequest(Method.GET, uri, null);
     CommitDailyProjectData commit;
+    // Check the cache, and return the instance from it if available. 
+    if (this.isCacheEnabled) {
+      commit = (CommitDailyProjectData)this.uriCache.get(uri);
+      if (commit != null) {
+        return commit;
+      }
+    }
+    Response response = makeRequest(Method.GET, uri, null);
 
     if (!response.getStatus().isSuccess()) {
       logElapsedTime(uri, startTime);
@@ -545,6 +614,10 @@ public class DailyProjectDataClient {
     try {
       String xmlData = response.getEntity().getText();
       commit = makeCommitDailyProjectData(xmlData);
+      // Add it to the cache if we're using one.
+      if (this.isCacheEnabled) {
+        this.uriCache.put(uri, commit);
+      }
     }
     catch (Exception e) {
       logElapsedTime(uri, startTime, e);
@@ -614,10 +687,16 @@ public class DailyProjectDataClient {
       requestStringBuilder.append(type);
     }
 
-    String uri = requestStringBuilder.toString();
-    Response response = makeRequest(Method.GET, uri, null);
-
     BuildDailyProjectData build;
+    String uri = requestStringBuilder.toString();
+    // Check the cache, and return the instance from it if available. 
+    if (this.isCacheEnabled) {
+      build = (BuildDailyProjectData)this.uriCache.get(uri);
+      if (build != null) {
+        return build;
+      }
+    }
+    Response response = makeRequest(Method.GET, uri, null);
 
     if (!response.getStatus().isSuccess()) {
       logElapsedTime(uri, startTime);
@@ -626,6 +705,10 @@ public class DailyProjectDataClient {
     try {
       String xmlData = response.getEntity().getText();
       build = makeBuildDailyProjectData(xmlData);
+      // Add it to the cache if we're using one.
+      if (this.isCacheEnabled) {
+        this.uriCache.put(uri, build);
+      }
     }
     catch (Exception e) {
       logElapsedTime(uri, startTime, e);
@@ -686,5 +769,25 @@ public class DailyProjectDataClient {
    */
   private void logElapsedTime (String uri, Date startTime) {
     logElapsedTime(uri, startTime, null);
+  }
+  
+  /**
+   * Enables caching in this client.  
+   * @param cacheName The name of the cache.
+   * @param subDir The subdirectory in which the cache backend store is saved.
+   * @param maxLife The default expiration time for objects.
+   * @param capacity The maximum number of instances to be held in-memory.
+   */
+  public synchronized void enableCaching(String cacheName, String subDir, Long maxLife, 
+      Long capacity) {
+    this.uriCache = new NewUriCache(cacheName, subDir, maxLife, capacity);
+    this.isCacheEnabled = true;
+  }
+  
+  /**
+   * Delete all entries from this cache. 
+   */
+  public synchronized void clearCache() {
+    this.uriCache.clear();
   }
 }
