@@ -77,7 +77,7 @@ public class DevTimeResource extends DailyProjectDataResource {
         String sensorBaseHost = this.server.getServerProperties().get(SENSORBASE_FULLHOST_KEY);
         for (String member : counter.getMembers()) {
           MemberData memberData = new MemberData();
-          memberData.setMemberUri(sensorBaseHost + "/users/" + member);
+          memberData.setMemberUri(sensorBaseHost + "users/" + member);
           memberData.setDevTime(counter.getMemberDevTime(member));
           devTime.getMemberData().add(memberData);
         }

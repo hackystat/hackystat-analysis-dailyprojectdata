@@ -80,7 +80,7 @@ public class CommitResource extends DailyProjectDataResource {
         CommitDailyProjectData commitData = new CommitDailyProjectData();
         for (String owner : container.getOwners()) {
           MemberData memberData = new MemberData();
-          memberData.setMemberUri(sensorBaseHost + "/users/" + owner);
+          memberData.setMemberUri(sensorBaseHost + "users/" + owner);
           memberData.setCommits(container.getCommits(owner));
           memberData.setLinesAdded(container.getLinesAdded(owner));
           memberData.setLinesDeleted(container.getLinesDeleted(owner));

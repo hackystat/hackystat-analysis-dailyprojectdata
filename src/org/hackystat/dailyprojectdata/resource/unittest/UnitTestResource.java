@@ -80,7 +80,7 @@ public class UnitTestResource extends DailyProjectDataResource {
         String sensorBaseHost = this.server.getServerProperties().get(SENSORBASE_FULLHOST_KEY);
         for (String member : counter.getMembers()) {
           MemberData memberData = new MemberData();
-          memberData.setMemberUri(sensorBaseHost + "/users/" + member);
+          memberData.setMemberUri(sensorBaseHost + "users/" + member);
           memberData.setSuccess(counter.getPassCount(member));
           memberData.setFailure(counter.getFailCount(member));
           unitTestDPD.getMemberData().add(memberData);
