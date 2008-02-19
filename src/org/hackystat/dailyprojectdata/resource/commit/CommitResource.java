@@ -25,6 +25,7 @@ import org.restlet.Context;
 import org.restlet.data.MediaType;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
+import org.restlet.data.Status;
 import org.restlet.resource.Representation;
 import org.restlet.resource.Variant;
 import org.w3c.dom.Document;
@@ -96,6 +97,7 @@ public class CommitResource extends DailyProjectDataResource {
       }
       catch (Exception e) {
         server.getLogger().warning("Error processing Commit DPD: " + StackTrace.toString(e));
+        getResponse().setStatus(Status.CLIENT_ERROR_BAD_REQUEST, e.getMessage());
         return null;
       }
     }

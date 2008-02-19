@@ -35,7 +35,7 @@ public class ServerProperties {
   public static final String TEST_SENSORBASE_FULLHOST_KEY = "dailyprojectdata.test.sensorbase.host";
   /** Indicates whether SensorBaseClient caching is enabled. */
   public static final String CACHE_ENABLED = "dailyprojectdata.cache.enabled";
-  /** The maxLife in seconds for each instance in each SensorBaseClient cache. */
+  /** The maxLife in days for each instance in each SensorBaseClient cache. */
   public static final String CACHE_MAX_LIFE = "dailyprojectdata.cache.max.life";
   /** The in-memory capacity of each SensorBaseClient cache. */
   public static final String CACHE_CAPACITY = "dailyprojectdata.cache.capacity";
@@ -79,7 +79,7 @@ public class ServerProperties {
     properties.setProperty(TEST_SENSORBASE_FULLHOST_KEY, "http://localhost:9976/sensorbase");
     properties.setProperty(TEST_INSTALL_KEY, "false");
     properties.setProperty(CACHE_ENABLED, "true");
-    properties.setProperty(CACHE_MAX_LIFE, "86400");
+    properties.setProperty(CACHE_MAX_LIFE, "365");
     properties.setProperty(CACHE_CAPACITY, "50000");
     FileInputStream stream = null;
     try {
@@ -182,19 +182,19 @@ public class ServerProperties {
   }
   
   /**
-   * Returns the caching max life as a long.
+   * Returns the caching max life as a double.
    * If the property has an illegal value, then return the default. 
    * @return The max life of each instance in the cache.
    */
-  public long getCacheMaxLife() {
+  public double getCacheMaxLife() {
     String maxLifeString = this.properties.getProperty(CACHE_MAX_LIFE);
-    long maxLife = 0;
+    double maxLife = 0;
     try {
-      maxLife = Long.valueOf(maxLifeString);
+      maxLife = Double.valueOf(maxLifeString);
     }
     catch (Exception e) {
       System.out.println("Illegal cache max life: " + maxLifeString + ". Using default.");
-      maxLife = 86400L;
+      maxLife = 365D;
     }
     return maxLife;
   }

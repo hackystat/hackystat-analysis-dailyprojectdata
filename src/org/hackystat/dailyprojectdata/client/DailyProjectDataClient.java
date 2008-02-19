@@ -16,6 +16,7 @@ import org.hackystat.dailyprojectdata.resource.devtime.jaxb.DevTimeDailyProjectD
 import org.hackystat.dailyprojectdata.resource.filemetric.jaxb.FileMetricDailyProjectData;
 import org.hackystat.dailyprojectdata.resource.unittest.jaxb.UnitTestDailyProjectData;
 import org.hackystat.utilities.logger.HackystatLogger;
+import org.hackystat.utilities.tstamp.Tstamp;
 import org.hackystat.utilities.uricache.NewUriCache;
 import org.restlet.Client;
 import org.restlet.data.ChallengeResponse;
@@ -258,7 +259,7 @@ public class DailyProjectDataClient {
       String xmlData = response.getEntity().getText();
       devTime = makeDevTimeDailyProjectData(xmlData);
       // Add it to the cache if we're using one.
-      if (this.isCacheEnabled) {
+      if (this.isCacheEnabled && !isToday(timestamp)) {
         this.uriCache.put(uri, devTime);
       }
     }
@@ -304,7 +305,7 @@ public class DailyProjectDataClient {
       String xmlData = response.getEntity().getText();
       unitDPD = makeUnitTestDailyProjectData(xmlData);
       // Add it to the cache if we're using one.
-      if (this.isCacheEnabled) {
+      if (this.isCacheEnabled && !isToday(timestamp)) {
         this.uriCache.put(uri, unitDPD);
       }
     }
@@ -394,7 +395,7 @@ public class DailyProjectDataClient {
       String xmlData = response.getEntity().getText();
       fileMetric = makeFileMetricDailyProjectData(xmlData);
       // Add it to the cache if we're using one.
-      if (this.isCacheEnabled) {
+      if (this.isCacheEnabled && !isToday(timestamp)) {
         this.uriCache.put(uri, fileMetric);
       }
     }
@@ -483,7 +484,7 @@ public class DailyProjectDataClient {
       String xmlData = response.getEntity().getText();
       codeIssue = makeCodeIssueDailyProjectData(xmlData);
       // Add it to the cache if we're using one.
-      if (this.isCacheEnabled) {
+      if (this.isCacheEnabled && !isToday(timestamp)) {
         this.uriCache.put(uri, codeIssue);
       }
     }
@@ -545,7 +546,7 @@ public class DailyProjectDataClient {
       String xmlData = response.getEntity().getText();
       coverage = makeCoverageDailyProjectData(xmlData);
       // Add it to the cache if we're using one.
-      if (this.isCacheEnabled) {
+      if (this.isCacheEnabled && !isToday(timestamp)) {
         this.uriCache.put(uri, coverage);
       }
     }
@@ -615,7 +616,7 @@ public class DailyProjectDataClient {
       String xmlData = response.getEntity().getText();
       commit = makeCommitDailyProjectData(xmlData);
       // Add it to the cache if we're using one.
-      if (this.isCacheEnabled) {
+      if (this.isCacheEnabled && !isToday(timestamp)) {
         this.uriCache.put(uri, commit);
       }
     }
@@ -706,7 +707,7 @@ public class DailyProjectDataClient {
       String xmlData = response.getEntity().getText();
       build = makeBuildDailyProjectData(xmlData);
       // Add it to the cache if we're using one.
-      if (this.isCacheEnabled) {
+      if (this.isCacheEnabled && !isToday(timestamp)) {
         this.uriCache.put(uri, build);
       }
     }
@@ -772,13 +773,14 @@ public class DailyProjectDataClient {
   }
   
   /**
-   * Enables caching in this client.  
+   * Enables caching in this client. 
+   * We do not cache DPDs for the current day, since not all data might be have been sent yet. 
    * @param cacheName The name of the cache.
    * @param subDir The subdirectory in which the cache backend store is saved.
-   * @param maxLife The default expiration time for objects.
+   * @param maxLife The default expiration time for cached objects in days.
    * @param capacity The maximum number of instances to be held in-memory.
    */
-  public synchronized void enableCaching(String cacheName, String subDir, Long maxLife, 
+  public synchronized void enableCaching(String cacheName, String subDir, Double maxLife, 
       Long capacity) {
     this.uriCache = new NewUriCache(cacheName, subDir, maxLife, capacity);
     this.isCacheEnabled = true;
@@ -789,5 +791,17 @@ public class DailyProjectDataClient {
    */
   public synchronized void clearCache() {
     this.uriCache.clear();
+  }
+  
+  /**
+   * Returns true if the passed timestamp indicates today's date. 
+   * @param timestamp The timestamp of interest.
+   * @return True if it's today. 
+   */
+  private boolean isToday(XMLGregorianCalendar timestamp) {
+    XMLGregorianCalendar today = Tstamp.makeTimestamp();
+    return (today.getYear() == timestamp.getYear()) &&
+    (today.getMonth() == timestamp.getMonth()) &&
+    (today.getDay() == timestamp.getDay());
   }
 }
