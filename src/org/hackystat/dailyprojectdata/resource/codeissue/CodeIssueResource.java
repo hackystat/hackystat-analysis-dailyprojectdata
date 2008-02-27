@@ -75,6 +75,7 @@ public class CodeIssueResource extends DailyProjectDataResource {
   @Override
   public Representation getRepresentation(Variant variant) {
     Logger logger = this.server.getLogger();
+    logger.fine("CodeIssue DPD: Starting");
     if (variant.getMediaType().equals(MediaType.TEXT_XML)) {
       try {
         // [1] get the SensorBaseClient for the user making this request.
@@ -83,8 +84,10 @@ public class CodeIssueResource extends DailyProjectDataResource {
         // [2] get a SensorDataIndex of all CodeIssue data for this Project on the requested day.
         XMLGregorianCalendar startTime = Tstamp.makeTimestamp(this.timestamp);
         XMLGregorianCalendar endTime = Tstamp.incrementDays(startTime, 1);
+        logger.fine("CodeIssue DPD: Requesting index: " + uriUser + " " + project);
         SensorDataIndex index = client.getProjectSensorData(uriUser, project, startTime,
             endTime, "CodeIssue");
+        logger.fine("CodeIssue DPD: Got index: " + index.getSensorDataRef().size() + " instances");
 
         // [3] Create a MultiToolSnapshot generated from all CodeIssue sensor data for this day.
         MultiToolSnapshot snapshot = new MultiToolSnapshot();
@@ -92,7 +95,7 @@ public class CodeIssueResource extends DailyProjectDataResource {
           SensorData data = client.getSensorData(ref);
           snapshot.add(data);
         }
-
+        logger.fine("CodeIssue DPD: retrieved all instances. Now building DPD.");
         // [4] Create the codeIssue DPD. 
         CodeIssueDailyProjectData codeIssue = new CodeIssueDailyProjectData();
         

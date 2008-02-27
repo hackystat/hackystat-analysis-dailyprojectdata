@@ -2,6 +2,7 @@ package org.hackystat.dailyprojectdata.resource.coverage;
 
 import java.io.StringWriter;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
@@ -64,6 +65,8 @@ public class CoverageResource extends DailyProjectDataResource {
    */
   @Override
   public Representation getRepresentation(Variant variant) {
+    Logger logger = this.server.getLogger();
+    logger.fine("Coverage DPD: Starting");
     if (variant.getMediaType().equals(MediaType.TEXT_XML)) {
       try {
         // [1] get the SensorBaseClient for the user making this request.
@@ -72,10 +75,12 @@ public class CoverageResource extends DailyProjectDataResource {
         // [2] Get the latest snapshot of Coverage data for this Project on the requested day.
         XMLGregorianCalendar startTime = Tstamp.makeTimestamp(this.timestamp);
         XMLGregorianCalendar endTime = Tstamp.incrementDays(startTime, 1);
+        logger.fine("Coverage DPD: Requesting index: " + uriUser + " " + project);
         SensorDataIndex snapshot = 
           client.getProjectSensorDataSnapshot(this.uriUser, this.project, startTime, endTime, 
               "Coverage");
-        
+        logger.fine("Coverage DPD: Got index: " + snapshot.getSensorDataRef().size() 
+            + " instances");
         // [3] Create the Coverage DPD.
         CoverageDailyProjectData coverageData = new CoverageDailyProjectData();
         coverageData.setProject(this.project);
@@ -102,6 +107,7 @@ public class CoverageResource extends DailyProjectDataResource {
             }
           }
         }
+        logger.fine("Coverage DPD: Finished processing instances.");
         // Now return the CoverageDPD instance. 
         String xmlData = this.makeCoverage(coverageData);
         logRequest("Coverage");

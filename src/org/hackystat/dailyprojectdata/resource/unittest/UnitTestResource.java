@@ -3,6 +3,8 @@ package org.hackystat.dailyprojectdata.resource.unittest;
 import static org.hackystat.dailyprojectdata.server.ServerProperties.SENSORBASE_FULLHOST_KEY;
 
 import java.io.StringWriter;
+import java.util.logging.Logger;
+
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import javax.xml.datatype.XMLGregorianCalendar;
@@ -60,6 +62,8 @@ public class UnitTestResource extends DailyProjectDataResource {
    */
   @Override
   public Representation getRepresentation(Variant variant) {
+    Logger logger = this.server.getLogger();
+    logger.fine("UnitTest DPD: Starting");
     if (variant.getMediaType().equals(MediaType.TEXT_XML)) {
       try {
         // [1] get the SensorBaseClient for the user making this request.
@@ -67,13 +71,16 @@ public class UnitTestResource extends DailyProjectDataResource {
         // [2] get a SensorDataIndex of UnitTest sensor data for this Project on the requested day.
         XMLGregorianCalendar startTime = Tstamp.makeTimestamp(this.timestamp);
         XMLGregorianCalendar endTime = Tstamp.incrementDays(startTime, 1);
+        logger.fine("UnitTest DPD: Requesting index: " + uriUser + " " + project);
         SensorDataIndex index = client.getProjectSensorData(uriUser, project, startTime, endTime,
             "UnitTest");
         // [3] Update the counter with this data.
+        logger.fine("UnitTest DPD: Got index.  " + index.getSensorDataRef().size() + " instances");
         UnitTestCounter counter = new UnitTestCounter();
         for (SensorDataRef ref : index.getSensorDataRef()) {
           counter.add(client.getSensorData(ref));
         } 
+        logger.fine("UnitTest DPD: Finished retrieving instances. "); 
 
         // return resulting data
         UnitTestDailyProjectData unitTestDPD = new UnitTestDailyProjectData();

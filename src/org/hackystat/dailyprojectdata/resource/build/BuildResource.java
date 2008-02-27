@@ -72,9 +72,9 @@ public class BuildResource extends DailyProjectDataResource {
   @Override
   public Representation getRepresentation(Variant variant) {
     Logger logger = this.server.getLogger();
+    logger.fine("Build DPD: Starting");
     if (variant.getMediaType().equals(MediaType.TEXT_XML)) {
       try {
-        logger.fine("Build DPD: Starting.");
         // [1] get the SensorBaseClient for the user making this request.
         SensorBaseClient client = super.getSensorBaseClient();
         // [2] get a SensorDataIndex of all Build data for this Project on the requested day.
@@ -83,11 +83,10 @@ public class BuildResource extends DailyProjectDataResource {
         logger.fine("Build DPD: Requesting index: " + uriUser + " " + project);
         SensorDataIndex index = client.getProjectSensorData(uriUser, project, startTime,
             endTime, "Build");
-        logger.fine("Build DPD: Got index: " + index.getSensorDataRef().size() + " entries");
+        logger.fine("Build DPD: Got index: " + index.getSensorDataRef().size() + " instances");
         // [3] update the build data counter
         MemberBuildCounter counter = new MemberBuildCounter();
         List<SensorDataRef> sensorDataRefList = index.getSensorDataRef();
-        logger.fine("Build DPD: About to iterate through entries");
         for (SensorDataRef sensorDataRef : sensorDataRefList) {
           SensorData data = client.getSensorData(sensorDataRef);
           String result = this.getPropertyValue(data, "Result");
@@ -99,7 +98,7 @@ public class BuildResource extends DailyProjectDataResource {
             counter.addFailedBuild(data.getOwner());
           }
         }
-        logger.fine("Build DPD: Finished iteration, now building the BuildDPD.");
+        logger.fine("Build DPD: retrieved all instances, now building the DPD.");
         // [4] create and return the BuildDailyProjectData
         BuildDailyProjectData build = new BuildDailyProjectData();
         String sensorBaseHost = this.server.getServerProperties().get(SENSORBASE_FULLHOST_KEY);

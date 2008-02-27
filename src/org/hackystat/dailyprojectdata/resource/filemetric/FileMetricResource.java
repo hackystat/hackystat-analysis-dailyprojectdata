@@ -2,6 +2,8 @@ package org.hackystat.dailyprojectdata.resource.filemetric;
 
 import java.io.StringWriter;
 import java.util.List;
+import java.util.logging.Logger;
+
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import javax.xml.datatype.XMLGregorianCalendar;
@@ -63,6 +65,8 @@ public class FileMetricResource extends DailyProjectDataResource {
    */
   @Override
   public Representation getRepresentation(Variant variant) {
+    Logger logger = this.server.getLogger();
+    logger.fine("FileMetric DPD: Starting");
     if (variant.getMediaType().equals(MediaType.TEXT_XML)) {
       try {
         // [1] get the SensorBaseClient for the user making this request.
@@ -71,10 +75,12 @@ public class FileMetricResource extends DailyProjectDataResource {
         // [2] Get the Snapshot containing the last sent FileMetric data for this Project.
         XMLGregorianCalendar startTime = Tstamp.makeTimestamp(this.timestamp);
         XMLGregorianCalendar endTime = Tstamp.incrementDays(startTime, 1);
+        logger.fine("FileMetric DPD: Requesting index: " + uriUser + " " + project);
         SensorDataIndex snapshot = 
           client.getProjectSensorDataSnapshot(this.uriUser, this.project, startTime, endTime, 
               "FileMetric");
-        
+        logger.fine("FileMetric DPD: Got index: " + 
+            snapshot.getSensorDataRef().size() + " instances. Now retrieving instances.");
         // [3] create and return the FileMetricDailyProjectData instance.
         double total = 0;
         FileMetricDailyProjectData fileDpd = new FileMetricDailyProjectData();

@@ -1,6 +1,8 @@
 package org.hackystat.dailyprojectdata.resource.devtime;
 
 import java.io.StringWriter;
+import java.util.logging.Logger;
+
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import javax.xml.datatype.XMLGregorianCalendar;
@@ -57,6 +59,8 @@ public class DevTimeResource extends DailyProjectDataResource {
    */
   @Override
   public Representation getRepresentation(Variant variant) {
+    Logger logger = this.server.getLogger();
+    logger.fine("DevTime DPD: Starting");
     if (variant.getMediaType().equals(MediaType.TEXT_XML)) {
       try {
         // [1] get the SensorBaseClient for the user making this request.
@@ -64,8 +68,10 @@ public class DevTimeResource extends DailyProjectDataResource {
         // [2] get a SensorDataIndex of all DevEvent data for this Project on the requested day.
         XMLGregorianCalendar startTime = Tstamp.makeTimestamp(this.timestamp);
         XMLGregorianCalendar endTime = Tstamp.incrementDays(startTime, 1);
+        logger.fine("DevTime DPD: Requesting index: " + uriUser + " " + project);
         SensorDataIndex index = client.getProjectSensorData(uriUser, project, startTime, endTime, 
             "DevEvent");
+        logger.fine("DevTime DPD: Got index: " + index.getSensorDataRef().size() + " instances");
         // [3] update the DevTime counter. 
         MemberDevTimeCounter counter = new MemberDevTimeCounter();
         for (SensorDataRef ref : index.getSensorDataRef()) {

@@ -3,6 +3,8 @@ package org.hackystat.dailyprojectdata.resource.commit;
 import static org.hackystat.dailyprojectdata.server.ServerProperties.SENSORBASE_FULLHOST_KEY;
 
 import java.io.StringWriter;
+import java.util.logging.Logger;
+
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import javax.xml.datatype.XMLGregorianCalendar;
@@ -59,6 +61,8 @@ public class CommitResource extends DailyProjectDataResource {
    */
   @Override
   public Representation getRepresentation(Variant variant) {
+    Logger logger = this.server.getLogger();
+    logger.fine("Coverage DPD: Starting");
     if (variant.getMediaType().equals(MediaType.TEXT_XML)) {
       try {
         // [1] get the SensorBaseClient for the user making this request.
@@ -67,14 +71,17 @@ public class CommitResource extends DailyProjectDataResource {
         // the requested day.
         XMLGregorianCalendar startTime = Tstamp.makeTimestamp(this.timestamp);
         XMLGregorianCalendar endTime = Tstamp.incrementDays(startTime, 1);
+        logger.fine("Coverage DPD: Requesting index: " + uriUser + " " + project);
         SensorDataIndex index = client.getProjectSensorData(this.uriUser, this.project,
             startTime, endTime, "Commit");
+        logger.fine("Coverage DPD: Got index: " + index.getSensorDataRef().size() + " instances");
 
         // [3] Add all of the appropriate data to the data container.
         CommitDataContainer container = new CommitDataContainer();
         for (SensorDataRef ref : index.getSensorDataRef()) {
           container.addCommitData(client.getSensorData(ref));
         }
+        logger.fine("Coverage DPD: retrieved instances, now building the DPD instance.");
 
         // [4] Get the aggregate data for each project member.
         String sensorBaseHost = this.server.getServerProperties().get(SENSORBASE_FULLHOST_KEY);
