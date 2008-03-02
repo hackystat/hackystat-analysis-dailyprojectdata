@@ -1,4 +1,4 @@
-package org.hackystat.dailyprojectdata.resource.filemetric;
+package org.hackystat.dailyprojectdata.resource.complexity;
 
 import java.io.StringWriter;
 import java.util.List;
@@ -13,9 +13,10 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+
+import org.hackystat.dailyprojectdata.resource.complexity.jaxb.ComplexityDailyProjectData;
 import org.hackystat.dailyprojectdata.resource.dailyprojectdata.DailyProjectDataResource;
-import org.hackystat.dailyprojectdata.resource.filemetric.jaxb.FileData;
-import org.hackystat.dailyprojectdata.resource.filemetric.jaxb.FileMetricDailyProjectData;
+import org.hackystat.dailyprojectdata.resource.complexity.jaxb.FileData;
 import org.hackystat.sensorbase.client.SensorBaseClient;
 import org.hackystat.sensorbase.resource.sensordata.jaxb.Property;
 import org.hackystat.sensorbase.resource.sensordata.jaxb.SensorData;
@@ -34,14 +35,14 @@ import org.w3c.dom.Document;
 
 /**
  * Implements the Resource for processing GET
- * {host}/filemetric/{user}/{project}/{starttime} requests. Requires the
+ * {host}/complexity/{user}/{project}/{starttime}/{type} requests. Requires the
  * authenticated user to be {user}, the Admin, or a member of {project}.
  * 
  * @author Cam Moore, Philip Johnson
  */
-public class FileMetricResource extends DailyProjectDataResource {
+public class ComplexityResource extends DailyProjectDataResource {
   
-  private String sizeMetric;
+  private String type;
   
   private String tool;
 
@@ -52,15 +53,15 @@ public class FileMetricResource extends DailyProjectDataResource {
    * @param request The request object.
    * @param response The response object.
    */
-  public FileMetricResource(Context context, Request request, Response response) {
+  public ComplexityResource(Context context, Request request, Response response) {
     super(context, request, response);
-    this.sizeMetric = (String) request.getAttributes().get("sizemetric");
+    this.type = (String) request.getAttributes().get("type");
     this.tool = (String) request.getAttributes().get("tool");
   }
 
   /**
-   * Returns an FileMetricDailyProjectData instance representing the FileMetric
-   * associated with the sizeMetric for the Project data, or null if not authorized.
+   * Returns a ComplexityDailyProjectData instance representing the Complexity
+   * associated with each file for the Project data, or null if not authorized.
    * Authenticated user must be the uriUser, or Admin, or project member. 
    * 
    * @param variant The representational variant requested.
@@ -69,7 +70,7 @@ public class FileMetricResource extends DailyProjectDataResource {
   @Override
   public Representation getRepresentation(Variant variant) {
     Logger logger = this.server.getLogger();
-    logger.fine("FileMetric DPD: Starting");
+    logger.fine("Complexity DPD: Starting");
     if (variant.getMediaType().equals(MediaType.TEXT_XML)) {
       try {
         // [1] get the SensorBaseClient for the user making this request.
@@ -78,7 +79,7 @@ public class FileMetricResource extends DailyProjectDataResource {
         // [2] Get the Snapshot containing the last sent FileMetric data for this Project.
         XMLGregorianCalendar startTime = Tstamp.makeTimestamp(this.timestamp);
         XMLGregorianCalendar endTime = Tstamp.incrementDays(startTime, 1);
-        logger.fine("FileMetric DPD: Requesting index: " + uriUser + " " + project);
+        logger.fine("Complexity DPD: Requesting index: " + uriUser + " " + project);
         SensorDataIndex snapshot = (this.tool == null) ?
             // Get the latest snapshot from any tool.
             client.getProjectSensorDataSnapshot(this.uriUser, this.project, startTime, endTime, 
@@ -87,34 +88,32 @@ public class FileMetricResource extends DailyProjectDataResource {
               client.getProjectSensorDataSnapshot(this.uriUser, this.project, startTime, endTime, 
                   "FileMetric", this.tool);
 
-        logger.fine("FileMetric DPD: Got index: " + 
+        logger.fine("Complexity DPD: Got index: " + 
             snapshot.getSensorDataRef().size() + " instances. Now retrieving instances.");
-        // [3] create and return the FileMetricDailyProjectData instance.
-        double total = 0;
-        FileMetricDailyProjectData fileDpd = new FileMetricDailyProjectData();
+        // [3] create and return the ComplexityDailyProjectData instance.
+        ComplexityDailyProjectData fileDpd = new ComplexityDailyProjectData();
         fileDpd.setOwner(uriUser);
         fileDpd.setProject(project);
         fileDpd.setStartTime(startTime);
-        fileDpd.setSizeMetric(this.sizeMetric);
+        fileDpd.setType(this.type);
         
         if (!snapshot.getSensorDataRef().isEmpty()) {
           for (SensorDataRef ref : snapshot.getSensorDataRef()) {
             SensorData data = client.getSensorData(ref);
             fileDpd.setOwner(data.getOwner());
             fileDpd.setTool(data.getTool());
-            Double value = getNumberProperty(data, this.sizeMetric);
-            if (value != null) { //NOPMD
+            String property = this.type + "ComplexityList";
+            String complexities = getProperty(data, property);
+            if (complexities != null) { //NOPMD
               FileData fileData = new FileData();
               fileData.setFileUri(data.getResource());
-              fileData.setSizeMetricValue(value);
+              fileData.setComplexityValues(complexities);
               fileDpd.getFileData().add(fileData);
-              total += value;
             }
           }
         }
-        fileDpd.setTotal(total);
-        String xmlData = makeFileMetric(fileDpd);
-        logRequest("FileMetric");
+        String xmlData = makeComplexityMetric(fileDpd);
+        logRequest("Complexity");
         return super.getStringRepresentation(xmlData);
       } 
       catch (Exception e) {
@@ -134,10 +133,10 @@ public class FileMetricResource extends DailyProjectDataResource {
    * @return The XML String representation.
    * @throws Exception If problems occur during translation.
    */
-  private String makeFileMetric(FileMetricDailyProjectData data) throws Exception {
-    JAXBContext fileMetricJAXB = (JAXBContext) this.server.getContext().getAttributes().get(
-        "FileMetricJAXB");
-    Marshaller marshaller = fileMetricJAXB.createMarshaller();
+  private String makeComplexityMetric(ComplexityDailyProjectData data) throws Exception {
+    JAXBContext complexityJAXB = (JAXBContext) this.server.getContext().getAttributes().get(
+        "ComplexityJAXB");
+    Marshaller marshaller = complexityJAXB.createMarshaller();
     DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
     dbf.setNamespaceAware(true);
     DocumentBuilder documentBuilder = dbf.newDocumentBuilder();
@@ -150,30 +149,6 @@ public class FileMetricResource extends DailyProjectDataResource {
     Transformer transformer = tf.newTransformer();
     transformer.transform(domSource, result);
     return writer.toString();
-  }
-  
-  /**
-   * Returns a Double as the value of key in data, or null if not found. Also null if
-   * the property was found but could not be converted to a Double.
-   * @param data The sensor data instance. 
-   * @param key The key whose Double value is to be retrieved.
-   * @return The value, as a double.
-   */
-  private Double getNumberProperty(SensorData data, String key) {
-    String prop = getProperty(data, key);
-    if (prop == null) {
-      return null;
-    }
-    // If we got a property, then make it a Double.
-    Double metricValue = null;
-    try {
-      metricValue = Double.parseDouble(getProperty(data, this.sizeMetric));
-    }
-    catch (Exception e) {
-      this.server.getLogger().info("In FileMetric Resource, parse into Double failed: " + 
-          getProperty(data, this.sizeMetric));
-    }
-    return metricValue;
   }
   
   /**

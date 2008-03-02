@@ -41,5 +41,8 @@
     <xjc extension="true" target="${env.JAXB_TARGET}" schema="${basedir}/xml/schema/CommitDailyProjectData.xsd" destdir="src" package="org.hackystat.dailyprojectdata.resource.commit.jaxb">
       <produces dir="${basedir}/src/org/hackystat/dailyprojectdata/resource/commit/jaxb" includes="*" />
     </xjc>
+    <xjc extension="true" target="${env.JAXB_TARGET}" schema="${basedir}/xml/schema/ComplexityDailyProjectData.xsd" destdir="src" package="org.hackystat.dailyprojectdata.resource.complexity.jaxb">
+       <produces dir="${basedir}/src/org/hackystat/dailyprojectdata/resource/complexity/jaxb" includes="*" />
+    </xjc>    
   </target>
 </project>

@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<ComplexityDailyProjectData Project="Default" Owner="johnson@hawaii.edu" StartTime="2006-01-31T00:00:00.000" Type="Cyclometric" Tool="JavaNCSS" UriPattern="**">
+ <FileData FileUri="file://users/johnson/Foo.java" ComplexityValues="1,3"/>
+ <FileData FileUri="file://users/johnson/Bar.java" ComplexityValues="1"/>
+ <FileData FileUri="file://users/johnson/Baz.java" ComplexityValues="1,4,6"/>
+</ComplexityDailyProjectData>

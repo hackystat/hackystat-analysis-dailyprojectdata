@@ -14,6 +14,7 @@ import javax.xml.bind.JAXBContext;
 import org.hackystat.dailyprojectdata.resource.build.BuildResource;
 import org.hackystat.dailyprojectdata.resource.codeissue.CodeIssueResource;
 import org.hackystat.dailyprojectdata.resource.commit.CommitResource;
+import org.hackystat.dailyprojectdata.resource.complexity.ComplexityResource;
 import org.hackystat.dailyprojectdata.resource.coverage.CoverageResource;
 import org.hackystat.dailyprojectdata.resource.devtime.DevTimeResource;
 import org.hackystat.dailyprojectdata.resource.filemetric.FileMetricResource;
@@ -120,6 +121,9 @@ public class Server extends Application {
     JAXBContext commitJAXB = JAXBContext.newInstance(
         org.hackystat.dailyprojectdata.resource.commit.jaxb.ObjectFactory.class);
     attributes.put("CommitJAXB", commitJAXB);
+    JAXBContext complexityJAXB = JAXBContext.newInstance(
+        org.hackystat.dailyprojectdata.resource.complexity.jaxb.ObjectFactory.class);
+    attributes.put("ComplexityJAXB", complexityJAXB);
     
     // Provide a pointer to this server in the Context so that Resources can get at this server.
     attributes.put("DailyProjectDataServer", server);
@@ -163,7 +167,13 @@ public class Server extends Application {
     // requests will require authentication.
     Router authRouter = new Router(getContext());
     authRouter.attach("/devtime/{user}/{project}/{timestamp}", DevTimeResource.class);
+    authRouter.attach("/complexity/{user}/{project}/{timestamp}/{type}", 
+        ComplexityResource.class);
+    authRouter.attach("/complexity/{user}/{project}/{timestamp}/{type}?Tool={tool}", 
+        ComplexityResource.class);
     authRouter.attach("/filemetric/{user}/{project}/{timestamp}/{sizemetric}", 
+        FileMetricResource.class);
+    authRouter.attach("/filemetric/{user}/{project}/{timestamp}/{sizemetric}?Tool={tool}", 
         FileMetricResource.class);
     authRouter.attach("/unittest/{user}/{project}/{timestamp}", UnitTestResource.class);
     authRouter.attach("/codeissue/{user}/{project}/{timestamp}", CodeIssueResource.class);
