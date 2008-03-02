@@ -11,6 +11,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import org.hackystat.dailyprojectdata.resource.build.jaxb.BuildDailyProjectData;
 import org.hackystat.dailyprojectdata.resource.codeissue.jaxb.CodeIssueDailyProjectData;
 import org.hackystat.dailyprojectdata.resource.commit.jaxb.CommitDailyProjectData;
+import org.hackystat.dailyprojectdata.resource.complexity.jaxb.ComplexityDailyProjectData;
 import org.hackystat.dailyprojectdata.resource.coverage.jaxb.CoverageDailyProjectData;
 import org.hackystat.dailyprojectdata.resource.devtime.jaxb.DevTimeDailyProjectData;
 import org.hackystat.dailyprojectdata.resource.filemetric.jaxb.FileMetricDailyProjectData;
@@ -63,6 +64,8 @@ public class DailyProjectDataClient {
   private JAXBContext commitJAXB;
   /** Build JAXB Context. */
   private JAXBContext buildJAXB;
+  /** Complexity JAXB Context. */
+  private JAXBContext complexityJAXB;
   /** The http authentication approach. */
   private ChallengeScheme scheme = ChallengeScheme.HTTP_BASIC;
   /** The preferred representation type. */
@@ -122,7 +125,9 @@ public class DailyProjectDataClient {
       this.buildJAXB = JAXBContext
           .newInstance(org.hackystat.dailyprojectdata.resource.build.jaxb.ObjectFactory.class);
       this.commitJAXB = JAXBContext
-          .newInstance(org.hackystat.dailyprojectdata.resource.commit.jaxb.ObjectFactory.class);
+      .newInstance(org.hackystat.dailyprojectdata.resource.commit.jaxb.ObjectFactory.class);
+      this.complexityJAXB = JAXBContext
+      .newInstance(org.hackystat.dailyprojectdata.resource.complexity.jaxb.ObjectFactory.class);
     }
     catch (Exception e) {
       throw new RuntimeException("Couldn't create JAXB context instances.", e);
@@ -406,6 +411,57 @@ public class DailyProjectDataClient {
     logElapsedTime(uri, startTime);
     return fileMetric;
   }
+  
+  /**
+   * Returns a ComplexityDailyProjectData instance from this server, or throws a
+   * DailyProjectData exception if problems occurred.
+   * 
+   * @param user The user that owns the project.
+   * @param project The project owned by user.
+   * @param timestamp The Timestamp indicating the start of the 24 hour period
+   * of DevTime.
+   * @param type The type of complexity, such as "Cyclometric".
+   * @param tool The tool that provided the complexity data, such as "JavaNCSS".
+   * @return A ComplexityDailyProjectData instance.
+   * @throws DailyProjectDataClientException If the credentials associated with
+   * this instance are not valid, or if the underlying SensorBase service cannot
+   * be reached, or if one or more of the supplied user, password, or timestamp
+   * is not valid.
+   */
+  public synchronized ComplexityDailyProjectData getComplexity(String user, String project,
+      XMLGregorianCalendar timestamp, String type, String tool) 
+  throws DailyProjectDataClientException {
+    Date startTime = new Date();
+    ComplexityDailyProjectData complexity;
+    String uri = "complexity/" + user + "/" + project + "/" + timestamp + "/" + type + "?Tool=" 
+    + tool;
+    // Check the cache, and return the instance from it if available. 
+    if (this.isCacheEnabled) {
+      complexity = (ComplexityDailyProjectData)this.uriCache.get(uri);
+      if (complexity != null) {
+        return complexity;
+      }
+    }
+    Response response = makeRequest(Method.GET, uri, null);
+    if (!response.getStatus().isSuccess()) {
+      System.err.println("complexity/" + user + "/" + project + "/" + timestamp + "/" + type);
+      throw new DailyProjectDataClientException(response.getStatus());
+    }
+    try {
+      String xmlData = response.getEntity().getText();
+      complexity = makeComplexityDailyProjectData(xmlData);
+      // Add it to the cache if we're using one.
+      if (this.isCacheEnabled && !isToday(timestamp)) {
+        this.uriCache.put(uri, complexity);
+      }
+    }
+    catch (Exception e) {
+      logElapsedTime(uri, startTime, e);
+      throw new DailyProjectDataClientException(response.getStatus(), e);
+    }
+    logElapsedTime(uri, startTime);
+    return complexity;
+  }
 
   /**
    * Takes a String encoding of a FileMetricDailyProjectData in XML format and
@@ -419,6 +475,20 @@ public class DailyProjectDataClient {
     throws Exception {
     Unmarshaller unmarshaller = this.fileMetricJAXB.createUnmarshaller();
     return (FileMetricDailyProjectData) unmarshaller.unmarshal(new StringReader(xmlString));
+  }
+  
+  /**
+   * Takes a String encoding of a ComplexityDailyProjectData in XML format and
+   * converts it.
+   * 
+   * @param xmlString The XML string representing a ComplexityDailyProjectData.
+   * @return The corresponding ComplexityDailyProjectData instance.
+   * @throws Exception If problems occur during unmarshalling.
+   */
+  private ComplexityDailyProjectData makeComplexityDailyProjectData(String xmlString)
+    throws Exception {
+    Unmarshaller unmarshaller = this.complexityJAXB.createUnmarshaller();
+    return (ComplexityDailyProjectData) unmarshaller.unmarshal(new StringReader(xmlString));
   }
 
   /**

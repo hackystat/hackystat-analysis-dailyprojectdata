@@ -38,7 +38,7 @@ import org.w3c.dom.Document;
  * {host}/complexity/{user}/{project}/{starttime}/{type} requests. Requires the
  * authenticated user to be {user}, the Admin, or a member of {project}.
  * 
- * @author Cam Moore, Philip Johnson
+ * @author Philip Johnson
  */
 public class ComplexityResource extends DailyProjectDataResource {
   

@@ -25,10 +25,10 @@ public class TestCommitRestApi extends DailyProjectDataTestHelper {
   /** Constant for Project. */
   private static final String PROJECT = "Default";
   /** The user for this test case. */
-  private String user = "TestCodeIssue@hackystat.org";
+  private String user = "TestCommit@hackystat.org";
 
   /**
-   * Test that GET {host}/codeissue/{user}/default/{starttime} works properly.
+   * Test that GET {host}/commit/{user}/default/{starttime} works properly.
    * First, it creates a test user and sends some sample CodeIssue data to the
    * SensorBase. Then, it invokes the GET request and checks to see that it
    * obtains the right answer. Finally, it deletes the data and the user.
