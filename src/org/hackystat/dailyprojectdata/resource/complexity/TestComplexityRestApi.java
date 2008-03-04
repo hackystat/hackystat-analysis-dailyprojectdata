@@ -1,10 +1,15 @@
 package org.hackystat.dailyprojectdata.resource.complexity;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.xml.datatype.XMLGregorianCalendar;
 import org.hackystat.dailyprojectdata.client.DailyProjectDataClient;
 import org.hackystat.dailyprojectdata.resource.complexity.jaxb.ComplexityDailyProjectData;
+import org.hackystat.dailyprojectdata.resource.complexity.jaxb.FileData;
 import org.hackystat.dailyprojectdata.test.DailyProjectDataTestHelper;
 import org.hackystat.sensorbase.client.SensorBaseClient;
 import org.hackystat.sensorbase.resource.sensordata.jaxb.Properties;
@@ -40,8 +45,12 @@ public class TestComplexityRestApi extends DailyProjectDataTestHelper {
     // First, create a batch of DevEvent sensor data.
     SensorDatas batchData = new SensorDatas();
     XMLGregorianCalendar tstamp = Tstamp.makeTimestamp("2007-04-30T02:00:00");
-    batchData.getSensorData().add(makeFileMetric(tstamp, "1,2"));
-    batchData.getSensorData().add(makeFileMetric(tstamp, "3,4"));
+    String complexityList1 = "1, 2";
+    String complexityList2 = "3, 4";
+    String totalLines1 = "300";
+    String totalLines2 = "200";
+    batchData.getSensorData().add(makeFileMetric(tstamp, complexityList1, totalLines1));
+    batchData.getSensorData().add(makeFileMetric(tstamp, complexityList2, totalLines2));
     
     // Connect to the sensorbase and register the test user.
     SensorBaseClient.registerUser(getSensorBaseHostName(), user);
@@ -57,7 +66,16 @@ public class TestComplexityRestApi extends DailyProjectDataTestHelper {
     ComplexityDailyProjectData complexity = 
       dpdClient.getComplexity(user, "Default", tstamp, "Cyclomatic", "JavaNCSS");
     assertEquals("Checking two entries returned", 2, complexity.getFileData().size());
-
+    Set<String> complexitySet = new HashSet<String>();
+    Set<String> totalLinesSet = new HashSet<String>();
+    for (FileData data : complexity.getFileData()) {
+      complexitySet.add(data.getComplexityValues());
+      totalLinesSet.add(data.getTotalLines());
+    }
+    assertTrue("Checking complexity 1", complexitySet.contains(complexityList1));
+    assertTrue("Checking complexity 2", complexitySet.contains(complexityList2));
+    assertTrue("Checking totalLines 1", totalLinesSet.contains(totalLines1));
+    assertTrue("Checking totalLines 2", totalLinesSet.contains(totalLines2));
   }
 
   /**
@@ -66,10 +84,12 @@ public class TestComplexityRestApi extends DailyProjectDataTestHelper {
    *
    * @param tstamp The timestamp, used as the Runtime and auto-incremented for the tstamp.
    * @param values The list of complexity data values.
+   * @param totalLines The total LOC for this file used to compute the complexity data. 
    * @return The new SensorData FileMetric instance.
    * @throws Exception If problems occur.
    */
-  private SensorData makeFileMetric(XMLGregorianCalendar tstamp, String values) throws Exception {
+  private SensorData makeFileMetric(XMLGregorianCalendar tstamp, String values, String totalLines) 
+  throws Exception {
     String sdt = "FileMetric";
     SensorData data = new SensorData();
     String tool = "JavaNCSS";
@@ -82,8 +102,12 @@ public class TestComplexityRestApi extends DailyProjectDataTestHelper {
     Property property = new Property();
     property.setKey("CyclomaticComplexityList");
     property.setValue(values);
+    Property property2 = new Property();
+    property2.setKey("TotalLines");
+    property2.setValue(totalLines);
     Properties properties = new Properties();
     properties.getProperty().add(property);
+    properties.getProperty().add(property2);
     data.setProperties(properties);
     return data;
   }

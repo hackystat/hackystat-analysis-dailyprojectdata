@@ -108,6 +108,7 @@ public class ComplexityResource extends DailyProjectDataResource {
               FileData fileData = new FileData();
               fileData.setFileUri(data.getResource());
               fileData.setComplexityValues(complexities);
+              fileData.setTotalLines(getProperty(data, "TotalLines"));
               fileDpd.getFileData().add(fileData);
             }
           }

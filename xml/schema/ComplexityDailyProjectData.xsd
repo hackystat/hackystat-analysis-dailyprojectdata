@@ -22,6 +22,7 @@
   <xs:attribute name="UriPattern" type="xs:string"/>
   <xs:attribute name="FileUri" type="xs:anyURI"/>
   <xs:attribute name="ComplexityValues" type="xs:string"/>
+  <xs:attribute name="TotalLines" type="xs:string"/>
     
   <xs:element name="ComplexityDailyProjectData">
     <xs:complexType>
@@ -41,6 +42,7 @@
     <xs:complexType>
       <xs:attribute ref="FileUri" use="required"/>
       <xs:attribute ref="ComplexityValues" use="required"/>
+      <xs:attribute ref="TotalLines" use="required"/>
     </xs:complexType>
   </xs:element>
 </xs:schema>
