@@ -381,9 +381,32 @@ public class DailyProjectDataClient {
    */
   public synchronized FileMetricDailyProjectData getFileMetric(String user, String project,
       XMLGregorianCalendar timestamp, String sizeMetric) throws DailyProjectDataClientException {
+    return getFileMetric(user, project, timestamp, sizeMetric, null);
+  }
+  
+  /**
+   * Returns a FileMetricDailyProjectData instance from this server, or throws a
+   * DailyProjectData exception if problems occurred.
+   * 
+   * @param user The user that owns the project.
+   * @param project The project owned by user.
+   * @param timestamp The Timestamp indicating the start of the 24 hour period
+   * of DevTime.
+   * @param sizeMetric The size metric to be retrieved.
+   * @param tool The tool whose data is to be retrieved, or null for no tool.
+   * @return A FileMetricDailyProjectData instance.
+   * @throws DailyProjectDataClientException If the credentials associated with
+   * this instance are not valid, or if the underlying SensorBase service cannot
+   * be reached, or if one or more of the supplied user, password, or timestamp
+   * is not valid.
+   */
+  public synchronized FileMetricDailyProjectData getFileMetric(String user, String project,
+      XMLGregorianCalendar timestamp, String sizeMetric, String tool) 
+  throws DailyProjectDataClientException {
     Date startTime = new Date();
     FileMetricDailyProjectData fileMetric;
-    String uri = "filemetric/" + user + "/" + project + "/" + timestamp + "/" + sizeMetric;
+    String param = (tool == null) ? "" : "?Tool=" + tool;
+    String uri = "filemetric/" + user + "/" + project + "/" + timestamp + "/" + sizeMetric + param;
     // Check the cache, and return the instance from it if available. 
     if (this.isCacheEnabled) {
       fileMetric = (FileMetricDailyProjectData)this.uriCache.get(uri);
