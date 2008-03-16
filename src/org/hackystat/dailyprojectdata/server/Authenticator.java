@@ -68,6 +68,8 @@ public class Authenticator extends Guard {
       // Credentials are good, so save them and create a sensorbase client for this user. 
       credentials.put(identifier, secret);
       SensorBaseClient client = new SensorBaseClient(sensorBaseHost, identifier, secret);
+      // Set timeout to 60 minutes.
+      client.setTimeout(1000 * 60 * 60);
       // Get the ServerProperties instance so we can determine if caching is enabled.
       Server server = (Server)getContext().getAttributes().get("DailyProjectDataServer");
       ServerProperties props = server.getServerProperties();
