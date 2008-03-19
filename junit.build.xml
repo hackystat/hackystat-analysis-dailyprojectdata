@@ -22,6 +22,7 @@
         <fileset file="${env.JAVAMAIL_HOME}/mail.jar"/> 
       </classpath>
       <sysproperty key="user.dir" value="${basedir}" />
+      <sysproperty key="HACKYSTAT_SENSORBASE_HOME" value="${env.HACKYSTAT_SENSORBASE_HOME}" />
       <formatter type="xml" />
       <batchtest todir="${junit.dir}">
         <fileset dir="${src.dir}" includes="**/Test*.java" />
