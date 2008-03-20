@@ -89,15 +89,21 @@ public class CoverageResource extends DailyProjectDataResource {
         
         // [4] If data, then add ConstructData instances for required granularity.
         if (!snapshot.getSensorDataRef().isEmpty()) {
+          logger.fine("There is data to process");
           // Add a ConstructData instance if this sensor data contains the appropriate granularity.
           for (SensorDataRef ref : snapshot.getSensorDataRef()) {
             SensorData data = client.getSensorData(ref);
+            logger.fine ("Sensor Data: " + data);
             coverageData.setOwner(data.getOwner()); 
             coverageData.setTool(data.getTool()); 
             String coveredKey = this.granularity.toLowerCase() + "_Covered";
             String uncoveredKey = this.granularity.toLowerCase() + "_Uncovered";
+            logger.fine("Covered: " + coveredKey + " " + this.getProperty(data, coveredKey));
+            logger.fine("Uncovered: " + uncoveredKey + " " + this.getProperty(data, coveredKey));
             Integer covered = this.getCoverageValue(data, coveredKey);
             Integer uncovered = this.getCoverageValue(data, uncoveredKey);
+            logger.fine("Covered num: " + covered);
+            logger.fine("Uncovered num: " + uncovered);
             if ((covered != null) && (uncovered != null)) { //NOPMD
               ConstructData construct = new ConstructData();
               construct.setName(data.getResource());
@@ -174,13 +180,13 @@ public class CoverageResource extends DailyProjectDataResource {
    */
   private Integer getCoverageValue(SensorData data, String granularityKey) {
     String prop = getProperty(data, granularityKey);
-    Integer coverageNum = null;
+    Double coverageNum = null;
     try {
-      coverageNum = Integer.parseInt(prop);
+      coverageNum = Double.parseDouble(prop);
     }
     catch (Exception e) { //NOPMD
       // Don't do anything, ok to drop through.
     }
-    return coverageNum;
+    return coverageNum.intValue();
   }
 }
