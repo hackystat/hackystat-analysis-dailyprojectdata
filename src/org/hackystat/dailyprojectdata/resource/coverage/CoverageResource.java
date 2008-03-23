@@ -187,6 +187,6 @@ public class CoverageResource extends DailyProjectDataResource {
     catch (Exception e) { //NOPMD
       // Don't do anything, ok to drop through.
     }
-    return coverageNum.intValue();
+    return ((coverageNum == null) ? null : coverageNum.intValue());
   }
 }
