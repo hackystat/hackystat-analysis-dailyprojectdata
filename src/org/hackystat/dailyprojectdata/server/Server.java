@@ -15,6 +15,7 @@ import org.hackystat.dailyprojectdata.resource.build.BuildResource;
 import org.hackystat.dailyprojectdata.resource.codeissue.CodeIssueResource;
 import org.hackystat.dailyprojectdata.resource.commit.CommitResource;
 import org.hackystat.dailyprojectdata.resource.complexity.ComplexityResource;
+import org.hackystat.dailyprojectdata.resource.coupling.CouplingResource;
 import org.hackystat.dailyprojectdata.resource.coverage.CoverageResource;
 import org.hackystat.dailyprojectdata.resource.devtime.DevTimeResource;
 import org.hackystat.dailyprojectdata.resource.filemetric.FileMetricResource;
@@ -167,6 +168,10 @@ public class Server extends Application {
     // requests will require authentication.
     Router authRouter = new Router(getContext());
     authRouter.attach("/devtime/{user}/{project}/{timestamp}", DevTimeResource.class);
+    authRouter.attach("/coupling/{user}/{project}/{timestamp}/{type}", 
+        CouplingResource.class);
+    authRouter.attach("/coupling/{user}/{project}/{timestamp}/{type}?Tool={tool}", 
+        CouplingResource.class);
     authRouter.attach("/complexity/{user}/{project}/{timestamp}/{type}", 
         ComplexityResource.class);
     authRouter.attach("/complexity/{user}/{project}/{timestamp}/{type}?Tool={tool}", 

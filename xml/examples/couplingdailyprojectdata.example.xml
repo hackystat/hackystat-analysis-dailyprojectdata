@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<CouplingDailyProjectData Project="Default" Owner="johnson@hawaii.edu" StartTime="2006-01-31T00:00:00.000" Type="package" Tool="JDepend">
+  <CouplingData Uri="file://users/johnson/foo" Afferent="2" Efferent="4"/>
+  <CouplingData Uri="file://users/johnson/bar" Afferent="1" Efferent="3"/>
+</CouplingDailyProjectData>
