@@ -105,7 +105,7 @@ public class CouplingResource extends DailyProjectDataResource {
             couplingDpd.setTool(data.getTool());
             Integer afferent = getIntegerProperty(data, "Afferent");
             Integer efferent = getIntegerProperty(data, "Efferent");
-            if ((afferent != null) && (efferent != null)) { 
+            if ((afferent != null) && (efferent != null)) { //NOPMD
               CouplingData couplingData = new CouplingData();
               couplingData.setUri(data.getResource());
               couplingData.setAfferent(BigInteger.valueOf(afferent));

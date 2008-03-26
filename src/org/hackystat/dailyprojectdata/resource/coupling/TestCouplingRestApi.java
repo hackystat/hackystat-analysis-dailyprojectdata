@@ -41,10 +41,10 @@ public class TestCouplingRestApi extends DailyProjectDataTestHelper {
     XMLGregorianCalendar tstamp = Tstamp.makeTimestamp("2007-04-30T02:00:00");
     String afferent1 = "1";
     String efferent1 = "2";
-    String afferent2 = "3";
-    String efferent2 = "4";
-    batchData.getSensorData().add(makeFileMetric(tstamp, afferent1, efferent1));
-    batchData.getSensorData().add(makeFileMetric(tstamp, afferent2, efferent2));
+    String afferent2 = "1";
+    String efferent2 = "2";
+    batchData.getSensorData().add(makeCoupling(tstamp, afferent1, efferent1));
+    batchData.getSensorData().add(makeCoupling(tstamp, afferent2, efferent2));
     
     // Connect to the sensorbase and register the test user.
     SensorBaseClient.registerUser(getSensorBaseHostName(), user);
@@ -58,12 +58,12 @@ public class TestCouplingRestApi extends DailyProjectDataTestHelper {
         user, user);
     dpdClient.authenticate();
     CouplingDailyProjectData coupling = 
-      dpdClient.getCoupling(user, "Default", tstamp, "package", "JDepend");
+      dpdClient.getCoupling(user, "Default", tstamp, "class", "DependencyFinder");
     assertEquals("Checking two entries returned", 2, coupling.getCouplingData().size());
     assertEquals("Checking 1", 1, coupling.getCouplingData().get(0).getAfferent().intValue());
     assertEquals("Checking 2", 2, coupling.getCouplingData().get(0).getEfferent().intValue());
-    assertEquals("Checking 3", 3, coupling.getCouplingData().get(1).getAfferent().intValue());
-    assertEquals("Checking 4", 4, coupling.getCouplingData().get(1).getEfferent().intValue());
+    assertEquals("Checking 2.1", 1, coupling.getCouplingData().get(1).getAfferent().intValue());
+    assertEquals("Checking 2.2", 2, coupling.getCouplingData().get(1).getEfferent().intValue());
   }
 
   /**
@@ -76,28 +76,38 @@ public class TestCouplingRestApi extends DailyProjectDataTestHelper {
    * @return The new SensorData Coupling instance.
    * @throws Exception If problems occur.
    */
-  private SensorData makeFileMetric(XMLGregorianCalendar tstamp, String afferent, String efferent) 
+  private SensorData makeCoupling(XMLGregorianCalendar tstamp, String afferent, String efferent) 
   throws Exception {
     String sdt = "Coupling";
     SensorData data = new SensorData();
-    String tool = "JDepend";
+    String tool = "DependencyFinder";
     data.setTool(tool);
     data.setOwner(user);
     data.setSensorDataType(sdt);
     data.setTimestamp(Tstamp.incrementMinutes(tstamp, counter++));
     data.setRuntime(tstamp);
-    data.setResource("/users/johnson/Foo-" + counter);
-    Property property = new Property();
-    property.setKey("Afferent");
-    property.setValue(afferent);
-    Property property2 = new Property();
-    property2.setKey("Efferent");
-    property2.setValue(efferent);
-    Properties properties = new Properties();
-    properties.getProperty().add(property);
-    properties.getProperty().add(property2);
-    data.setProperties(properties);
+    data.setResource("/users/johnson/Foo-" + counter + ".java");
+    addProperty(data, "Afferent", afferent);
+    addProperty(data, "Efferent", efferent);
+    addProperty(data, "Type", "class");
     return data;
+  }
+  
+  /**
+   * Updates the sensor data instance with the new property.
+   * @param data The sensor data instance. 
+   * @param key The new key.
+   * @param value The new value. 
+   */
+  private void addProperty(SensorData data, String key, String value) {
+    if (data.getProperties() == null) {
+      data.setProperties(new Properties());
+    }
+    Properties properties = data.getProperties();
+    Property property = new Property();
+    property.setKey(key);
+    property.setValue(value);
+    properties.getProperty().add(property);
   }
 
 }

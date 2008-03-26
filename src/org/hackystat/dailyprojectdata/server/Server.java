@@ -125,6 +125,9 @@ public class Server extends Application {
     JAXBContext complexityJAXB = JAXBContext.newInstance(
         org.hackystat.dailyprojectdata.resource.complexity.jaxb.ObjectFactory.class);
     attributes.put("ComplexityJAXB", complexityJAXB);
+    JAXBContext couplingJAXB = JAXBContext.newInstance(
+        org.hackystat.dailyprojectdata.resource.coupling.jaxb.ObjectFactory.class);
+    attributes.put("CouplingJAXB", couplingJAXB);
     
     // Provide a pointer to this server in the Context so that Resources can get at this server.
     attributes.put("DailyProjectDataServer", server);
