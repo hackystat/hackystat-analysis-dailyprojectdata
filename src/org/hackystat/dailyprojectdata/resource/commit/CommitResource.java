@@ -62,7 +62,7 @@ public class CommitResource extends DailyProjectDataResource {
   @Override
   public Representation getRepresentation(Variant variant) {
     Logger logger = this.server.getLogger();
-    logger.fine("Coverage DPD: Starting");
+    logger.fine("Commit DPD: Starting");
     if (variant.getMediaType().equals(MediaType.TEXT_XML)) {
       try {
         // [1] get the SensorBaseClient for the user making this request.
@@ -71,17 +71,17 @@ public class CommitResource extends DailyProjectDataResource {
         // the requested day.
         XMLGregorianCalendar startTime = Tstamp.makeTimestamp(this.timestamp);
         XMLGregorianCalendar endTime = Tstamp.incrementDays(startTime, 1);
-        logger.fine("Coverage DPD: Requesting index: " + uriUser + " " + project);
+        logger.fine("Commit DPD: Requesting index: " + uriUser + " " + project);
         SensorDataIndex index = client.getProjectSensorData(this.uriUser, this.project,
             startTime, endTime, "Commit");
-        logger.fine("Coverage DPD: Got index: " + index.getSensorDataRef().size() + " instances");
+        logger.fine("Commit DPD: Got index: " + index.getSensorDataRef().size() + " instances");
 
         // [3] Add all of the appropriate data to the data container.
         CommitDataContainer container = new CommitDataContainer();
         for (SensorDataRef ref : index.getSensorDataRef()) {
           container.addCommitData(client.getSensorData(ref));
         }
-        logger.fine("Coverage DPD: retrieved instances, now building the DPD instance.");
+        logger.fine("Commit DPD: retrieved instances, now building the DPD instance.");
 
         // [4] Get the aggregate data for each project member.
         String sensorBaseHost = this.server.getServerProperties().get(SENSORBASE_FULLHOST_KEY);
