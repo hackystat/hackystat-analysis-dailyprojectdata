@@ -84,10 +84,6 @@ public class DailyProjectDataClient {
   /** Indicates whether or not cache is enabled. */
   private boolean isCacheEnabled = false;
   
-  /** The System property key used to retrieve the default timeout value in milliseconds. */
-  public static final String DAILYPROJECTDATACLIENT_TIMEOUT_KEY = "dailyprojectdataclient.timeout";
-
-
   /**
    * Initializes a new DailyProjectDataClient, given the host, userEmail, and
    * password. Note that the userEmail and password refer to the underlying
@@ -118,7 +114,6 @@ public class DailyProjectDataClient {
           + "', email='" + email + "', password='" + password + "'");
     }
     this.client = new Client(Protocol.HTTP);
-    setTimeout(getDefaultTimeout());
     try {
       this.devTimeJAXB = JAXBContext
           .newInstance(org.hackystat.dailyprojectdata.resource.devtime.jaxb.ObjectFactory.class);
@@ -156,45 +151,44 @@ public class DailyProjectDataClient {
   }
   
   /**
-   * Attempts to provide a timeout value for this client.  
+   * Sets the timeout value for this client. 
    * @param milliseconds The number of milliseconds to wait before timing out. 
    */
   public final synchronized void setTimeout(int milliseconds) {
-    setClientTimeout(this.client, milliseconds);
-  }
-  
-  /**
-   * Returns the default timeout in milliseconds. 
-   * The default timeout is set to 10 minutes (1000 * 60 * 10 ms), but clients can change this 
-   * by creating a 
-   * System property called dailyprojectdataclient.timeout and set it to a String indicating
-   * the number of milliseconds.  
-   * @return The default timeout.
-   */
-  private static int getDefaultTimeout() {
-    String systemTimeout = System.getProperty(DAILYPROJECTDATACLIENT_TIMEOUT_KEY, "600000");
-    int timeout = 600000;
-    try {
-      timeout = Integer.parseInt(systemTimeout);
-    }
-    catch (Exception e) {
-      timeout = 600000;
-    }
-    return timeout;
-  }
-  
-  /**
-   * Attempts to set timeout values for the passed client. 
-   * @param client The client .
-   * @param milliseconds The timeout value. 
-   */
-  private static void setClientTimeout(Client client, int milliseconds) {
+    client.getContext().getParameters().removeAll("connectTimeout");
     client.getContext().getParameters().add("connectTimeout", String.valueOf(milliseconds));
     // For the Apache Commons client.
+    client.getContext().getParameters().removeAll("readTimeout");
     client.getContext().getParameters().add("readTimeout", String.valueOf(milliseconds));
+    client.getContext().getParameters().removeAll("connectionManagerTimeout");
     client.getContext().getParameters().add("connectionManagerTimeout", 
         String.valueOf(milliseconds));
   }
+  
+//  I am pretty sure this method is no longer needed, but am keeping it here because we may want
+//  to be able to use dailyprojectdataclient.timeout.  Although it seems like this could go in the 
+//  telemetry.properties file (or analogous in some other higher-level client?) 6/2008 pmj
+//
+//  /**
+//   * Returns the default timeout in milliseconds. 
+//   * The default timeout is set to 10 minutes (1000 * 60 * 10 ms), but clients can change this 
+//   * by creating a 
+//   * System property called dailyprojectdataclient.timeout and set it to a String indicating
+//   * the number of milliseconds.  
+//   * @return The default timeout.
+//   */
+//  private static int getDefaultTimeout() {
+//    String systemTimeout = System.getProperty(DAILYPROJECTDATACLIENT_TIMEOUT_KEY, "600000");
+//    int timeout = 600000;
+//    try {
+//      timeout = Integer.parseInt(systemTimeout);
+//    }
+//    catch (Exception e) {
+//      timeout = 600000;
+//    }
+//    return timeout;
+//  }
+ 
 
 
   /**
