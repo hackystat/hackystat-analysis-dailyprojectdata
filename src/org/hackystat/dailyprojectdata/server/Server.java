@@ -12,6 +12,7 @@ import java.util.logging.Logger;
 import javax.xml.bind.JAXBContext;
 
 import org.hackystat.dailyprojectdata.resource.build.BuildResource;
+import org.hackystat.dailyprojectdata.resource.cache.CacheResource;
 import org.hackystat.dailyprojectdata.resource.codeissue.CodeIssueResource;
 import org.hackystat.dailyprojectdata.resource.commit.CommitResource;
 import org.hackystat.dailyprojectdata.resource.complexity.ComplexityResource;
@@ -196,6 +197,7 @@ public class Server extends Application {
     authRouter.attach("/build/{user}/{project}/{timestamp}", BuildResource.class);
     authRouter.attach("/build/{user}/{project}/{timestamp}?Type={Type}", BuildResource.class);
     authRouter.attach("/commit/{user}/{project}/{timestamp}", CommitResource.class);
+    authRouter.attach("/cache/{user}", CacheResource.class);
 
     // Here's the Guard that we will place in front of authRouter.
     Guard guard = new Authenticator(getContext(), 

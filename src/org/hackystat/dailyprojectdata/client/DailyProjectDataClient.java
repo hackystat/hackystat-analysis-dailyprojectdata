@@ -992,10 +992,34 @@ public class DailyProjectDataClient {
   }
   
   /**
-   * Delete all entries from this cache. 
+   * Delete all entries from the local cache of DailyProjectData instances associated with this 
+   * DailyProjectDataClient instance.
+   * If this DPDClient instance does not have caching enabled, then this method has no effect. 
    */
   public synchronized void clearCache() {
-    this.uriCache.clear();
+    if (this.uriCache != null) {
+      this.uriCache.clear();  
+    }
+  }
+  
+  /**
+   * Clears the SensorData cache associated with the specified user on the DailyProjectData server 
+   * to which this DailyProjectDataClient instance is connected. 
+   * @param user The user whose SensorData cache on the DPD server is to be cleared.
+   * @return True if the command succeeded.
+   * @throws DailyProjectDataClientException If problems occur.
+   */
+  public synchronized boolean clearServerCache(String user) throws DailyProjectDataClientException {
+    Date startTime = new Date();
+    String uri = "cache/" + user;
+    Response response = makeRequest(Method.DELETE, uri, null);
+    if (!response.getStatus().isSuccess()) {
+      logElapsedTime(uri, startTime);
+      System.err.println("cache/" + user);
+      throw new DailyProjectDataClientException(response.getStatus());
+    }
+    logElapsedTime(uri, startTime);
+    return true;
   }
   
   /**

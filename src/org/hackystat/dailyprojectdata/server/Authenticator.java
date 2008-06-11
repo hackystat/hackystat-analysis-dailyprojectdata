@@ -24,11 +24,12 @@ import org.restlet.data.ChallengeScheme;
  */
 public class Authenticator extends Guard {
   
-  /** A map containing previously verified credentials. */
-  private Map<String, String> credentials = new HashMap<String, String>();
+  /** A singleton map containing previously verified credentials. */
+  private static Map<String, String> credentials = new HashMap<String, String>();
   
-  /** A map containing SensorBaseClient instances, one per credentialed user. */
-  private Map<String, SensorBaseClient> userClientMap = new HashMap<String, SensorBaseClient>();
+  /** A singleton map containing SensorBaseClient instances, one per credentialed user. */
+  private static Map<String, SensorBaseClient> userClientMap = 
+    new HashMap<String, SensorBaseClient>();
   
   /** The sensorbase host, such as "http://localhost:9876/sensorbase/" */
   private String sensorBaseHost;
@@ -56,29 +57,40 @@ public class Authenticator extends Guard {
    * @return If the credentials are valid.
    */
   @Override protected boolean checkSecret(String identifier, char[] secretCharArray) {
-    String secret = new String(secretCharArray);
-    // Return true if the user/password credentials are in the cache. 
-    if (credentials.containsKey(identifier) &&
-        secret.equals(credentials.get(identifier))) {
-      return true;
-    }
-    // Otherwise we check the credentials with the SensorBase.
-    boolean isRegistered = SensorBaseClient.isRegistered(sensorBaseHost, identifier, secret);
-    if (isRegistered) {
-      // Credentials are good, so save them and create a sensorbase client for this user. 
-      credentials.put(identifier, secret);
-      SensorBaseClient client = new SensorBaseClient(sensorBaseHost, identifier, secret);
-      // Set timeout to 60 minutes.
-      client.setTimeout(1000 * 60 * 60);
-      // Get the ServerProperties instance so we can determine if caching is enabled.
-      Server server = (Server)getContext().getAttributes().get("DailyProjectDataServer");
-      ServerProperties props = server.getServerProperties();
-      if (props.isCacheEnabled()) {
-        client.enableCaching(identifier, "dailyprojectdata", 
-            props.getCacheMaxLife(), props.getCacheCapacity());
+    /*
+     * I am synchronizing here on a static (class-wide) variable for two reasons:
+     * (1) JCS write-through caching fails when multiple threads access the same back-end file:
+     * <https://issues.apache.org/jira/browse/JCS-31>. Thus, it is vitally important to ensure
+     * that only one instance of a SensorBaseClient for any given user is created.
+     * (2) I do not know if Restlet allows multiple Authenticator instances.  Thus, I am 
+     * synchronizing on a class-wide variable just in case. 
+     * This synchronization creates a bottleneck on every request, but the benefits of reliable
+     * caching should outweigh this potential performance hit under high loads. 
+     */
+    synchronized (userClientMap) {
+      String secret = new String(secretCharArray);
+      // Return true if the user/password credentials are in the cache.
+      if (credentials.containsKey(identifier) && secret.equals(credentials.get(identifier))) {
+        return true;
       }
-      userClientMap.put(identifier, client);
-    }
+      // Otherwise we check the credentials with the SensorBase.
+      boolean isRegistered = SensorBaseClient.isRegistered(sensorBaseHost, identifier, secret);
+      if (isRegistered) {
+        // Credentials are good, so save them and create a sensorbase client for this user.
+        credentials.put(identifier, secret);
+        SensorBaseClient client = new SensorBaseClient(sensorBaseHost, identifier, secret);
+        // Set timeout to 60 minutes.
+        client.setTimeout(1000 * 60 * 60);
+        // Get the ServerProperties instance so we can determine if caching is enabled.
+        Server server = (Server) getContext().getAttributes().get("DailyProjectDataServer");
+        ServerProperties props = server.getServerProperties();
+        if (props.isCacheEnabled()) {
+          client.enableCaching(identifier, "dailyprojectdata", props.getCacheMaxLife(), props
+              .getCacheCapacity());
+        }
+        userClientMap.put(identifier, client);
+      }
     return isRegistered;
+    }
   }
 }
