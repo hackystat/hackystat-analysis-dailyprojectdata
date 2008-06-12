@@ -120,7 +120,7 @@ public class TestBuildRestApi extends DailyProjectDataTestHelper {
    * @return The new SensorData Build instance.
    * @throws Exception If problems occur.
    */
-  private SensorData makeBuild(String tstampString, String user, String runtimeString,
+  public static SensorData makeBuild(String tstampString, String user, String runtimeString,
       String type, String result) throws Exception {
     XMLGregorianCalendar tstamp = Tstamp.makeTimestamp(tstampString);
     XMLGregorianCalendar runtime = Tstamp.makeTimestamp(runtimeString);
