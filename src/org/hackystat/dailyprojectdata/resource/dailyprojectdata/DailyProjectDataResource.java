@@ -109,9 +109,25 @@ public abstract class DailyProjectDataResource extends Resource {
    * @param requestType The type of DPD request, such as "Commit", "FileMetric", etc.
    */
   protected void logRequest(String requestType) {
+    logRequest(requestType, "");
+  }
+  
+  /**
+   * Generates a log message indicating the type of request, the elapsed time required, 
+   * the user who requested the data, and the day.
+   * @param requestType The type of DPD request, such as "Commit", "FileMetric", etc.
+   * @param optionalParams Any additional parameters to the request.
+   */
+  protected void logRequest(String requestType, String... optionalParams) {
     long elapsed = new Date().getTime() - requestStartTime;
-    String msg = elapsed + " ms: " + requestType + " " + uriUser + " " + this.timestamp;
-    server.getLogger().info(msg);
+    String sp = " ";
+    StringBuffer msg = new StringBuffer(20);
+    msg.append(elapsed).append(" ms: ").append(requestType).append(sp).append(uriUser).append(sp);
+    msg.append(project).append(sp).append(timestamp);
+    for (String param : optionalParams) {
+      msg.append(sp).append(param);
+    }
+    server.getLogger().info(msg.toString());
   }
 
 }

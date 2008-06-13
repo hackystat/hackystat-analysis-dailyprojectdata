@@ -79,6 +79,9 @@ public class DailyProjectDataClient {
   private boolean isTraceEnabled = false;
   /** For logging. */
   private Logger logger;
+  /** The System property key used to retrieve the default timeout value in milliseconds. */
+  public static final String DAILYPROJECTDATACLIENT_TIMEOUT_KEY = "dailyprojectdataclient.timeout";
+
 
   /** An associated UriCache to improve responsiveness. */
   private UriCache uriCache;
@@ -115,6 +118,7 @@ public class DailyProjectDataClient {
           + "', email='" + email + "', password='" + password + "'");
     }
     this.client = new Client(Protocol.HTTP);
+    setTimeoutFromSystemProperty();
     try {
       this.devTimeJAXB = JAXBContext
           .newInstance(org.hackystat.dailyprojectdata.resource.devtime.jaxb.ObjectFactory.class);
@@ -167,29 +171,27 @@ public class DailyProjectDataClient {
         String.valueOf(milliseconds));
   }
 
-  // I am pretty sure this method is no longer needed, but am keeping it here because we may want
-  // to be able to use dailyprojectdataclient.timeout. Although it seems like this could go in the
-  // telemetry.properties file (or analogous in some other higher-level client?) 6/2008 pmj
-  //
-  // /**
-  // * Returns the default timeout in milliseconds.
-  // * The default timeout is set to 10 minutes (1000 * 60 * 10 ms), but clients can change this
-  // * by creating a
-  // * System property called dailyprojectdataclient.timeout and set it to a String indicating
-  // * the number of milliseconds.
-  // * @return The default timeout.
-  // */
-  // private static int getDefaultTimeout() {
-  // String systemTimeout = System.getProperty(DAILYPROJECTDATACLIENT_TIMEOUT_KEY, "600000");
-  // int timeout = 600000;
-  // try {
-  // timeout = Integer.parseInt(systemTimeout);
-  // }
-  // catch (Exception e) {
-  // timeout = 600000;
-  // }
-  // return timeout;
-  // }
+  /**
+   * Sets the timeout for this client if the system property 
+   * dailyprojectdataclient.timeout is set
+   * and if it can be parsed to an integer.
+   */
+  private void setTimeoutFromSystemProperty() {
+    String systemTimeout = System.getProperty(DAILYPROJECTDATACLIENT_TIMEOUT_KEY);
+    // if not set, then return immediately.
+    if (systemTimeout == null) {
+      return;
+    }
+    // systemTimeout has a value, so set it if we can.
+    try {
+      int timeout = Integer.parseInt(systemTimeout);
+      setTimeout(timeout);
+      this.logger.info("DdpClient timeout set to: " + timeout + " milliseconds");
+    }
+    catch (Exception e) {
+      this.logger.warning("dailyprojectdataclient.timeout has non integer value: " + systemTimeout);
+    }
+  }
 
   /**
    * Does the housekeeping for making HTTP requests to the SensorBase by a test or admin user.

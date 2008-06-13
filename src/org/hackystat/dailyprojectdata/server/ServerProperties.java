@@ -37,7 +37,7 @@ public class ServerProperties {
   public static final String CACHE_ENABLED = "dailyprojectdata.cache.enabled";
   /** The maxLife in days for each instance in each SensorBaseClient cache. */
   public static final String CACHE_MAX_LIFE = "dailyprojectdata.cache.max.life";
-  /** The in-memory capacity of each SensorBaseClient cache. */
+  /** The total capacity of each SensorBaseClient cache. */
   public static final String CACHE_CAPACITY = "dailyprojectdata.cache.capacity";
 
   /** Where we store the properties. */
@@ -80,7 +80,7 @@ public class ServerProperties {
     properties.setProperty(TEST_INSTALL_KEY, "false");
     properties.setProperty(CACHE_ENABLED, "true");
     properties.setProperty(CACHE_MAX_LIFE, "365");
-    properties.setProperty(CACHE_CAPACITY, "50000");
+    properties.setProperty(CACHE_CAPACITY, "500000");
     FileInputStream stream = null;
     try {
       stream = new FileInputStream(propFile);
@@ -212,7 +212,7 @@ public class ServerProperties {
     }
     catch (Exception e) {
       System.out.println("Illegal cache capacity: " + capacityString + ". Using default.");
-      capacity = 50000L;
+      capacity = 500000L;
     }
     return capacity;
   }

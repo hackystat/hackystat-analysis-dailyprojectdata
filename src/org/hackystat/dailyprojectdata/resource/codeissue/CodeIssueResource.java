@@ -163,7 +163,7 @@ public class CodeIssueResource extends DailyProjectDataResource {
         codeIssue.setUriPattern("**"); // we don't support UriPatterns yet.
 
         String xmlData = this.makeCodeIssue(codeIssue);
-        logRequest("CodeIssue");
+        logRequest("CodeIssue", this.tool, this.type);
         return super.getStringRepresentation(xmlData);
       }
       catch (Exception e) {

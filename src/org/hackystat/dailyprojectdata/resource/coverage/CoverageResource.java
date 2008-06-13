@@ -116,7 +116,7 @@ public class CoverageResource extends DailyProjectDataResource {
         logger.fine("Coverage DPD: Finished processing instances.");
         // Now return the CoverageDPD instance. 
         String xmlData = this.makeCoverage(coverageData);
-        logRequest("Coverage");
+        logRequest("Coverage", this.granularity);
         return super.getStringRepresentation(xmlData);
       }
       catch (Exception e) {

@@ -115,7 +115,7 @@ public class CouplingResource extends DailyProjectDataResource {
           }
         }
         String xmlData = makeCouplingMetric(couplingDpd);
-        logRequest("Coupling");
+        logRequest("Coupling", this.tool, this.type);
         return super.getStringRepresentation(xmlData);
       } 
       catch (Exception e) {

@@ -114,7 +114,7 @@ public class FileMetricResource extends DailyProjectDataResource {
         }
         fileDpd.setTotal(total);
         String xmlData = makeFileMetric(fileDpd);
-        logRequest("FileMetric");
+        logRequest("FileMetric", this.tool, this.sizeMetric);
         return super.getStringRepresentation(xmlData);
       } 
       catch (Exception e) {
