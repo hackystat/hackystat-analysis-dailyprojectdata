@@ -786,7 +786,7 @@ public class DailyProjectDataClient {
       commit = makeCommitDailyProjectData(xmlData);
       // Add it to the cache if we're using one.
       if (this.isCacheEnabled && !isToday(timestamp)) {
-        this.uriCache.putInGroup(uri, "coverage", commit);
+        this.uriCache.putInGroup(uri, "commit", commit);
       }
     }
     catch (Exception e) {
