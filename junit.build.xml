@@ -15,13 +15,14 @@
     <!-- Run the tests, which are all classes whose name starts with 'Test'. -->
     <!-- Fork is on until I can figure out how to stop the sensorbase and unbind the port. -->
     <!-- Note that emma is forking in its JUnit as well. -->
-    <junit printsummary="withOutAndErr" haltonfailure="${junit.haltonfailure}" fork="yes" failureproperty="junit.failed">
+    <junit maxmemory="1024M" printsummary="withOutAndErr" haltonfailure="${junit.haltonfailure}" fork="yes" failureproperty="junit.failed">
       <classpath>
         <pathelement location="${build.dir}/classes" />
         <path refid="compile.classpath" />
         <fileset file="${env.JAVAMAIL_HOME}/mail.jar"/> 
       </classpath>
       <sysproperty key="user.dir" value="${basedir}" />
+      <sysproperty key="derby.language.logQueryPlan" value="false" />
       <sysproperty key="HACKYSTAT_SENSORBASE_HOME" value="${env.HACKYSTAT_SENSORBASE_HOME}" />
       <formatter type="xml" />
       <batchtest todir="${junit.dir}">
