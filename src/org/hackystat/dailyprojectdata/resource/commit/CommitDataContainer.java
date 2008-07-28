@@ -33,6 +33,7 @@ public class CommitDataContainer {
   
   /**
    * Returns true if the SensorData instance has the Commit properties, false otherwise.
+   * Note that linesModified is an optional property. 
    * @param data The sensor data instance. 
    * @return True if the sensor data instance is a Commit instance. 
    */
@@ -107,6 +108,22 @@ public class CommitDataContainer {
       }
     }
     return totalLinesDeleted;
+  }
+  
+  /**
+   * Returns the total lines modified by the specified owner.
+   * Not all CM systems track lines modified. SVN does not, Perforce does. 
+   * @param owner The specified owner.
+   * @return The total lines modified.
+   */
+  public int getLinesModified(String owner) {
+    int totalLinesModified = 0;
+    for (CommitData data : this.data) {
+      if (data.getOwner().equals(owner)) {
+        totalLinesModified += data.getLinesModified();
+      }
+    }
+    return totalLinesModified;
   }
 
 

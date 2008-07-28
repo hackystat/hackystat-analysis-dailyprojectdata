@@ -48,11 +48,12 @@ public class CommitData {
   }
 
   /**
-   * Returns the total lines changed stored in this data instance.
-   * @return the total lines changed.
+   * Returns the total lines modified in this data instance.
+   * Note that linesModified is an optional property, so this will return 0 if not present. 
+   * @return the total lines modified
    */
-  public int getLinesChanged() {
-    return Integer.valueOf(this.getCommitProperty("totalLines").getValue());
+  public int getLinesModified() {
+    return Integer.valueOf(this.getCommitProperty("linesModified", "0").getValue());
   }
 
   /**
@@ -99,6 +100,27 @@ public class CommitData {
     }
     return null;
   }
+  
+  /**
+   * Returns the Property instance with the specified property name. If no
+   * property exists, defaultValue is returned. 
+   * @param propertyName the property name to search for.
+   * @param defaultValue The string to return if the property does not exist. 
+   * @return The property with the specified name or defaultValue. 
+   */
+  public Property getCommitProperty(String propertyName, String defaultValue) {
+    List<Property> propertyList = this.data.getProperties().getProperty();
+    for (Property property : propertyList) {
+      if (propertyName.equals(property.getKey())) {
+        return property;
+      }
+    }
+    // Make a new Property instance.
+    Property property = new Property();
+    property.setKey(propertyName);
+    property.setValue(defaultValue);
+    return property;
+  }
 
   /**
    * Returns the string representation of this data object, which is useful for
@@ -108,7 +130,7 @@ public class CommitData {
   @Override
   public String toString() {
     return "Owner=" + this.getOwner() + ", LinesAdded=" + this.getLinesAdded()
-        + ", LinesDeleted=" + this.getLinesDeleted() + ", LinesChanged="
-        + this.getLinesChanged();
+        + ", LinesDeleted=" + this.getLinesDeleted() + ", LinesModified="
+        + this.getLinesModified();
   }
 }

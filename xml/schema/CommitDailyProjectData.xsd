@@ -23,6 +23,7 @@
 	<xs:attribute name="Commits" type="xs:int" />
 	<xs:attribute name="LinesAdded" type="xs:int" />
 	<xs:attribute name="LinesDeleted" type="xs:int" />
+	<xs:attribute name="LinesModified" type="xs:int" />
 
 	<xs:element name="CommitDailyProjectData">
 		<xs:complexType>
@@ -43,6 +44,7 @@
 			<xs:attribute ref="Commits" />
 			<xs:attribute ref="LinesAdded" />
 			<xs:attribute ref="LinesDeleted" />
+			<xs:attribute ref="LinesModified" use="optional"/>
 		</xs:complexType>
 	</xs:element>
 
