@@ -71,7 +71,8 @@ public class FileMetricCounter {
           fileMetrics.add(data);
         }
 
-      } else if (Tstamp.greaterThan(refTime, lastTime)) {
+      } 
+      else if (Tstamp.greaterThan(refTime, lastTime)) {
         // newer time so replace everything
         lastTime = refTime;
         fileMetrics = new ArrayList<SensorData>();
@@ -86,7 +87,8 @@ public class FileMetricCounter {
         }
         fileMetrics.add(data);
       }
-    } catch (SensorBaseClientException e) {
+    } 
+    catch (SensorBaseClientException e) {
       lastTool = "";
     }
 

@@ -42,7 +42,7 @@ public abstract class DailyProjectDataResource extends Resource {
   /** To be retrieved from the URL as the 'timestamp' template parameter, or null. */
   protected String timestamp = null; 
 
-  /** The authenticated user, retrieved from the ChallengeResponse, or null */
+  /** The authenticated user, retrieved from the ChallengeResponse, or null. */
   protected String authUser = null;
   
   /** The server. */

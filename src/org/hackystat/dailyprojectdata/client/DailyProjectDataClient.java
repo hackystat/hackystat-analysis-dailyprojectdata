@@ -53,17 +53,17 @@ public class DailyProjectDataClient {
   private String dailyProjectDataHost;
   /** The Restlet Client instance used to communicate with the server. */
   private Client client;
-  /** DevTime JAXBContext */
+  /** DevTime JAXBContext. */
   private JAXBContext devTimeJAXB;
-  /** FileMetric JAXBContext */
+  /** FileMetric JAXBContext. */
   private JAXBContext fileMetricJAXB;
-  /** UnitTest JAXBContext */
+  /** UnitTest JAXBContext. */
   private JAXBContext unitTestJAXB;
-  /** CodeIssue JAXBContext */
+  /** CodeIssue JAXBContext. */
   private JAXBContext codeIssueJAXB;
-  /** CodeIssue JAXBContext */
+  /** CodeIssue JAXBContext. */
   private JAXBContext coverageJAXB;
-  /** Commit JAXBContext */
+  /** Commit JAXBContext. */
   private JAXBContext commitJAXB;
   /** Build JAXB Context. */
   private JAXBContext buildJAXB;

@@ -20,7 +20,7 @@ import org.restlet.resource.Variant;
  * instantiated SensorBaseClient
  * for that user, and (2) it avoids concurrency race conditions. This constraints are very important
  * given the current JCS implementation suffers from a concurrent access problem:
- * <https://issues.apache.org/jira/browse/JCS-31>.
+ * (https://issues.apache.org/jira/browse/JCS-31).
  * The restriction means that there is no "admin" level cache deletion, but I think we can live
  * with that.  The admin can always figure out the emails/passwords and write a script to do the
  * deletion, or else bring down the server and manually delete the files.  

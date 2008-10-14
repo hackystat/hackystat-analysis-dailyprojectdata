@@ -31,7 +31,7 @@ public class Authenticator extends Guard {
   private static Map<String, SensorBaseClient> userClientMap = 
     new HashMap<String, SensorBaseClient>();
   
-  /** The sensorbase host, such as "http://localhost:9876/sensorbase/" */
+  /** The sensorbase host, such as "http://localhost:9876/sensorbase/". */
   private String sensorBaseHost;
   
   /** The key to be used to retrieve the sensorbaseclient map from the server context. */
