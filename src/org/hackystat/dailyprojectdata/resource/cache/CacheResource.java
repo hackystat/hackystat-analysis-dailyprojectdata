@@ -2,7 +2,6 @@ package org.hackystat.dailyprojectdata.resource.cache;
 
 import java.util.logging.Logger;
 import org.hackystat.dailyprojectdata.resource.dailyprojectdata.DailyProjectDataResource;
-import org.hackystat.utilities.stacktrace.StackTrace;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -62,9 +61,7 @@ public class CacheResource extends DailyProjectDataResource {
       return;
     }
     catch (Exception e) {
-      String msg = "Error occurred during cache deletion: " + StackTrace.toString(e);
-      logger.info(msg);
-      getResponse().setStatus(Status.SERVER_ERROR_INTERNAL, msg);
+      setStatusError("Error during cache deletion", e);
       return;
     }
   }

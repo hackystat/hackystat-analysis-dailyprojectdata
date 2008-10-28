@@ -27,13 +27,11 @@ import org.hackystat.sensorbase.resource.sensordata.jaxb.Property;
 import org.hackystat.sensorbase.resource.sensordata.jaxb.SensorData;
 import org.hackystat.sensorbase.resource.sensordata.jaxb.SensorDataIndex;
 import org.hackystat.sensorbase.resource.sensordata.jaxb.SensorDataRef;
-import org.hackystat.utilities.stacktrace.StackTrace;
 import org.hackystat.utilities.tstamp.Tstamp;
 import org.restlet.Context;
 import org.restlet.data.MediaType;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
-import org.restlet.data.Status;
 import org.restlet.resource.Representation;
 import org.restlet.resource.Variant;
 import org.w3c.dom.Document;
@@ -43,7 +41,7 @@ import org.w3c.dom.Document;
  * requests. 
  * Authenticated user must be the uriUser, or Admin, or project member. 
  * 
- * @author jsakuda
+ * @author Philip Johnson
  */
 public class BuildResource extends DailyProjectDataResource {
 
@@ -81,7 +79,8 @@ public class BuildResource extends DailyProjectDataResource {
         XMLGregorianCalendar startTime = Tstamp.makeTimestamp(this.timestamp);
         XMLGregorianCalendar endTime = Tstamp.incrementDays(startTime, 1);
         logger.fine("Build DPD: Requesting index: " + uriUser + " " + project);
-        SensorDataIndex index = client.getProjectSensorData(uriUser, project, startTime,
+        SensorDataIndex index = null;
+        index = client.getProjectSensorData(uriUser, project, startTime,
             endTime, "Build");
         logger.fine("Build DPD: Got index: " + index.getSensorDataRef().size() + " instances");
         // [3] update the build data counter
@@ -141,8 +140,7 @@ public class BuildResource extends DailyProjectDataResource {
         return super.getStringRepresentation(xmlData);
       }
       catch (Exception e) {
-        server.getLogger().warning("Error processing Build DPD: " + StackTrace.toString(e));
-        getResponse().setStatus(Status.CLIENT_ERROR_BAD_REQUEST, e.getMessage());
+        setStatusError("Error creating Build DPD", e);
         return null;
       }
     }

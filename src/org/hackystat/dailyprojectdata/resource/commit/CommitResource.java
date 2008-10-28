@@ -21,13 +21,11 @@ import org.hackystat.dailyprojectdata.resource.dailyprojectdata.DailyProjectData
 import org.hackystat.sensorbase.client.SensorBaseClient;
 import org.hackystat.sensorbase.resource.sensordata.jaxb.SensorDataIndex;
 import org.hackystat.sensorbase.resource.sensordata.jaxb.SensorDataRef;
-import org.hackystat.utilities.stacktrace.StackTrace;
 import org.hackystat.utilities.tstamp.Tstamp;
 import org.restlet.Context;
 import org.restlet.data.MediaType;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
-import org.restlet.data.Status;
 import org.restlet.resource.Representation;
 import org.restlet.resource.Variant;
 import org.w3c.dom.Document;
@@ -104,8 +102,7 @@ public class CommitResource extends DailyProjectDataResource {
         return super.getStringRepresentation(xmlData);
       }
       catch (Exception e) {
-        server.getLogger().warning("Error processing Commit DPD: " + StackTrace.toString(e));
-        getResponse().setStatus(Status.CLIENT_ERROR_BAD_REQUEST, e.getMessage());
+        setStatusError("Error creating Commit DPD.", e);
         return null;
       }
     }

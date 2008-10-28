@@ -11,6 +11,7 @@ import org.restlet.data.Language;
 import org.restlet.data.MediaType;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
+import org.restlet.data.Status;
 import org.restlet.resource.Representation;
 import org.restlet.resource.Resource;
 import org.restlet.resource.StringRepresentation;
@@ -128,6 +129,21 @@ public abstract class DailyProjectDataResource extends Resource {
       msg.append(sp).append(param);
     }
     server.getLogger().info(msg.toString());
+  }
+  
+  /**
+   * Called when an error resulting from an exception is caught during processing. 
+   * @param msg A description of the error.
+   * @param e A chained exception.
+   */
+  protected void setStatusError (String msg, Exception e) {
+    String responseMsg = String.format("%s:%n  Request: %s %s%n  Caused by: %s", 
+        msg,  
+        this.getRequest().getMethod().getName(),
+        this.getRequest().getResourceRef().toString(),
+        e.getMessage());
+    this.getLogger().info(responseMsg);
+    getResponse().setStatus(Status.CLIENT_ERROR_BAD_REQUEST, responseMsg);
   }
 
 }
