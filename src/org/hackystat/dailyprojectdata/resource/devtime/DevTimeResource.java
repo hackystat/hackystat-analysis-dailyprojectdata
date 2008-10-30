@@ -67,7 +67,8 @@ public class DevTimeResource extends DailyProjectDataResource {
         String cachedDpd = this.server.getFrontSideCache().get(uriUser, uriString);
         if (cachedDpd != null && client.inProject(authUser, project)) {
           return super.getStringRepresentation(cachedDpd);
-        }// [2] get a SensorDataIndex of all DevEvent data for this Project on the requested day.
+        }
+        // [2] get a SensorDataIndex of all DevEvent data for this Project on the requested day.
         XMLGregorianCalendar startTime = Tstamp.makeTimestamp(this.timestamp);
         XMLGregorianCalendar endTime = Tstamp.incrementDays(startTime, 1);
         logger.fine("DevTime DPD: Requesting index: " + uriUser + " " + project);

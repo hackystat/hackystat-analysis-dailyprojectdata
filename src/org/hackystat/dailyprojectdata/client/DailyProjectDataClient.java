@@ -1065,10 +1065,11 @@ public class DailyProjectDataClient {
    */
   private boolean isTodayOrFuture(XMLGregorianCalendar timestamp) {
     XMLGregorianCalendar today = Tstamp.makeTimestamp();
-    boolean isToday = (today.getYear() == timestamp.getYear()) && (today.getMonth() == timestamp.getMonth())
-        && (today.getDay() == timestamp.getDay());
+    boolean isToday = (today.getYear() == timestamp.getYear()) && 
+                      (today.getMonth() == timestamp.getMonth()) && 
+                      (today.getDay() == timestamp.getDay());
     boolean isFuture = today.toGregorianCalendar().getTimeInMillis() <
-    timestamp.toGregorianCalendar().getTimeInMillis();
+                       timestamp.toGregorianCalendar().getTimeInMillis();
     return (isToday || isFuture);
   }
 }

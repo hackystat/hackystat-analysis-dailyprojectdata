@@ -99,7 +99,8 @@ public class FrontSideCache {
    * Returns the string representation of the DPD associated with the DPD owner and the 
    * URI, or null if not in the cache. 
    * @param user The user who is the owner of the Project associated with this DPD.
-   * @param uri The URI naming this DPD.  
+   * @param uri The URI naming this DPD. 
+   * @return The string representation of the DPD, or null. 
    * @return
    */
   public String get(String user, String uri) {
