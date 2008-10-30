@@ -43,6 +43,8 @@ public class ServerProperties {
   /** Whether or not the front side cache is enabled. */
   public static final String FRONTSIDECACHE_ENABLED = "dailyprojectdata.cache.frontside.enabled";
   
+  private String falseString = "false"; // for PMD.
+  
   
 
   /** Where we store the properties. */
@@ -77,12 +79,12 @@ public class ServerProperties {
     properties.setProperty(PORT_KEY, "9877");
     properties.setProperty(CONTEXT_ROOT_KEY, "dailyprojectdata");
     properties.setProperty(LOGGING_LEVEL_KEY, "INFO");
-    properties.setProperty(RESTLET_LOGGING_KEY, "false");
+    properties.setProperty(RESTLET_LOGGING_KEY, falseString);
     properties.setProperty(XML_DIR_KEY, userDir + "/xml");
     properties.setProperty(TEST_PORT_KEY, "9977");
     properties.setProperty(TEST_HOSTNAME_KEY, "localhost");
     properties.setProperty(TEST_SENSORBASE_FULLHOST_KEY, "http://localhost:9976/sensorbase");
-    properties.setProperty(TEST_INSTALL_KEY, "false");
+    properties.setProperty(TEST_INSTALL_KEY, falseString);
     properties.setProperty(CACHE_ENABLED, "true");
     properties.setProperty(FRONTSIDECACHE_ENABLED, "true");
     properties.setProperty(CACHE_MAX_LIFE, "365");
@@ -125,8 +127,8 @@ public class ServerProperties {
     properties.setProperty(SENSORBASE_FULLHOST_KEY, 
     properties.getProperty(TEST_SENSORBASE_FULLHOST_KEY));
     properties.setProperty(TEST_INSTALL_KEY, "true");
-    properties.setProperty(CACHE_ENABLED, "false");
-    properties.setProperty(FRONTSIDECACHE_ENABLED, "false");
+    properties.setProperty(CACHE_ENABLED, falseString);
+    properties.setProperty(FRONTSIDECACHE_ENABLED, falseString);
     trimProperties(properties);
   }
   
@@ -227,7 +229,7 @@ public class ServerProperties {
       String propValue = (String)entry.getValue();
       alphaProps.put(propName, propValue);
     }
-    StringBuffer buff = new StringBuffer(25);
+    StringBuffer buff = new StringBuffer(30);
     buff.append("DailyProjectData Properties:").append(cr);
     for (String key : alphaProps.keySet()) {
       buff.append(pad).append(key).append(eq).append(get(key)).append(cr);

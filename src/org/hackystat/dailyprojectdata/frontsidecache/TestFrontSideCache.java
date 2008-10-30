@@ -19,7 +19,7 @@ public class TestFrontSideCache extends DailyProjectDataTestHelper {
     String user = "user";
     String uri = "uri";
     String dpd = "dpd";
-    FrontSideCache cache = new FrontSideCache(DailyProjectDataTestHelper.server);
+    FrontSideCache cache = new FrontSideCache(getDpdServer());
     cache.put(user, uri, dpd);
     // The following is the most important test. It's commented out because front side caching
     // is disabled for the rest of testing.  To run the following line, you must edit
