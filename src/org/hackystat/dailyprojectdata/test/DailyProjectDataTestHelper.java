@@ -10,8 +10,8 @@ import org.junit.BeforeClass;
 public class DailyProjectDataTestHelper {
 
   /** The Sensorbase server used in these tests. */
-  private static org.hackystat.sensorbase.server.Server sensorbaseServer;
-  private static Server server;
+  protected static org.hackystat.sensorbase.server.Server sensorbaseServer;
+  protected static Server server;
 
   /**
    * Constructor.

@@ -55,6 +55,8 @@ public abstract class DailyProjectDataResource extends Resource {
   /** Records the time at which each HTTP request was initiated. */
   protected long requestStartTime = new Date().getTime();
   
+  protected String uriString; 
+  
   /**
    * Provides the following representational variants: TEXT_XML.
    * @param context The context.
@@ -70,6 +72,7 @@ public abstract class DailyProjectDataResource extends Resource {
     this.uriUser = (String) request.getAttributes().get("user");
     this.project = (String) request.getAttributes().get("project");
     this.timestamp = (String) request.getAttributes().get("timestamp");
+    this.uriString = this.getRequest().getResourceRef().toString();
     getVariants().clear(); // copied from BookmarksResource.java, not sure why needed.
     getVariants().add(new Variant(MediaType.TEXT_XML));
   }

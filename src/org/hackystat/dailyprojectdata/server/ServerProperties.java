@@ -4,6 +4,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Properties;
+import java.util.TreeMap;
 
 /**
  * Provides access to the values stored in the dailyprojectdata.properties file. 
@@ -39,6 +40,10 @@ public class ServerProperties {
   public static final String CACHE_MAX_LIFE = "dailyprojectdata.cache.max.life";
   /** The total capacity of each SensorBaseClient cache. */
   public static final String CACHE_CAPACITY = "dailyprojectdata.cache.capacity";
+  /** Whether or not the front side cache is enabled. */
+  public static final String FRONTSIDECACHE_ENABLED = "dailyprojectdata.cache.frontside.enabled";
+  
+  
 
   /** Where we store the properties. */
   private Properties properties; 
@@ -79,6 +84,7 @@ public class ServerProperties {
     properties.setProperty(TEST_SENSORBASE_FULLHOST_KEY, "http://localhost:9976/sensorbase");
     properties.setProperty(TEST_INSTALL_KEY, "false");
     properties.setProperty(CACHE_ENABLED, "true");
+    properties.setProperty(FRONTSIDECACHE_ENABLED, "true");
     properties.setProperty(CACHE_MAX_LIFE, "365");
     properties.setProperty(CACHE_CAPACITY, "500000");
     FileInputStream stream = null;
@@ -120,27 +126,8 @@ public class ServerProperties {
     properties.getProperty(TEST_SENSORBASE_FULLHOST_KEY));
     properties.setProperty(TEST_INSTALL_KEY, "true");
     properties.setProperty(CACHE_ENABLED, "false");
+    properties.setProperty(FRONTSIDECACHE_ENABLED, "false");
     trimProperties(properties);
-  }
-
-  /**
-   * Returns a string indicating current property settings. 
-   * @return The string with current property settings. 
-   */
-  public String echoProperties() {
-    String cr = System.getProperty("line.separator"); 
-    String eq = " = ";
-    String pad = "                ";
-    return "DailyProjectData Properties:" + cr +
-      pad + SENSORBASE_FULLHOST_KEY   + eq + get(SENSORBASE_FULLHOST_KEY) + cr +
-      pad + HOSTNAME_KEY      + eq + get(HOSTNAME_KEY) + cr +
-      pad + CONTEXT_ROOT_KEY  + eq + get(CONTEXT_ROOT_KEY) + cr +
-      pad + PORT_KEY          + eq + get(PORT_KEY) + cr +
-      pad + LOGGING_LEVEL_KEY + eq + get(LOGGING_LEVEL_KEY) + cr +
-      pad + TEST_INSTALL_KEY + eq + get(TEST_INSTALL_KEY) + cr +
-      pad + CACHE_ENABLED + eq + get(CACHE_ENABLED) + cr +
-      pad + CACHE_MAX_LIFE + eq + get(CACHE_MAX_LIFE) + cr +
-      pad + CACHE_CAPACITY + eq + get(CACHE_CAPACITY);
   }
   
   /**
@@ -178,7 +165,15 @@ public class ServerProperties {
    * @return True if caching enabled.
    */
   public boolean isCacheEnabled() {
-    return Boolean.valueOf(this.properties.getProperty(CACHE_ENABLED));
+    return "True".equalsIgnoreCase(this.properties.getProperty(CACHE_ENABLED));
+  }
+  
+  /**
+   * Returns true if front side caching is enabled in this service. 
+   * @return True if caching enabled.
+   */
+  public boolean isFrontSideCacheEnabled() {
+    return "True".equalsIgnoreCase(this.properties.getProperty(FRONTSIDECACHE_ENABLED));
   }
   
   /**
@@ -215,6 +210,29 @@ public class ServerProperties {
       capacity = 500000L;
     }
     return capacity;
+  }
+  
+  /**
+   * Returns a string containing all current properties in alphabetical order.
+   * @return A string with the properties.  
+   */
+  public String echoProperties() {
+    String cr = System.getProperty("line.separator"); 
+    String eq = " = ";
+    String pad = "                ";
+    // Adding them to a treemap has the effect of alphabetizing them. 
+    TreeMap<String, String> alphaProps = new TreeMap<String, String>();
+    for (Map.Entry<Object, Object> entry : this.properties.entrySet()) {
+      String propName = (String)entry.getKey();
+      String propValue = (String)entry.getValue();
+      alphaProps.put(propName, propValue);
+    }
+    StringBuffer buff = new StringBuffer(25);
+    buff.append("DailyProjectData Properties:").append(cr);
+    for (String key : alphaProps.keySet()) {
+      buff.append(pad).append(key).append(eq).append(get(key)).append(cr);
+    }
+    return buff.toString();
   }
 
 }

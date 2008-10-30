@@ -78,7 +78,11 @@ public class CodeIssueResource extends DailyProjectDataResource {
       try {
         // [1] get the SensorBaseClient for the user making this request.
         SensorBaseClient client = super.getSensorBaseClient();
-        
+        // [2] Check the front side cache and return if the DPD is found and is OK to access.
+        String cachedDpd = this.server.getFrontSideCache().get(uriUser, uriString);
+        if (cachedDpd != null && client.inProject(authUser, project)) {
+          return super.getStringRepresentation(cachedDpd);
+        }
         // [2] get a SensorDataIndex of all CodeIssue data for this Project on the requested day.
         XMLGregorianCalendar startTime = Tstamp.makeTimestamp(this.timestamp);
         XMLGregorianCalendar endTime = Tstamp.incrementDays(startTime, 1);
@@ -161,6 +165,7 @@ public class CodeIssueResource extends DailyProjectDataResource {
         codeIssue.setUriPattern("**"); // we don't support UriPatterns yet.
 
         String xmlData = this.makeCodeIssue(codeIssue);
+        this.server.getFrontSideCache().put(uriUser, uriString, xmlData);
         logRequest("CodeIssue", this.tool, this.type);
         return super.getStringRepresentation(xmlData);
       }

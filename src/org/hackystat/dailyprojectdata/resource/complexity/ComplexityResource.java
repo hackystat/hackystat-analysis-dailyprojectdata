@@ -73,7 +73,11 @@ public class ComplexityResource extends DailyProjectDataResource {
       try {
         // [1] get the SensorBaseClient for the user making this request.
         SensorBaseClient client = super.getSensorBaseClient();
-        
+        // [2] Check the front side cache and return if the DPD is found and is OK to access.
+        String cachedDpd = this.server.getFrontSideCache().get(uriUser, uriString);
+        if (cachedDpd != null && client.inProject(authUser, project)) {
+          return super.getStringRepresentation(cachedDpd);
+        }
         // [2] Get the Snapshot containing the last sent FileMetric data for this Project.
         XMLGregorianCalendar startTime = Tstamp.makeTimestamp(this.timestamp);
         XMLGregorianCalendar endTime = Tstamp.incrementDays(startTime, 1);
@@ -112,6 +116,7 @@ public class ComplexityResource extends DailyProjectDataResource {
           }
         }
         String xmlData = makeComplexityMetric(fileDpd);
+        this.server.getFrontSideCache().put(uriUser, uriString, xmlData);
         logRequest("Complexity", this.tool, this.type);
         return super.getStringRepresentation(xmlData);
       } 

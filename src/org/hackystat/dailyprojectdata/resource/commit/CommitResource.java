@@ -65,6 +65,11 @@ public class CommitResource extends DailyProjectDataResource {
       try {
         // [1] get the SensorBaseClient for the user making this request.
         SensorBaseClient client = super.getSensorBaseClient();
+        // [2] Check the front side cache and return if the DPD is found and is OK to access.
+        String cachedDpd = this.server.getFrontSideCache().get(uriUser, uriString);
+        if (cachedDpd != null && client.inProject(authUser, project)) {
+          return super.getStringRepresentation(cachedDpd);
+        }
         // [2] get a SensorDataIndex of all Coverage data for this Project on
         // the requested day.
         XMLGregorianCalendar startTime = Tstamp.makeTimestamp(this.timestamp);
@@ -98,6 +103,7 @@ public class CommitResource extends DailyProjectDataResource {
         commitData.setOwner(this.uriUser);
         commitData.setProject(this.project);
         String xmlData = this.makeCommit(commitData);
+        this.server.getFrontSideCache().put(uriUser, uriString, xmlData);
         logRequest("Commit");
         return super.getStringRepresentation(xmlData);
       }

@@ -11,6 +11,7 @@ import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBContext;
 
+import org.hackystat.dailyprojectdata.frontsidecache.FrontSideCache;
 import org.hackystat.dailyprojectdata.resource.build.BuildResource;
 import org.hackystat.dailyprojectdata.resource.cache.CacheResource;
 import org.hackystat.dailyprojectdata.resource.codeissue.CodeIssueResource;
@@ -34,6 +35,7 @@ import org.restlet.data.Protocol;
 
 /**
  * Sets up the HTTP Server process and dispatching to the associated resources. 
+ *
  * @author Philip Johnson
  */
 public class Server extends Application { 
@@ -49,6 +51,8 @@ public class Server extends Application {
   
   /** Holds the ServerProperties instance for this Service. */
   private ServerProperties properties;
+  
+  private FrontSideCache frontSideCache;
 
   /**
    * Creates a new instance of a DailyProjectData HTTP server, listening on the supplied port.
@@ -94,6 +98,7 @@ public class Server extends Application {
     server.component.getServers().add(Protocol.HTTP, port);
     server.component.getDefaultHost()
       .attach("/" + server.properties.get(CONTEXT_ROOT_KEY), server);
+    server.frontSideCache = new FrontSideCache(server);
     
     // Create and store the JAXBContext instances on the server context.
     // They are supposed to be thread safe. 
@@ -249,6 +254,14 @@ public class Server extends Application {
   @Override
   public Logger getLogger() {
     return this.logger;
+  }
+  
+  /**
+   * Returns the front side cache for this server. 
+   * @return The FrontSideCache.
+   */
+  public FrontSideCache getFrontSideCache() {
+    return this.frontSideCache;
   }
 }
 
