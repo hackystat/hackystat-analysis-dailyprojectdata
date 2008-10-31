@@ -82,12 +82,7 @@ public class FrontSideCache {
       return;
     }
     try {
-      UriCache uriCache = user2cache.get(user);
-      if (uriCache == null) {
-        server.getLogger().info("Creating new front side cache for: " + user);
-        uriCache = new UriCache(user, subDir, maxLife, capacity);
-        user2cache.put(user, uriCache);
-      }
+      UriCache uriCache = getCache(user);
       uriCache.put(uri, dpdRepresentation);
     }
     catch (Exception e) {
@@ -102,14 +97,13 @@ public class FrontSideCache {
    * @param user The user who is the owner of the Project associated with this DPD.
    * @param uri The URI naming this DPD. 
    * @return The string representation of the DPD, or null. 
-   * @return
    */
   public String get(String user, String uri) {
     if (isDisabled()) {
       return null;
     }
-    UriCache uriCache = user2cache.get(user);
-    return ((uriCache == null) ? null : (String)uriCache.get(uri));
+    UriCache uriCache = getCache(user);
+    return (String)uriCache.get(uri);
   }
   
   /**
@@ -122,11 +116,8 @@ public class FrontSideCache {
       return;
     }
     try {
-      UriCache cache = user2cache.get(user);
-      if (cache == null) {
-        cache = new UriCache(user, subDir, maxLife, capacity);
-      }
-      cache.clear();
+      UriCache uriCache = getCache(user);
+      uriCache.clear();
     }
     catch (Exception e) {
       this.server.getLogger().warning("Error during DPD front-side cache clear: " +
@@ -134,12 +125,28 @@ public class FrontSideCache {
     }
   }
   
+  
   /**
    * Returns true if frontsidecaching is disabled.
    * @return True if disabled.
    */
   private boolean isDisabled() {
     return !this.server.getServerProperties().isFrontSideCacheEnabled();
+  }
+
+  /**
+   * Gets the UriCache associated with this project owner from the in-memory map.
+   * Instantiates it if necessary.
+   * @param user The user email (project owner) associated with this UriCache.
+   * @return A UriCache instance for this user. 
+   */
+  private UriCache getCache(String user) {
+    UriCache uriCache = user2cache.get(user);
+    if (uriCache == null) {
+      uriCache = new UriCache(user, subDir, maxLife, capacity);
+      user2cache.put(user, uriCache);
+    }
+    return uriCache;
   }
 
 }
