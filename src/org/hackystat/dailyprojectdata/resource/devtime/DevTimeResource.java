@@ -65,7 +65,7 @@ public class DevTimeResource extends DailyProjectDataResource {
         SensorBaseClient client = super.getSensorBaseClient();
         // [2] Check the front side cache and return if the DPD is found and is OK to access.
         String cachedDpd = this.server.getFrontSideCache().get(uriUser, uriString);
-        if (cachedDpd != null && client.inProject(authUser, project)) {
+        if ((cachedDpd != null) && client.inProject(uriUser, project)) {
           return super.getStringRepresentation(cachedDpd);
         }
         // [2] get a SensorDataIndex of all DevEvent data for this Project on the requested day.

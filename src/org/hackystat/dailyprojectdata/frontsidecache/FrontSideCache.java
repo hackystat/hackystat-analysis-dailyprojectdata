@@ -84,6 +84,7 @@ public class FrontSideCache {
     try {
       UriCache uriCache = user2cache.get(user);
       if (uriCache == null) {
+        server.getLogger().info("Creating new front side cache for: " + user);
         uriCache = new UriCache(user, subDir, maxLife, capacity);
         user2cache.put(user, uriCache);
       }
