@@ -302,7 +302,7 @@ public class DailyProjectDataClient {
       String xmlData = response.getEntity().getText();
       devTime = makeDevTimeDailyProjectData(xmlData);
       // Add it to the cache if we're using one.
-      if (this.isCacheEnabled && !isTodayOrFuture(timestamp)) {
+      if (this.isCacheEnabled && !Tstamp.isTodayOrLater(timestamp)) {
         this.uriCache.putInGroup(uri, "devtime", devTime);
       }
     }
@@ -346,7 +346,7 @@ public class DailyProjectDataClient {
       String xmlData = response.getEntity().getText();
       unitDPD = makeUnitTestDailyProjectData(xmlData);
       // Add it to the cache if we're using one.
-      if (this.isCacheEnabled && !isTodayOrFuture(timestamp)) {
+      if (this.isCacheEnabled && !Tstamp.isTodayOrLater(timestamp)) {
         this.uriCache.putInGroup(uri, "unittest", unitDPD);
       }
     }
@@ -452,7 +452,7 @@ public class DailyProjectDataClient {
       String xmlData = response.getEntity().getText();
       fileMetric = makeFileMetricDailyProjectData(xmlData);
       // Add it to the cache if we're using one.
-      if (this.isCacheEnabled && !isTodayOrFuture(timestamp)) {
+      if (this.isCacheEnabled && !Tstamp.isTodayOrLater(timestamp)) {
         this.uriCache.putInGroup(uri, "filemetric", fileMetric);
       }
     }
@@ -501,7 +501,7 @@ public class DailyProjectDataClient {
       String xmlData = response.getEntity().getText();
       complexity = makeComplexityDailyProjectData(xmlData);
       // Add it to the cache if we're using one.
-      if (this.isCacheEnabled && !isTodayOrFuture(timestamp)) {
+      if (this.isCacheEnabled && !Tstamp.isTodayOrLater(timestamp)) {
         this.uriCache.putInGroup(uri, "complexity", complexity);
       }
     }
@@ -550,7 +550,7 @@ public class DailyProjectDataClient {
       String xmlData = response.getEntity().getText();
       coupling = makeCouplingDailyProjectData(xmlData);
       // Add it to the cache if we're using one.
-      if (this.isCacheEnabled && !isTodayOrFuture(timestamp)) {
+      if (this.isCacheEnabled && !Tstamp.isTodayOrLater(timestamp)) {
         this.uriCache.putInGroup(uri, "coupling", coupling);
       }
     }
@@ -661,7 +661,7 @@ public class DailyProjectDataClient {
       String xmlData = response.getEntity().getText();
       codeIssue = makeCodeIssueDailyProjectData(xmlData);
       // Add it to the cache if we're using one.
-      if (this.isCacheEnabled && !isTodayOrFuture(timestamp)) {
+      if (this.isCacheEnabled && !Tstamp.isTodayOrLater(timestamp)) {
         this.uriCache.putInGroup(uri, "codeissue", codeIssue);
       }
     }
@@ -720,7 +720,7 @@ public class DailyProjectDataClient {
       String xmlData = response.getEntity().getText();
       coverage = makeCoverageDailyProjectData(xmlData);
       // Add it to the cache if we're using one.
-      if (this.isCacheEnabled && !isTodayOrFuture(timestamp)) {
+      if (this.isCacheEnabled && !Tstamp.isTodayOrLater(timestamp)) {
         this.uriCache.putInGroup(uri, "coverage", coverage);
       }
     }
@@ -785,7 +785,8 @@ public class DailyProjectDataClient {
       String xmlData = response.getEntity().getText();
       commit = makeCommitDailyProjectData(xmlData);
       // Add it to the cache if we're using one.
-      if (this.isCacheEnabled && !isTodayOrFuture(timestamp)) {
+      // Since CM sensors typically run on yesterday's data, don't cache unless 2 days or older.
+      if (this.isCacheEnabled && !Tstamp.isYesterdayOrLater(timestamp)) {
         this.uriCache.putInGroup(uri, "commit", commit);
       }
     }
@@ -871,7 +872,7 @@ public class DailyProjectDataClient {
       String xmlData = response.getEntity().getText();
       build = makeBuildDailyProjectData(xmlData);
       // Add it to the cache if we're using one.
-      if (this.isCacheEnabled && !isTodayOrFuture(timestamp)) {
+      if (this.isCacheEnabled && !Tstamp.isTodayOrLater(timestamp)) {
         this.uriCache.putInGroup(uri, "build", build);
       }
     }
@@ -1056,20 +1057,4 @@ public class DailyProjectDataClient {
     return true;
   }
 
-  /**
-   * Returns true if the passed timestamp indicates some time today or some time 
-   * in the future. 
-   * 
-   * @param timestamp The timestamp of interest.
-   * @return True if it's today or some day in the future. 
-   */
-  private boolean isTodayOrFuture(XMLGregorianCalendar timestamp) {
-    XMLGregorianCalendar today = Tstamp.makeTimestamp();
-    boolean isToday = (today.getYear() == timestamp.getYear()) && 
-                      (today.getMonth() == timestamp.getMonth()) && 
-                      (today.getDay() == timestamp.getDay());
-    boolean isFuture = today.toGregorianCalendar().getTimeInMillis() <
-                       timestamp.toGregorianCalendar().getTimeInMillis();
-    return (isToday || isFuture);
-  }
 }

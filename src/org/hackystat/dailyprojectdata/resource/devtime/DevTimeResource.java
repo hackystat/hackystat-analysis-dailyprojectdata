@@ -96,7 +96,9 @@ public class DevTimeResource extends DailyProjectDataResource {
         devTime.setUriPattern("**"); // we don't support UriPatterns yet. 
         devTime.setTotalDevTime(counter.getTotalDevTime());
         String xmlData = makeDevTime(devTime);
-        this.server.getFrontSideCache().put(uriUser, uriString, xmlData);
+        if (!Tstamp.isTodayOrLater(startTime)) {
+          this.server.getFrontSideCache().put(uriUser, uriString, xmlData);
+        }
         logRequest("DevTime");
         return super.getStringRepresentation(xmlData);
       }

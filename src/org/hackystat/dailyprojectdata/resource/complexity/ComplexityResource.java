@@ -116,7 +116,9 @@ public class ComplexityResource extends DailyProjectDataResource {
           }
         }
         String xmlData = makeComplexityMetric(fileDpd);
-        this.server.getFrontSideCache().put(uriUser, uriString, xmlData);
+        if (!Tstamp.isTodayOrLater(startTime)) {
+          this.server.getFrontSideCache().put(uriUser, uriString, xmlData);
+        }
         logRequest("Complexity", this.tool, this.type);
         return super.getStringRepresentation(xmlData);
       } 

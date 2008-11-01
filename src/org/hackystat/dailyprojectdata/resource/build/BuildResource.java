@@ -141,7 +141,9 @@ public class BuildResource extends DailyProjectDataResource {
         }
         
         String xmlData = this.makeBuild(build);
-        this.server.getFrontSideCache().put(uriUser, uriString, xmlData);
+        if (!Tstamp.isTodayOrLater(startTime)) {
+          this.server.getFrontSideCache().put(uriUser, uriString, xmlData);
+        }
         logRequest("Build", this.type);
         return super.getStringRepresentation(xmlData);
       }

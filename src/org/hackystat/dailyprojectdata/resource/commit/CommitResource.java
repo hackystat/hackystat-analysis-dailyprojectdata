@@ -103,7 +103,9 @@ public class CommitResource extends DailyProjectDataResource {
         commitData.setOwner(this.uriUser);
         commitData.setProject(this.project);
         String xmlData = this.makeCommit(commitData);
-        this.server.getFrontSideCache().put(uriUser, uriString, xmlData);
+        if (!Tstamp.isYesterdayOrLater(startTime)) {
+          this.server.getFrontSideCache().put(uriUser, uriString, xmlData);
+        }
         logRequest("Commit");
         return super.getStringRepresentation(xmlData);
       }

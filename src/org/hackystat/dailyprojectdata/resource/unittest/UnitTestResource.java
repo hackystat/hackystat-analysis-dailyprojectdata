@@ -103,7 +103,9 @@ public class UnitTestResource extends DailyProjectDataResource {
         unitTestDPD.setUriPattern("**"); // we don't support UriPatterns yet.
 
         String xmlData = makeUnitTestDPD(unitTestDPD);
-        this.server.getFrontSideCache().put(uriUser, uriString, xmlData);
+        if (!Tstamp.isTodayOrLater(startTime)) {
+          this.server.getFrontSideCache().put(uriUser, uriString, xmlData);
+        }
         logRequest("UnitTest");
         return super.getStringRepresentation(xmlData);
 

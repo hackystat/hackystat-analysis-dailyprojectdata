@@ -117,7 +117,9 @@ public class CouplingResource extends DailyProjectDataResource {
           }
         }
         String xmlData = makeCouplingMetric(couplingDpd);
-        this.server.getFrontSideCache().put(uriUser, uriString, xmlData);
+        if (!Tstamp.isTodayOrLater(startTime)) {
+          this.server.getFrontSideCache().put(uriUser, uriString, xmlData);
+        }
         logRequest("Coupling", this.tool, this.type);
         return super.getStringRepresentation(xmlData);
       } 

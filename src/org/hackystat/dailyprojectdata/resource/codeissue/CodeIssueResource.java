@@ -165,7 +165,9 @@ public class CodeIssueResource extends DailyProjectDataResource {
         codeIssue.setUriPattern("**"); // we don't support UriPatterns yet.
 
         String xmlData = this.makeCodeIssue(codeIssue);
-        this.server.getFrontSideCache().put(uriUser, uriString, xmlData);
+        if (!Tstamp.isTodayOrLater(startTime)) {
+          this.server.getFrontSideCache().put(uriUser, uriString, xmlData);
+        }
         logRequest("CodeIssue", this.tool, this.type);
         return super.getStringRepresentation(xmlData);
       }
