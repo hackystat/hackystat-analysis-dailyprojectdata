@@ -24,7 +24,7 @@ public class TestCacheRestApi extends DailyProjectDataTestHelper {
   private String user = "TestCache@hackystat.org";
 
   /**
-   * Test that DELETE {host}/cache/{user} can be invoked successfully.
+   * Test that DELETE {host}/cache/{user} and {user}/{project} can be invoked successfully.
    * 
    * @throws Exception If problems occur.
    */
@@ -35,7 +35,9 @@ public class TestCacheRestApi extends DailyProjectDataTestHelper {
     DailyProjectDataClient dpdClient = new DailyProjectDataClient(getDailyProjectDataHostName(),
         user, user);
     dpdClient.authenticate();
-    assertTrue("Testing delete cache.", dpdClient.clearServerCache(user));
+    assertTrue("Testing DPD user cache delete", dpdClient.clearServerCache(user));
+    assertTrue("Testing DPD user/project cache delete.", 
+        dpdClient.clearServerCache(user, "Default"));
   }
 
   /**
@@ -75,23 +77,22 @@ public class TestCacheRestApi extends DailyProjectDataTestHelper {
 
     XMLGregorianCalendar requestTstamp = Tstamp.makeTimestamp("2007-10-30");
 
+    String project = "Default";
     // This thing should be cached.
-    dpdClient.getBuild(user, "Default", requestTstamp, null);
-    String dpdType = "build";
-    assertEquals("Check initial cache", 1, dpdClient.cacheSize(dpdType));
+    dpdClient.getBuild(user, project, requestTstamp, null);
+    assertEquals("Check initial cache", 1, dpdClient.cacheSize(project));
     dpdClient.clearCache();
-    assertEquals("Check cleared cache 1", 0, dpdClient.cacheSize(dpdType));
+    assertEquals("Check cleared cache 1", 0, dpdClient.cacheSize(project));
 
-    // Add it back and check the dpd-specific clear.
-    dpdClient.getBuild(user, "Default", requestTstamp, null);
-    assertEquals("Check cache 2", 1, dpdClient.cacheSize(dpdType));
-    dpdClient.clearCache("build");
-    assertEquals("Check cleared cache 2", 0, dpdClient.cacheSize(dpdType));
-
-    // Add it back and check the dpd-specific and timestamp clear.
-    dpdClient.getBuild(user, "Default", requestTstamp, null);
-    assertEquals("Check cache 3", 1, dpdClient.cacheSize(dpdType));
-    dpdClient.clearCache("build", "2007-10-30");
-    assertEquals("Check cleared cache 3", 0, dpdClient.cacheSize(dpdType));
+    // Add it back and check the project-specific clear.
+    dpdClient.getBuild(user, project, requestTstamp, null);
+    assertEquals("Check cache 2", 1, dpdClient.cacheSize(project));
+    dpdClient.clearCache(project);
+    assertEquals("Check cleared cache 2", 0, dpdClient.cacheSize(project));
+    
+    // Finally, check to make sure the server-side cache can be cleared as well.  
+    // We just check to make sure we can call the methods successfully.
+   dpdClient.clearServerCache(user);
+   dpdClient.clearServerCache(user, project);
   }
 }

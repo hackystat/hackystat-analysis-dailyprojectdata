@@ -148,5 +148,18 @@ public abstract class DailyProjectDataResource extends Resource {
     this.getLogger().info(responseMsg);
     getResponse().setStatus(Status.CLIENT_ERROR_BAD_REQUEST, responseMsg);
   }
+  
+  /**
+   * Called when an error resulting from an exception is caught during processing. 
+   * @param msg A description of the error.
+   */
+  protected void setStatusError (String msg) {
+    String responseMsg = String.format("%s:%n  Request: %s %s%n", 
+        msg,  
+        this.getRequest().getMethod().getName(),
+        this.getRequest().getResourceRef().toString());
+    this.getLogger().info(responseMsg);
+    getResponse().setStatus(Status.CLIENT_ERROR_BAD_REQUEST, responseMsg);
+  }
 
 }

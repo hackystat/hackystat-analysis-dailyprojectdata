@@ -12,17 +12,9 @@ import org.restlet.resource.Variant;
 /**
  * This resource responds to requests of form:
  * DELETE {host}/cache/{user}
- * by deleting the contents of the SensorData cache associated with that user. 
- * Note that the {user} and the authenticated user names must be the same. 
- * Thus, the only person who can delete a user cache is that user themselves. 
- * This restriction overcomes several problems: (1) it guarantees that there is an
- * instantiated SensorBaseClient
- * for that user, and (2) it avoids concurrency race conditions. This constraints are very important
- * given the current JCS implementation suffers from a concurrent access problem:
- * (https://issues.apache.org/jira/browse/JCS-31).
- * The restriction means that there is no "admin" level cache deletion, but I think we can live
- * with that.  The admin can always figure out the emails/passwords and write a script to do the
- * deletion, or else bring down the server and manually delete the files.  
+ * DELETE {host}/cache/{user}/{project}
+ * by clearing the contents of the (front-side) DPD cache associated with that user (and project,
+ * if supplied). 
  * 
  * @author Philip Johnson
  */
@@ -49,14 +41,19 @@ public class CacheResource extends DailyProjectDataResource {
     try {
       // [1] Make sure the authorized user is the same as the uriUser
       if (!this.authUser.equals(this.uriUser)) {
-        String msg = "Authenticated user (" + this.authUser + ") must be the URI user (" +
-        this.uriUser + ")";
-        getResponse().setStatus(Status.CLIENT_ERROR_BAD_REQUEST, msg);
+        String msg = String.format("Authenticated user (%s) isn't UriUser (%s)", authUser, uriUser);
+        setStatusError(msg);
         return;
       }
-      // [2] Now get the associated sensorbaseclient and invoke the clear operation.
-      super.getSensorBaseClient().clearCache();
-      logger.info("Sensor data cache deleted for user: " + this.uriUser);
+      // [2] Now invoke the clear operation.
+      if (this.project == null) {
+        super.server.getFrontSideCache().clear(uriUser);
+        logger.info(String.format("DPD cache deleted for %s ", uriUser));
+      }
+      else {
+        super.server.getFrontSideCache().clear(uriUser, project);
+        logger.info(String.format("DPD cache deleted for %s/%s. ", uriUser, project));
+      }
       getResponse().setStatus(Status.SUCCESS_OK);
       return;
     }

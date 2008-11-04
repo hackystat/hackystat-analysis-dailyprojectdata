@@ -74,16 +74,17 @@ public class FrontSideCache {
    * The associated UriCache for this user is created if it does not already exist.
    * Does nothing if frontsidecaching is disabled. 
    * @param user The user who is the owner of the project associated with this DPD.
+   * @param project The name of the project.
    * @param uri The URL naming this DPD, as a string. 
    * @param dpdRepresentation A string representing the DPD instance. 
    */
-  public void put(String user, String uri, String dpdRepresentation) {
+  public void put(String user, String project, String uri, String dpdRepresentation) {
     if (isDisabled()) {
       return;
     }
     try {
       UriCache uriCache = getCache(user);
-      uriCache.put(uri, dpdRepresentation);
+      uriCache.putInGroup(uri, project, dpdRepresentation);
     }
     catch (Exception e) {
       this.server.getLogger().warning("Error during DPD front-side cache add: " +
@@ -96,14 +97,15 @@ public class FrontSideCache {
    * URI, or null if not in the cache. 
    * @param user The user who is the owner of the Project associated with this DPD.
    * @param uri The URI naming this DPD. 
+   * @param project The project associated with this URI.
    * @return The string representation of the DPD, or null. 
    */
-  public String get(String user, String uri) {
+  public String get(String user, String project, String uri) {
     if (isDisabled()) {
       return null;
     }
     UriCache uriCache = getCache(user);
-    return (String)uriCache.get(uri);
+    return (String)uriCache.getFromGroup(uri, project);
   }
   
   /**
@@ -118,6 +120,25 @@ public class FrontSideCache {
     try {
       UriCache uriCache = getCache(user);
       uriCache.clear();
+    }
+    catch (Exception e) {
+      this.server.getLogger().warning("Error during DPD front-side cache clear: " +
+          StackTrace.toString(e));
+    }
+  }
+
+  /**
+   * Clears all of the cached DPD instances associated with this project and user. 
+   * @param user The user. 
+   * @param project The project. 
+   */
+  public void clear(String user, String project) {
+    if (isDisabled()) {
+      return;
+    }
+    try {
+      UriCache uriCache = getCache(user);
+      uriCache.clearGroup(project);
     }
     catch (Exception e) {
       this.server.getLogger().warning("Error during DPD front-side cache clear: " +

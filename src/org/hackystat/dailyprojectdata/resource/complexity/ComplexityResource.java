@@ -74,7 +74,7 @@ public class ComplexityResource extends DailyProjectDataResource {
         // [1] get the SensorBaseClient for the user making this request.
         SensorBaseClient client = super.getSensorBaseClient();
         // [2] Check the front side cache and return if the DPD is found and is OK to access.
-        String cachedDpd = this.server.getFrontSideCache().get(uriUser, uriString);
+        String cachedDpd = this.server.getFrontSideCache().get(uriUser, project, uriString);
         if ((cachedDpd != null) && client.inProject(uriUser, project)) {
           return super.getStringRepresentation(cachedDpd);
         }
@@ -117,7 +117,7 @@ public class ComplexityResource extends DailyProjectDataResource {
         }
         String xmlData = makeComplexityMetric(fileDpd);
         if (!Tstamp.isTodayOrLater(startTime)) {
-          this.server.getFrontSideCache().put(uriUser, uriString, xmlData);
+          this.server.getFrontSideCache().put(uriUser, project, uriString, xmlData);
         }
         logRequest("Complexity", this.tool, this.type);
         return super.getStringRepresentation(xmlData);
