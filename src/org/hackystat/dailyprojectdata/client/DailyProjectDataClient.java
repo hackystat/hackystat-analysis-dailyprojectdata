@@ -285,7 +285,7 @@ public class DailyProjectDataClient {
     String uri = "devtime/" + user + "/" + project + "/" + timestamp;
     // Check the cache, and return the instance from it if available.
     if (this.isCacheEnabled) {
-      devTime = (DevTimeDailyProjectData) this.uriCache.getFromGroup(uri, project);
+      devTime = (DevTimeDailyProjectData) this.uriCache.getFromGroup(uri, user + project);
       if (devTime != null) {
         return devTime;
       }
@@ -300,7 +300,7 @@ public class DailyProjectDataClient {
       devTime = makeDevTimeDailyProjectData(xmlData);
       // Add it to the cache if we're using one.
       if (this.isCacheEnabled && !Tstamp.isTodayOrLater(timestamp)) {
-        this.uriCache.putInGroup(uri, project, devTime);
+        this.uriCache.putInGroup(uri, user + project, devTime);
       }
     }
     catch (Exception e) {
@@ -330,7 +330,7 @@ public class DailyProjectDataClient {
     UnitTestDailyProjectData unitDPD;
     // Check the cache, and return the instance from it if available.
     if (this.isCacheEnabled) {
-      unitDPD = (UnitTestDailyProjectData) this.uriCache.getFromGroup(uri, project);
+      unitDPD = (UnitTestDailyProjectData) this.uriCache.getFromGroup(uri, user + project);
       if (unitDPD != null) {
         return unitDPD;
       }
@@ -344,7 +344,7 @@ public class DailyProjectDataClient {
       unitDPD = makeUnitTestDailyProjectData(xmlData);
       // Add it to the cache if we're using one.
       if (this.isCacheEnabled && !Tstamp.isTodayOrLater(timestamp)) {
-        this.uriCache.putInGroup(uri, project, unitDPD);
+        this.uriCache.putInGroup(uri, user + project, unitDPD);
       }
     }
     catch (Exception e) {
@@ -435,7 +435,7 @@ public class DailyProjectDataClient {
     String uri = "filemetric/" + user + "/" + project + "/" + timestamp + "/" + sizeMetric + param;
     // Check the cache, and return the instance from it if available.
     if (this.isCacheEnabled) {
-      fileMetric = (FileMetricDailyProjectData) this.uriCache.getFromGroup(uri, project);
+      fileMetric = (FileMetricDailyProjectData) this.uriCache.getFromGroup(uri, user + project);
       if (fileMetric != null) {
         return fileMetric;
       }
@@ -450,7 +450,7 @@ public class DailyProjectDataClient {
       fileMetric = makeFileMetricDailyProjectData(xmlData);
       // Add it to the cache if we're using one.
       if (this.isCacheEnabled && !Tstamp.isTodayOrLater(timestamp)) {
-        this.uriCache.putInGroup(uri, project, fileMetric);
+        this.uriCache.putInGroup(uri, user + project, fileMetric);
       }
     }
     catch (Exception e) {
@@ -484,7 +484,7 @@ public class DailyProjectDataClient {
         + tool;
     // Check the cache, and return the instance from it if available.
     if (this.isCacheEnabled) {
-      complexity = (ComplexityDailyProjectData) this.uriCache.getFromGroup(uri, project);
+      complexity = (ComplexityDailyProjectData) this.uriCache.getFromGroup(uri, user + project);
       if (complexity != null) {
         return complexity;
       }
@@ -499,7 +499,7 @@ public class DailyProjectDataClient {
       complexity = makeComplexityDailyProjectData(xmlData);
       // Add it to the cache if we're using one.
       if (this.isCacheEnabled && !Tstamp.isTodayOrLater(timestamp)) {
-        this.uriCache.putInGroup(uri, project, complexity);
+        this.uriCache.putInGroup(uri, user + project, complexity);
       }
     }
     catch (Exception e) {
@@ -533,7 +533,7 @@ public class DailyProjectDataClient {
         + tool;
     // Check the cache, and return the instance from it if available.
     if (this.isCacheEnabled) {
-      coupling = (CouplingDailyProjectData) this.uriCache.getFromGroup(uri, project);
+      coupling = (CouplingDailyProjectData) this.uriCache.getFromGroup(uri, user + project);
       if (coupling != null) {
         return coupling;
       }
@@ -548,7 +548,7 @@ public class DailyProjectDataClient {
       coupling = makeCouplingDailyProjectData(xmlData);
       // Add it to the cache if we're using one.
       if (this.isCacheEnabled && !Tstamp.isTodayOrLater(timestamp)) {
-        this.uriCache.putInGroup(uri, project, coupling);
+        this.uriCache.putInGroup(uri, user + project, coupling);
       }
     }
     catch (Exception e) {
@@ -643,7 +643,7 @@ public class DailyProjectDataClient {
     String uri = requestStringBuilder.toString();
     // Check the cache, and return the instance from it if available.
     if (this.isCacheEnabled) {
-      codeIssue = (CodeIssueDailyProjectData) this.uriCache.getFromGroup(uri, project);
+      codeIssue = (CodeIssueDailyProjectData) this.uriCache.getFromGroup(uri, user + project);
       if (codeIssue != null) {
         return codeIssue;
       }
@@ -659,7 +659,7 @@ public class DailyProjectDataClient {
       codeIssue = makeCodeIssueDailyProjectData(xmlData);
       // Add it to the cache if we're using one.
       if (this.isCacheEnabled && !Tstamp.isTodayOrLater(timestamp)) {
-        this.uriCache.putInGroup(uri, project, codeIssue);
+        this.uriCache.putInGroup(uri, user + project, codeIssue);
       }
     }
     catch (Exception e) {
@@ -702,7 +702,7 @@ public class DailyProjectDataClient {
     CoverageDailyProjectData coverage;
     // Check the cache, and return the instance from it if available.
     if (this.isCacheEnabled) {
-      coverage = (CoverageDailyProjectData) this.uriCache.getFromGroup(uri, project);
+      coverage = (CoverageDailyProjectData) this.uriCache.getFromGroup(uri, user + project);
       if (coverage != null) {
         return coverage;
       }
@@ -718,7 +718,7 @@ public class DailyProjectDataClient {
       coverage = makeCoverageDailyProjectData(xmlData);
       // Add it to the cache if we're using one.
       if (this.isCacheEnabled && !Tstamp.isTodayOrLater(timestamp)) {
-        this.uriCache.putInGroup(uri, project, coverage);
+        this.uriCache.putInGroup(uri, user + project, coverage);
       }
     }
     catch (Exception e) {
@@ -767,7 +767,7 @@ public class DailyProjectDataClient {
     CommitDailyProjectData commit;
     // Check the cache, and return the instance from it if available.
     if (this.isCacheEnabled) {
-      commit = (CommitDailyProjectData) this.uriCache.getFromGroup(uri, project);
+      commit = (CommitDailyProjectData) this.uriCache.getFromGroup(uri, user + project);
       if (commit != null) {
         return commit;
       }
@@ -784,7 +784,7 @@ public class DailyProjectDataClient {
       // Add it to the cache if we're using one.
       // Since CM sensors typically run on yesterday's data, don't cache unless 2 days or older.
       if (this.isCacheEnabled && !Tstamp.isYesterdayOrLater(timestamp)) {
-        this.uriCache.putInGroup(uri, project, commit);
+        this.uriCache.putInGroup(uri, user + project, commit);
       }
     }
     catch (Exception e) {
@@ -854,7 +854,7 @@ public class DailyProjectDataClient {
     String uri = requestStringBuilder.toString();
     // Check the cache, and return the instance from it if available.
     if (this.isCacheEnabled) {
-      build = (BuildDailyProjectData) this.uriCache.getFromGroup(uri, project);
+      build = (BuildDailyProjectData) this.uriCache.getFromGroup(uri, user + project);
       if (build != null) {
         return build;
       }
@@ -870,7 +870,7 @@ public class DailyProjectDataClient {
       build = makeBuildDailyProjectData(xmlData);
       // Add it to the cache if we're using one.
       if (this.isCacheEnabled && !Tstamp.isTodayOrLater(timestamp)) {
-        this.uriCache.putInGroup(uri, project, build);
+        this.uriCache.putInGroup(uri, user + project, build);
       }
     }
     catch (Exception e) {
@@ -953,50 +953,51 @@ public class DailyProjectDataClient {
    * DailyProjectDataClient instance. All DPD-specific caches are cleared. If this DPDClient
    * instance does not have caching enabled, then this method has no effect.
    */
-  public synchronized void clearCache() {
+  public synchronized void clearLocalCache() {
     if (this.uriCache != null) {
       this.uriCache.clearAll();
     }
   }
 
   /**
-   * Delete all cache entries associated with this user and the passed project.
+   * Delete all cache entries associated with the specified project and its owner. 
    * If this DPDClient does not have caching enabled, then this has no effect.
    * 
+   * @param user The user. 
    * @param project The project. 
    */
-  public synchronized void clearCache(String project) {
+  public synchronized void clearLocalCache(String user, String project) {
     if (this.uriCache != null) {
-      this.uriCache.clearGroup(project);
+      this.uriCache.clearGroup(user + project);
     }
   }
 
   /**
-   * Returns the number of cached entries for the given project.
+   * Returns the number of cached entries for the given project and its owner. 
    * If this DPDClient does not have caching enabled, then returns 0.
    * 
+   * @param user The owner of this project. 
    * @param project The project.
    * @return The number of entries in the cache for that project. 
    */
-  public synchronized int cacheSize(String project) {
+  public synchronized int localCacheSize(String user, String project) {
     int size = 0;
     if (this.uriCache != null) {
-      size = this.uriCache.getGroupSize(project);
+      size = this.uriCache.getGroupSize(user + project);
     }
     return size;
   }
 
   /**
-   * Clears the DPD cache associated with the specified user on the DailyProjectData server
+   * Clears the (front side) DPD cache associated with this user on the DailyProjectData server
    * to which this DailyProjectDataClient instance is connected.
    * 
-   * @param user The user whose DPD cache on the DPD server is to be cleared.
    * @return True if the command succeeded.
    * @throws DailyProjectDataClientException If problems occur.
    */
-  public synchronized boolean clearServerCache(String user) throws DailyProjectDataClientException {
+  public synchronized boolean clearServerCache() throws DailyProjectDataClientException {
     Date startTime = new Date();
-    String uri = "cache/" + user;
+    String uri = "cache";
     Response response = makeRequest(Method.DELETE, uri, null);
     if (!response.getStatus().isSuccess()) {
       logElapsedTime(uri, startTime);
@@ -1007,18 +1008,18 @@ public class DailyProjectDataClient {
   }
   
   /**
-   * Clears the DPD cache associated with the specified user and project on the 
-   * DailyProjectData server to which this DailyProjectDataClient instance is connected.
+   * Clears the (front side) DPD cache entries associated with the specified project and its owner 
+   * on the DailyProjectData server to which this DailyProjectDataClient instance is connected.
    * 
-   * @param user The user whose DPD cache on the DPD server is to be cleared.
+   * @param owner The owner of the project whose entries are to be cleared.
    * @param project The project DPDs to be cleared on the server. 
    * @return True if the command succeeded.
    * @throws DailyProjectDataClientException If problems occur.
    */
-  public synchronized boolean clearServerCache(String user, String project) 
+  public synchronized boolean clearServerCache(String owner, String project) 
   throws DailyProjectDataClientException {
     Date startTime = new Date();
-    String uri = String.format("cache/%s/%s", user, project);
+    String uri = String.format("cache/%s/%s", owner, project);
     Response response = makeRequest(Method.DELETE, uri, null);
     if (!response.getStatus().isSuccess()) {
       logElapsedTime(uri, startTime);

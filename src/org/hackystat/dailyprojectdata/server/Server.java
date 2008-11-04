@@ -202,8 +202,8 @@ public class Server extends Application {
     authRouter.attach("/build/{user}/{project}/{timestamp}", BuildResource.class);
     authRouter.attach("/build/{user}/{project}/{timestamp}?Type={Type}", BuildResource.class);
     authRouter.attach("/commit/{user}/{project}/{timestamp}", CommitResource.class);
-    authRouter.attach("/cache/{user}", CacheResource.class);
     authRouter.attach("/cache/{user}/{project}", CacheResource.class);
+    authRouter.attach("/cache", CacheResource.class);
 
     // Here's the Guard that we will place in front of authRouter.
     Guard guard = new Authenticator(getContext(), 

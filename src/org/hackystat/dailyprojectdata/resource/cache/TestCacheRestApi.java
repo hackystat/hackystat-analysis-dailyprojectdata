@@ -35,7 +35,7 @@ public class TestCacheRestApi extends DailyProjectDataTestHelper {
     DailyProjectDataClient dpdClient = new DailyProjectDataClient(getDailyProjectDataHostName(),
         user, user);
     dpdClient.authenticate();
-    assertTrue("Testing DPD user cache delete", dpdClient.clearServerCache(user));
+    assertTrue("Testing DPD user cache delete", dpdClient.clearServerCache());
     assertTrue("Testing DPD user/project cache delete.", 
         dpdClient.clearServerCache(user, "Default"));
   }
@@ -73,26 +73,26 @@ public class TestCacheRestApi extends DailyProjectDataTestHelper {
         user, user);
     dpdClient.authenticate();
     dpdClient.enableCaching("TestDpdCache", "testdpdcache", 1D, 1000L);
-    dpdClient.clearCache();
+    dpdClient.clearLocalCache();
 
     XMLGregorianCalendar requestTstamp = Tstamp.makeTimestamp("2007-10-30");
 
     String project = "Default";
     // This thing should be cached.
     dpdClient.getBuild(user, project, requestTstamp, null);
-    assertEquals("Check initial cache", 1, dpdClient.cacheSize(project));
-    dpdClient.clearCache();
-    assertEquals("Check cleared cache 1", 0, dpdClient.cacheSize(project));
+    assertEquals("Check initial cache", 1, dpdClient.localCacheSize(user, project));
+    dpdClient.clearLocalCache();
+    assertEquals("Check cleared cache 1", 0, dpdClient.localCacheSize(user, project));
 
     // Add it back and check the project-specific clear.
     dpdClient.getBuild(user, project, requestTstamp, null);
-    assertEquals("Check cache 2", 1, dpdClient.cacheSize(project));
-    dpdClient.clearCache(project);
-    assertEquals("Check cleared cache 2", 0, dpdClient.cacheSize(project));
+    assertEquals("Check cache 2", 1, dpdClient.localCacheSize(user, project));
+    dpdClient.clearLocalCache(user, project);
+    assertEquals("Check cleared cache 2", 0, dpdClient.localCacheSize(user, project));
     
     // Finally, check to make sure the server-side cache can be cleared as well.  
     // We just check to make sure we can call the methods successfully.
-   dpdClient.clearServerCache(user);
+   dpdClient.clearServerCache();
    dpdClient.clearServerCache(user, project);
   }
 }
