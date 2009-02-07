@@ -245,5 +245,36 @@ public class CoverageDailyProjectData
     public boolean isSetTool() {
         return (this.tool!= null);
     }
+    
+    // Custom methods follow.
+    
+    /**
+     * Returns the percentage coverage as an integer between 0 and 100, or 0 if not coverage
+     * data is present.
+     * @return The percentage coverage as an integer between 0 and 100.  
+     */
+    public int getPercentageCoverage() {
+      if (!hasCoverageData()) {
+        return 0;
+      }
+      // Otherwise we have coverage data, so get the total covered and uncovered values.
+      int totalCovered = 0;
+      int totalUncovered = 0;
+      for (ConstructData data : this.getConstructData()) {
+        totalCovered += data.getNumCovered();
+        totalUncovered += data.getNumUncovered();
+      }
+      double total = totalCovered + totalUncovered;
+      return (int)((totalCovered / total) * 100.0);
+      
+    }
+
+    /**
+     * Returns true if there is actual coverage data in this instance. 
+     * @return True if coverage data is in this instance. 
+     */
+    public boolean hasCoverageData() {
+      return ((this.constructData != null) && (!this.constructData.isEmpty()));
+    }
 
 }
