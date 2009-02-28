@@ -146,7 +146,8 @@ public abstract class DailyProjectDataResource extends Resource {
         this.getRequest().getResourceRef().toString(),
         e.getMessage());
     this.getLogger().info(responseMsg);
-    getResponse().setStatus(Status.CLIENT_ERROR_BAD_REQUEST, responseMsg);
+    getResponse().setStatus(Status.CLIENT_ERROR_BAD_REQUEST, 
+        responseMsg.replace(System.getProperty("line.separator"), " "));
   }
   
   /**
@@ -159,7 +160,8 @@ public abstract class DailyProjectDataResource extends Resource {
         this.getRequest().getMethod().getName(),
         this.getRequest().getResourceRef().toString());
     this.getLogger().info(responseMsg);
-    getResponse().setStatus(Status.CLIENT_ERROR_BAD_REQUEST, responseMsg);
+    getResponse().setStatus(Status.CLIENT_ERROR_BAD_REQUEST, 
+        responseMsg.replace(System.getProperty("line.separator"), " "));
   }
 
 }
