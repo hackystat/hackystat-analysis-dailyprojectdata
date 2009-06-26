@@ -42,7 +42,7 @@ public class CacheResource extends DailyProjectDataResource {
    * identified by UriUser and project.
    */
   @Override
-  public void delete() {
+  public void removeRepresentations() {
     Logger logger = this.server.getLogger();
     logger.fine(String.format("Delete cache: %s %s %s ", authUser, uriUser, project));
     try {
@@ -102,7 +102,7 @@ public class CacheResource extends DailyProjectDataResource {
    * @return Null.
    */
   @Override
-  public Representation getRepresentation(Variant variant) {
+  public Representation represent(Variant variant) {
     getResponse().setStatus(Status.CLIENT_ERROR_METHOD_NOT_ALLOWED);
     return null;
   }

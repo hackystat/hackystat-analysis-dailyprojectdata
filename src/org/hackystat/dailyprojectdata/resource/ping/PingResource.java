@@ -45,7 +45,7 @@ public class PingResource extends DailyProjectDataResource {
    * @return The representation as a string.  
    */
   @Override
-  public Representation getRepresentation(Variant variant) {
+  public Representation represent(Variant variant) {
     String unauthenticated = "DailyProjectData";
     String authenticated = "DailyProjectData authenticated";
     // Don't try to authenticate unless the user has passed both a user and password. 

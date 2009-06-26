@@ -28,7 +28,7 @@ public class FileMetricCounter {
 
   private String lastTool;
   private XMLGregorianCalendar lastTime;
-  private ArrayList<SensorData> fileMetrics;
+  private List<SensorData> fileMetrics;
   private SensorBaseClient sbClient;
   private long totalLines;
 

@@ -1,6 +1,7 @@
 package org.hackystat.dailyprojectdata.resource.coverage;
 
 import java.util.List;
+import java.util.Locale;
 
 import javax.xml.datatype.XMLGregorianCalendar;
 
@@ -66,7 +67,7 @@ public class CoverageData {
    * @return the uncovered value.
    */
   public int getUncovered(String granularity) {
-    String lowerCaseGranularity = granularity.toLowerCase();
+    String lowerCaseGranularity = granularity.toLowerCase(Locale.ENGLISH);
     String coverageProperty = this.getCoverageProperty(
         lowerCaseGranularity + SEPERATOR + UNCOVERED_NAME).getValue();
     return Double.valueOf(coverageProperty).intValue();
@@ -80,7 +81,7 @@ public class CoverageData {
    * @return the covered value.
    */
   public int getCovered(String granularity) {
-    String lowerCaseGranularity = granularity.toLowerCase();
+    String lowerCaseGranularity = granularity.toLowerCase(Locale.ENGLISH);
     String coverageProperty = this.getCoverageProperty(
         lowerCaseGranularity + SEPERATOR + COVERED_NAME).getValue();
     return Double.valueOf(coverageProperty).intValue();

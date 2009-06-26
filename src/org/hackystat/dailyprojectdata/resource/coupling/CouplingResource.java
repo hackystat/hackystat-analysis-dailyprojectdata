@@ -67,7 +67,7 @@ public class CouplingResource extends DailyProjectDataResource {
    * @return The representation.
    */
   @Override
-  public Representation getRepresentation(Variant variant) {
+  public Representation represent(Variant variant) {
     Logger logger = this.server.getLogger();
     logger.fine("Coupling DPD: Starting");
     if (variant.getMediaType().equals(MediaType.TEXT_XML)) {

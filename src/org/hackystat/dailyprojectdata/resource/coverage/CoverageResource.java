@@ -62,7 +62,7 @@ public class CoverageResource extends DailyProjectDataResource {
    * @return The representation.
    */
   @Override
-  public Representation getRepresentation(Variant variant) {
+  public Representation represent(Variant variant) {
     Logger logger = this.server.getLogger();
     logger.fine("Coverage DPD: Starting");
     if (variant.getMediaType().equals(MediaType.TEXT_XML)) {

@@ -71,7 +71,7 @@ public class CodeIssueResource extends DailyProjectDataResource {
    * @return The representation.
    */
   @Override
-  public Representation getRepresentation(Variant variant) {
+  public Representation represent(Variant variant) {
     Logger logger = this.server.getLogger();
     logger.fine("CodeIssue DPD: Starting");
     if (variant.getMediaType().equals(MediaType.TEXT_XML)) {
