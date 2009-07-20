@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+           xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
+           jaxb:extensionBindingPrefixes="xjc"
+           jaxb:version="2.0">
+         
+    <xs:annotation>
+       <xs:appinfo>
+          <jaxb:globalBindings generateIsSetMethod="true">
+              <xjc:serializable uid="20090719"/>
+          </jaxb:globalBindings>
+       </xs:appinfo>
+    </xs:annotation>
+  <!-- Primitive elements and attributes -->
+  <xs:attribute name="Project" type="xs:string" />
+  <xs:attribute name="Owner" type="xs:string" />
+  <xs:attribute name="StartTime" type="xs:dateTime" />
+  <xs:attribute name="OpenIssues" type="xs:int" />
+
+  <xs:attribute name="Id" type="xs:int" />
+  <xs:attribute name="Type" type="xs:string" />
+  <xs:attribute name="Status" type="xs:string" />
+  <xs:attribute name="Priority" type="xs:string" />
+  <xs:attribute name="Milestone" type="xs:string" />
+
+  <xs:element name="IssueDailyProjectData">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="IssueData" minOccurs="0" maxOccurs="unbounded" />
+      </xs:sequence>
+      <xs:attribute ref="Project" use="required"/>
+      <xs:attribute ref="Owner" use="required"/>
+      <xs:attribute ref="StartTime" use="required"/>
+      <xs:attribute ref="OpenIssues" use="required"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="IssueData">
+    <xs:complexType>
+      <xs:attribute ref="Id" use="required"/>
+      <xs:attribute ref="Status" use="required"/>
+      <xs:attribute ref="Owner" use="required"/>
+      <xs:attribute ref="Type" use="optional"/>
+      <xs:attribute ref="Priority" use="optional"/>
+      <xs:attribute ref="Milestone" use="optional"/>
+    </xs:complexType>
+  </xs:element>
+
+</xs:schema>

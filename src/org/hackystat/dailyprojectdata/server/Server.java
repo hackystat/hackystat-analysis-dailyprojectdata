@@ -21,6 +21,7 @@ import org.hackystat.dailyprojectdata.resource.coupling.CouplingResource;
 import org.hackystat.dailyprojectdata.resource.coverage.CoverageResource;
 import org.hackystat.dailyprojectdata.resource.devtime.DevTimeResource;
 import org.hackystat.dailyprojectdata.resource.filemetric.FileMetricResource;
+import org.hackystat.dailyprojectdata.resource.issue.IssueResource;
 import org.hackystat.dailyprojectdata.resource.ping.PingResource;
 import org.hackystat.dailyprojectdata.resource.unittest.UnitTestResource;
 import org.hackystat.sensorbase.client.SensorBaseClient;
@@ -134,6 +135,9 @@ public class Server extends Application {
     JAXBContext couplingJAXB = JAXBContext.newInstance(
         org.hackystat.dailyprojectdata.resource.coupling.jaxb.ObjectFactory.class);
     attributes.put("CouplingJAXB", couplingJAXB);
+    JAXBContext issueJAXB = JAXBContext.newInstance(
+        org.hackystat.dailyprojectdata.resource.issue.jaxb.ObjectFactory.class);
+    attributes.put("IssueJAXB", issueJAXB);
     
     // Provide a pointer to this server in the Context so that Resources can get at this server.
     attributes.put("DailyProjectDataServer", server);
@@ -202,6 +206,7 @@ public class Server extends Application {
     authRouter.attach("/build/{user}/{project}/{timestamp}", BuildResource.class);
     authRouter.attach("/build/{user}/{project}/{timestamp}?Type={Type}", BuildResource.class);
     authRouter.attach("/commit/{user}/{project}/{timestamp}", CommitResource.class);
+    authRouter.attach("/issue/{user}/{project}/{timestamp}", IssueResource.class);
     authRouter.attach("/cache/{user}/{project}", CacheResource.class);
     authRouter.attach("/cache", CacheResource.class);
 
