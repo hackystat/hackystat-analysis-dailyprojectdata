@@ -24,7 +24,7 @@
 
  
   <target name="verify" 
-    depends="clean, compile, checkstyle.tool, junit.tool,  findbugs.tool, pmd.tool" 
+    depends="clean, compile, checkstyle.tool, findbugs.tool, pmd.tool, junit.tool" 
     description="Invoke analyzers, fail if any errors found.">
       <fail message="FindBugs reported warnings." if="findbugs.warningsfound"/>
   </target>
