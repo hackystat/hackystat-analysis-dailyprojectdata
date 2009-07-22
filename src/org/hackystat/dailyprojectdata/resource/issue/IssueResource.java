@@ -68,8 +68,11 @@ public class IssueResource extends DailyProjectDataResource {
         XMLGregorianCalendar startTime = Tstamp.makeTimestamp(this.timestamp);
         XMLGregorianCalendar endTime = Tstamp.incrementDays(startTime, 1);
         logger.fine("Issue DPD: Requesting index: " + uriUser + " " + project);
-        SensorDataIndex index = client.getProjectSensorData(uriUser, project, startTime, endTime, 
-            "Issue");
+        
+        XMLGregorianCalendar projectStartTime = client.getProject(uriUser, project).getStartTime();
+        
+        SensorDataIndex index = client.getProjectSensorData(uriUser, project, projectStartTime, 
+            endTime, "Issue");
         logger.fine("Issue DPD: Got index: " + index.getSensorDataRef().size() + " instances");
         // [3] prepare the IssueDailyProjectData
         IssueDailyProjectData issueDpd = new IssueDailyProjectData();

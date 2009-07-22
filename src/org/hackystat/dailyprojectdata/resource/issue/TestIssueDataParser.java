@@ -6,7 +6,6 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import org.hackystat.dailyprojectdata.resource.issue.jaxb.IssueData;
 import org.hackystat.sensorbase.resource.sensordata.jaxb.SensorData;
 import org.hackystat.utilities.tstamp.Tstamp;
-import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -18,45 +17,46 @@ public class TestIssueDataParser {
 
   private IssueDataParser parser = new IssueDataParser(Logger.getLogger("IssueDpdTester"));
   
-  private String ACCEPTED = "Accepted";
-  private String FIXED = "Fixed";
-  private String DEFECT = "Defect";
-  private String ENHANCEMENT = "Enhancement";
-  private String MEDIUM = "Medium";
-  private String HIGH = "High";
+  protected static final String ACCEPTED = "Accepted";
+  protected static final String FIXED = "Fixed";
+  protected static final String DEFECT = "Defect";
+  protected static final String ENHANCEMENT = "Enhancement";
+  protected static final String MEDIUM = "Medium";
+  protected static final String HIGH = "High";
+
+  protected static final String testDataOwner = "testDataOwner@hackystat.org";
+  protected static final String testUser1 = "tester1@hackystat.org";
+  protected static final String testUser2 = "tester2@hackystat.org";
+  protected static final String testProject = "hackystat-test-project";
   
-  private String testUser1 = "tester1";
-  private String testUser2 = "tester2";
-  
-  private String[] columnKeyOrder = {
+  protected static final String[] columnKeyOrder = {
       IssueDataParser.TYPE_PROPERTY_KEY, IssueDataParser.STATUS_PROPERTY_KEY, 
       IssueDataParser.PRIORITY_PROPERTY_KEY, IssueDataParser.MILESTONE_PROPERTY_KEY, 
       IssueDataParser.OWNER_PROPERTY_KEY};
-  private String[] testData1T1 = {"21", DEFECT, ACCEPTED, MEDIUM, "", testUser1};
-  private String[] testData1T2 = {"21", ENHANCEMENT, FIXED, MEDIUM, "8.4", testUser1};
-  private String[] testData2T1 = {"23", ENHANCEMENT, ACCEPTED, MEDIUM, "", testUser1};
-  private String[] testData2T2 = {"23", ENHANCEMENT, ACCEPTED, HIGH, "", testUser2};
-  private XMLGregorianCalendar testTime1 = Tstamp.makeTimestamp("2009-07-20T11:00:00");
-  private XMLGregorianCalendar testTime2 = Tstamp.makeTimestamp("2009-07-22T00:00:00");
+  protected static final String[] testData1T1 = 
+      {"21", DEFECT, ACCEPTED, MEDIUM, "", testUser1, "2008-09-07T11:00:00"};
+  protected static final String[] testData1T2 = 
+      {"21", ENHANCEMENT, FIXED, MEDIUM, "8.4", testUser1, "2008-09-07T11:00:00"};
+  protected static final String[] testData2T1 = 
+      {"23", ENHANCEMENT, ACCEPTED, MEDIUM, "", testUser1, "2009-07-20T10:24:06"};
+  protected static final String[] testData2T2 = 
+      {"23", ENHANCEMENT, ACCEPTED, HIGH, "", testUser2, "2009-07-20T10:24:06"};
+  protected final XMLGregorianCalendar testTime1;
+  protected final XMLGregorianCalendar testTime2;
   
-  private SensorData testData1;
-  private SensorData testData2;
+  private final SensorData testData1;
+  private final SensorData testData2;
   
   /**
-   * Constructor.
+   * Constructor, prepare the test data.
    * @throws Exception if error when making XMLGregorianCalendar timestamps.
    */
   public TestIssueDataParser() throws Exception {
-    //Do nothing, explicitly throws exception for Tstamp.makeTimestamp().
-  }
-  
-  /**
-   * Prepare the two test sensordata.
-   */
-  @Before public void setUp() {
-    testData1 = makeIssueSensorData(new String[][]{testData1T1, testData1T2}, 
+    testTime1 = Tstamp.makeTimestamp("2009-07-20T11:00:00");
+    testTime2 = Tstamp.makeTimestamp("2009-07-22T00:00:00");
+    testData1 = makeIssueSensorData(testDataOwner, new String[][]{testData1T1, testData1T2}, 
         new XMLGregorianCalendar[]{testTime1, testTime2});
-    testData2 = makeIssueSensorData(new String[][]{testData2T1, testData2T2}, 
+    testData2 = makeIssueSensorData(testDataOwner, new String[][]{testData2T1, testData2T2}, 
         new XMLGregorianCalendar[]{testTime1, testTime2});
   }
 
@@ -119,22 +119,38 @@ public class TestIssueDataParser {
    * strings = {{"21", "Enhancement", "Accepted", "Medium", "", "rlcox0"},
                 {"21", "Enhancement", "Fixed", "High", "8.4", "rlcox0"}}
      timestamps = {"2009-07-20T11:00:00", "2009-07-22T00:00:00"}
+     @param dataOwner owner of the data.
    * @param strings Array of String array which contain state values in order.
    * @param timestamps Array of timestamp of each String array in 1st parameter.
    * @return the sensordata.
    */
-  private SensorData makeIssueSensorData(String[][] strings,
+  protected static SensorData makeIssueSensorData(String dataOwner, String[][] strings,
       XMLGregorianCalendar[] timestamps) {
+    String sdt = "Issue";
+    String tool = "GoogleProjectHosting";
+    
     SensorData sensorData = new SensorData();
+    sensorData.setTool(tool);
+    sensorData.setOwner(dataOwner);
+    sensorData.setSensorDataType(sdt);
+    try {
+      sensorData.setTimestamp(Tstamp.makeTimestamp(strings[0][6]));
+    }
+    catch (Exception e) {
+      e.printStackTrace();
+    }
+    String id = strings[0][0];
+    sensorData.setResource("http://code.google.com/p/" + testProject + "/issues/detail?id=" + id);
+    sensorData.setRuntime(Tstamp.makeTimestamp());
     //add id
-    sensorData.addProperty(IssueDataParser.ID_PROPERTY_KEY, strings[0][0]);
+    sensorData.addProperty(IssueDataParser.ID_PROPERTY_KEY, id);
     for (int i = 0; i < strings.length; i++) {
       String[] values = strings[i];
       String timeString = timestamps[i].toString();
       //add other state values.
-      for (int j = 0; j < this.columnKeyOrder.length; j++) {
+      for (int j = 0; j < columnKeyOrder.length; j++) {
         if (values[j + 1].length() > 0) {
-          sensorData.addProperty(this.columnKeyOrder[j], 
+          sensorData.addProperty(columnKeyOrder[j], 
               values[j + 1] + IssueDataParser.TIMESTAMP_SEPARATOR + timeString);
         }
       }
