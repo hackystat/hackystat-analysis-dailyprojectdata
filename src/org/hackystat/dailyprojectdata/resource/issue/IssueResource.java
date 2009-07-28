@@ -34,6 +34,8 @@ import org.w3c.dom.Document;
  */
 public class IssueResource extends DailyProjectDataResource {
 
+  private String status;
+  
   /**
    * The standard constructor.
    * @param context The context.
@@ -42,6 +44,7 @@ public class IssueResource extends DailyProjectDataResource {
    */
   public IssueResource(Context context, Request request, Response response) {
     super(context, request, response);
+    this.status = (String) request.getAttributes().get("Status");
   }
 
   /**
@@ -55,6 +58,18 @@ public class IssueResource extends DailyProjectDataResource {
   public Representation represent(Variant variant) {
     Logger logger = this.server.getLogger();
     logger.fine("Issue DPD: Starting");
+    boolean isIncludeOpen = false;
+    boolean isIncludeClosed = false;
+    if (status == null || "all".equalsIgnoreCase(status)) {
+      isIncludeOpen = true;
+      isIncludeClosed = true;
+    }
+    else if ("open".equalsIgnoreCase(status)) {
+      isIncludeOpen = true;
+    }
+    else if ("closed".equalsIgnoreCase(status)) {
+      isIncludeClosed = true;
+    }
     if (variant.getMediaType().equals(MediaType.TEXT_XML)) {
       try {
         // [1] get the SensorBaseClient for the user making this request.
@@ -84,9 +99,13 @@ public class IssueResource extends DailyProjectDataResource {
         IssueDataParser parser = new IssueDataParser(this.server.getLogger());
         for (SensorDataRef ref : index.getSensorDataRef()) {
           IssueData issueData = parser.getIssueDpd(client.getSensorData(ref), endTime);
-          issueDpd.getIssueData().add(issueData);
-          if (parser.isOpenStatus(issueData.getStatus())) {
+          boolean isOpen = parser.isOpenStatus(issueData.getStatus());
+          if (isIncludeOpen && isOpen) {
             openIssue++;
+            issueDpd.getIssueData().add(issueData);
+          }
+          else if (isIncludeClosed && !isOpen) {
+            issueDpd.getIssueData().add(issueData);
           }
         }
         // [5] finish the IssueDailyProjectData and send.

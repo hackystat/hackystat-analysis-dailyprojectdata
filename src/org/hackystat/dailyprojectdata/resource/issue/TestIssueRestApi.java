@@ -101,6 +101,20 @@ public class TestIssueRestApi extends DailyProjectDataTestHelper {
     assertEquals("Checking total issues for time 2.", 5, issueT2.getIssueData().size());
     assertEquals("Checking open issues for time 2.", 3, issueT2.getOpenIssues());
     //assertEquals("Checking MemberData size", 1, devTime.getMemberData().size());
+    
+    final IssueDailyProjectData issueT3 = 
+      dpdClient.getIssues(dataOwner, "Default", testTime2, "open");
+    assertEquals("Checking open issues for time 2 with open status query.", 
+        3, issueT3.getIssueData().size());
+    assertEquals("Checking open issues count for time 2 with open status query.", 
+        3, issueT3.getOpenIssues());
+    
+    final IssueDailyProjectData issueT4 = 
+      dpdClient.getIssues(dataOwner, "Default", testTime2, "closed");
+    assertEquals("Checking closed issues for time 2 with closed status query.", 
+        2, issueT4.getIssueData().size());
+    assertEquals("Checking open issues for time 2 with closed status query.", 
+        0, issueT4.getOpenIssues());
   }
   
 }

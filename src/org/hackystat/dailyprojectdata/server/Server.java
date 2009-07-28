@@ -207,6 +207,7 @@ public class Server extends Application {
     authRouter.attach("/build/{user}/{project}/{timestamp}?Type={Type}", BuildResource.class);
     authRouter.attach("/commit/{user}/{project}/{timestamp}", CommitResource.class);
     authRouter.attach("/issue/{user}/{project}/{timestamp}", IssueResource.class);
+    authRouter.attach("/issue/{user}/{project}/{timestamp}?Status={Status}", IssueResource.class);
     authRouter.attach("/cache/{user}/{project}", CacheResource.class);
     authRouter.attach("/cache", CacheResource.class);
 

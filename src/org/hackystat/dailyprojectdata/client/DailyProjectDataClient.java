@@ -922,13 +922,14 @@ public class DailyProjectDataClient {
    * @param user The user that owns the project.
    * @param project The project owned by user.
    * @param timestamp The Timestamp indicating the start of the 24 hour period of build data.
+   * @param status The status of the issue, open or closed.
    * @return A IssueDailyProjectData instance.
    * @throws DailyProjectDataClientException If the credentials associated with this instance are
    *         not valid, or if the underlying SensorBase service cannot be reached, or if one or more
    *         of the supplied user, password, or timestamp is not valid.
    */
   public synchronized IssueDailyProjectData getIssues(String user, String project,
-      XMLGregorianCalendar timestamp) throws DailyProjectDataClientException {
+      XMLGregorianCalendar timestamp, String status) throws DailyProjectDataClientException {
     Date startTime = new Date();
 
     StringBuilder requestStringBuilder = new StringBuilder("issue/");
@@ -938,6 +939,12 @@ public class DailyProjectDataClient {
     requestStringBuilder.append("/");
     requestStringBuilder.append(timestamp);
 
+    if (status != null) {
+      requestStringBuilder.append("?");
+      requestStringBuilder.append("Status=");
+      requestStringBuilder.append(status);
+    }
+    
     IssueDailyProjectData issue;
     String uri = requestStringBuilder.toString();
     // Check the cache, and return the instance from it if available.
@@ -967,9 +974,23 @@ public class DailyProjectDataClient {
     }
     logElapsedTime(uri, startTime);
     return issue;
-    // TODO Auto-generated method stub
   }
 
+  /**
+   * Returns a IssueDailyProjectData instance from this server, or throws a DailyProjectData
+   * exception if problems occurred.
+   * @param user The user that owns the project.
+   * @param project The project owned by user.
+   * @param timestamp The Timestamp indicating the start of the 24 hour period of build data.
+   * @return A IssueDailyProjectData instance.
+   * @throws DailyProjectDataClientException If the credentials associated with this instance are
+   *         not valid, or if the underlying SensorBase service cannot be reached, or if one or more
+   *         of the supplied user, password, or timestamp is not valid.
+   */
+  public synchronized IssueDailyProjectData getIssues(String user, String project,
+      XMLGregorianCalendar timestamp) throws DailyProjectDataClientException {
+    return getIssues(user, project, timestamp, null);
+  }
   /**
    * Takes a String encoding of a IssueDailyProjectData in XML format and converts it.
    * 
