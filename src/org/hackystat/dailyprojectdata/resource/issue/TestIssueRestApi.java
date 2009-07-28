@@ -33,6 +33,8 @@ public class TestIssueRestApi extends DailyProjectDataTestHelper {
   private static final String testUser1 = "tester1@hackystat.org";
   private static final String testUser2 = "tester2@hackystat.org";
   
+  private static final String defaultProject = "Default";
+  
   private static final String[] testData1T1 = {"21", DEFECT, ACCEPTED, MEDIUM, "", testUser1, 
       "2008-09-07T11:00:00"};
   private static final String[] testData1T2 = {"21", ENHANCEMENT, FIXED, MEDIUM, "8.4", testUser1, 
@@ -87,7 +89,7 @@ public class TestIssueRestApi extends DailyProjectDataTestHelper {
     final DailyProjectDataClient dpdClient = 
       new DailyProjectDataClient(getDailyProjectDataHostName(), dataOwner, dataOwner);
     dpdClient.authenticate(); 
-    final IssueDailyProjectData issueT1 = dpdClient.getIssues(dataOwner, "Default", testTime1);
+    final IssueDailyProjectData issueT1 = dpdClient.getIssues(dataOwner, defaultProject, testTime1);
     
     System.out.println("issue dpd for time 1");
     for (IssueData data : issueT1.getIssueData()) {
@@ -97,20 +99,20 @@ public class TestIssueRestApi extends DailyProjectDataTestHelper {
     assertEquals("Checking total issues for time 1.", 3, issueT1.getIssueData().size());
     assertEquals("Checking open issues for time 1.", 3, issueT1.getOpenIssues());
     
-    final IssueDailyProjectData issueT2 = dpdClient.getIssues(dataOwner, "Default", testTime2);
+    final IssueDailyProjectData issueT2 = dpdClient.getIssues(dataOwner, defaultProject, testTime2);
     assertEquals("Checking total issues for time 2.", 5, issueT2.getIssueData().size());
     assertEquals("Checking open issues for time 2.", 3, issueT2.getOpenIssues());
     //assertEquals("Checking MemberData size", 1, devTime.getMemberData().size());
     
     final IssueDailyProjectData issueT3 = 
-      dpdClient.getIssues(dataOwner, "Default", testTime2, "open");
+      dpdClient.getIssues(dataOwner, defaultProject, testTime2, "open");
     assertEquals("Checking open issues for time 2 with open status query.", 
         3, issueT3.getIssueData().size());
     assertEquals("Checking open issues count for time 2 with open status query.", 
         3, issueT3.getOpenIssues());
     
     final IssueDailyProjectData issueT4 = 
-      dpdClient.getIssues(dataOwner, "Default", testTime2, "closed");
+      dpdClient.getIssues(dataOwner, defaultProject, testTime2, "closed");
     assertEquals("Checking closed issues for time 2 with closed status query.", 
         2, issueT4.getIssueData().size());
     assertEquals("Checking open issues for time 2 with closed status query.", 
