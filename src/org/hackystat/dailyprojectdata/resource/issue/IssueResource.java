@@ -89,10 +89,10 @@ public class IssueResource extends DailyProjectDataResource {
           IssueData issueData = parser.getIssueDpd(client.getSensorData(ref), endTime);
           boolean isOpen = parser.isOpenStatus(issueData.getStatus());
           boolean include = false;
-          if ((status == null) || 
-              ((status.equalsIgnoreCase("open") && isOpen) || 
-               (status.equalsIgnoreCase("closed") && !isOpen) ||
-               (status.equalsIgnoreCase(issueData.getStatus())))) {
+          if ((status == null) || (status.equalsIgnoreCase("all")) ||
+              (status.equalsIgnoreCase("open") && isOpen) || 
+              (status.equalsIgnoreCase("closed") && !isOpen) ||
+              (status.equalsIgnoreCase(issueData.getStatus()))) {
             include = true;
             issueDpd.getIssueData().add(issueData);
           }
