@@ -124,7 +124,7 @@ public class TestIssueDataParser {
    * @param timestamps Array of timestamp of each String array in 1st parameter.
    * @return the sensordata.
    */
-  protected static SensorData makeIssueSensorData(String dataOwner, String[][] strings,
+  public static SensorData makeIssueSensorData(String dataOwner, String[][] strings,
       XMLGregorianCalendar[] timestamps) {
     String sdt = "Issue";
     String tool = "GoogleProjectHosting";
