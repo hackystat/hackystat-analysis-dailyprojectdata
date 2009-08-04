@@ -923,7 +923,7 @@ public class DailyProjectDataClient {
    * @param project The project owned by user.
    * @param timestamp The Timestamp indicating the start of the 24 hour period of build data.
    * @param status The status of the issue, open or closed, 
-   *          or a specified status such as "Accept" or "Fixed"
+   *          or a specified status such as "Accepted" or "Fixed"
    * @return A IssueDailyProjectData instance.
    * @throws DailyProjectDataClientException If the credentials associated with this instance are
    *         not valid, or if the underlying SensorBase service cannot be reached, or if one or more
