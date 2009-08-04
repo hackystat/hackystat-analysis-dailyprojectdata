@@ -70,8 +70,8 @@ public class DailyProjectDataClient {
   private JAXBContext complexityJAXB;
   /** Coupling JAXB Context. */
   private JAXBContext couplingJAXB;
-  /** Issues JAXB Context. */
-  private JAXBContext issuesJAXB;
+  /** Issue JAXB Context. */
+  private JAXBContext issueJAXB;
   /** The http authentication approach. */
   private ChallengeScheme scheme = ChallengeScheme.HTTP_BASIC;
   /** The preferred representation type. */
@@ -139,7 +139,7 @@ public class DailyProjectDataClient {
           .newInstance(org.hackystat.dailyprojectdata.resource.complexity.jaxb.ObjectFactory.class);
       this.couplingJAXB = JAXBContext
           .newInstance(org.hackystat.dailyprojectdata.resource.coupling.jaxb.ObjectFactory.class);
-      this.issuesJAXB = JAXBContext
+      this.issueJAXB = JAXBContext
       .newInstance(org.hackystat.dailyprojectdata.resource.issue.jaxb.ObjectFactory.class);
     }
     catch (Exception e) {
@@ -922,13 +922,14 @@ public class DailyProjectDataClient {
    * @param user The user that owns the project.
    * @param project The project owned by user.
    * @param timestamp The Timestamp indicating the start of the 24 hour period of build data.
-   * @param status The status of the issue, open or closed.
+   * @param status The status of the issue, open or closed, 
+   *          or a specified status such as "Accept" or "Fixed"
    * @return A IssueDailyProjectData instance.
    * @throws DailyProjectDataClientException If the credentials associated with this instance are
    *         not valid, or if the underlying SensorBase service cannot be reached, or if one or more
    *         of the supplied user, password, or timestamp is not valid.
    */
-  public synchronized IssueDailyProjectData getIssues(String user, String project,
+  public synchronized IssueDailyProjectData getIssue(String user, String project,
       XMLGregorianCalendar timestamp, String status) throws DailyProjectDataClientException {
     Date startTime = new Date();
 
@@ -987,9 +988,9 @@ public class DailyProjectDataClient {
    *         not valid, or if the underlying SensorBase service cannot be reached, or if one or more
    *         of the supplied user, password, or timestamp is not valid.
    */
-  public synchronized IssueDailyProjectData getIssues(String user, String project,
+  public synchronized IssueDailyProjectData getIssue(String user, String project,
       XMLGregorianCalendar timestamp) throws DailyProjectDataClientException {
-    return getIssues(user, project, timestamp, null);
+    return getIssue(user, project, timestamp, null);
   }
   /**
    * Takes a String encoding of a IssueDailyProjectData in XML format and converts it.
@@ -999,7 +1000,7 @@ public class DailyProjectDataClient {
    * @throws JAXBException If problems occur during unmarshalling.
    */
   private IssueDailyProjectData makeIssueDailyProjectData(String xmlData) throws JAXBException {
-    Unmarshaller unmarshaller = this.issuesJAXB.createUnmarshaller();
+    Unmarshaller unmarshaller = this.issueJAXB.createUnmarshaller();
     return (IssueDailyProjectData) unmarshaller.unmarshal(new StringReader(xmlData));
   }
 

@@ -58,18 +58,6 @@ public class IssueResource extends DailyProjectDataResource {
   public Representation represent(Variant variant) {
     Logger logger = this.server.getLogger();
     logger.fine("Issue DPD: Starting");
-    boolean isIncludeOpen = false;
-    boolean isIncludeClosed = false;
-    if (status == null || "all".equalsIgnoreCase(status)) {
-      isIncludeOpen = true;
-      isIncludeClosed = true;
-    }
-    else if ("open".equalsIgnoreCase(status)) {
-      isIncludeOpen = true;
-    }
-    else if ("closed".equalsIgnoreCase(status)) {
-      isIncludeClosed = true;
-    }
     if (variant.getMediaType().equals(MediaType.TEXT_XML)) {
       try {
         // [1] get the SensorBaseClient for the user making this request.
@@ -100,12 +88,16 @@ public class IssueResource extends DailyProjectDataResource {
         for (SensorDataRef ref : index.getSensorDataRef()) {
           IssueData issueData = parser.getIssueDpd(client.getSensorData(ref), endTime);
           boolean isOpen = parser.isOpenStatus(issueData.getStatus());
-          if (isIncludeOpen && isOpen) {
-            openIssue++;
+          boolean include = false;
+          if ((status == null) || 
+              ((status.equalsIgnoreCase("open") && isOpen) || 
+               (status.equalsIgnoreCase("closed") && !isOpen) ||
+               (status.equalsIgnoreCase(issueData.getStatus())))) {
+            include = true;
             issueDpd.getIssueData().add(issueData);
           }
-          else if (isIncludeClosed && !isOpen) {
-            issueDpd.getIssueData().add(issueData);
+          if (include && isOpen) {
+            openIssue++;
           }
         }
         // [5] finish the IssueDailyProjectData and send.
