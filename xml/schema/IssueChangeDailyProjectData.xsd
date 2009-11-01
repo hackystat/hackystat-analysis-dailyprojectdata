@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+           xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
+           jaxb:extensionBindingPrefixes="xjc"
+           jaxb:version="2.0">
+         
+    <xs:annotation>
+       <xs:appinfo>
+          <jaxb:globalBindings generateIsSetMethod="true">
+              <xjc:serializable uid="20091030"/>
+          </jaxb:globalBindings>
+       </xs:appinfo>
+    </xs:annotation>
+  <!-- Primitive elements and attributes -->
+
+
+  <xs:element name="IssueChangeDailyProjectData">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="IssueChangeData" minOccurs="0" maxOccurs="unbounded" />
+      </xs:sequence>
+		  <xs:attribute name="Project" type="xs:string" use="required"/>
+		  <xs:attribute name="Owner" type="xs:string" use="required"/>
+		  <xs:attribute name="StartTime" type="xs:dateTime" use="required"/>
+		  <xs:attribute name="Opened" type="xs:int" use="required"/>
+		  <xs:attribute name="Closed" type="xs:int" use="required"/>
+      <xs:attribute name="Reopened" type="xs:int" use="required"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="IssueChangeData">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="ChangedItem" minOccurs="1" maxOccurs="unbounded" />
+      </xs:sequence>
+      <xs:attribute name="Id" type="xs:int" use="required"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="ChangedItem">
+    <xs:complexType>
+      <xs:attribute name="Key" type="xs:string" use="required"/>
+      <xs:attribute name="ToValue" type="xs:string" use="required"/>
+      <xs:attribute name="FromValue" type="xs:string" use="required"/>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

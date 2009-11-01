@@ -18,6 +18,7 @@ import org.hackystat.dailyprojectdata.resource.coverage.jaxb.CoverageDailyProjec
 import org.hackystat.dailyprojectdata.resource.devtime.jaxb.DevTimeDailyProjectData;
 import org.hackystat.dailyprojectdata.resource.filemetric.jaxb.FileMetricDailyProjectData;
 import org.hackystat.dailyprojectdata.resource.issue.jaxb.IssueDailyProjectData;
+import org.hackystat.dailyprojectdata.resource.issuechange.jaxb.IssueChangeDailyProjectData;
 import org.hackystat.dailyprojectdata.resource.unittest.jaxb.UnitTestDailyProjectData;
 import org.hackystat.utilities.logger.HackystatLogger;
 import org.hackystat.utilities.tstamp.Tstamp;
@@ -72,6 +73,8 @@ public class DailyProjectDataClient {
   private JAXBContext couplingJAXB;
   /** Issue JAXB Context. */
   private JAXBContext issueJAXB;
+  /** IssueChange JAXB Context. */
+  private JAXBContext issuechangeJAXB;
   /** The http authentication approach. */
   private ChallengeScheme scheme = ChallengeScheme.HTTP_BASIC;
   /** The preferred representation type. */
@@ -141,6 +144,8 @@ public class DailyProjectDataClient {
           .newInstance(org.hackystat.dailyprojectdata.resource.coupling.jaxb.ObjectFactory.class);
       this.issueJAXB = JAXBContext
       .newInstance(org.hackystat.dailyprojectdata.resource.issue.jaxb.ObjectFactory.class);
+      this.issuechangeJAXB = JAXBContext
+      .newInstance(org.hackystat.dailyprojectdata.resource.issuechange.jaxb.ObjectFactory.class);
     }
     catch (Exception e) {
       throw new RuntimeException("Couldn't create JAXB context instances.", e);
@@ -976,7 +981,6 @@ public class DailyProjectDataClient {
     logElapsedTime(uri, startTime);
     return issue;
   }
-
   /**
    * Returns a IssueDailyProjectData instance from this server, or throws a DailyProjectData
    * exception if problems occurred.
@@ -1004,6 +1008,70 @@ public class DailyProjectDataClient {
     return (IssueDailyProjectData) unmarshaller.unmarshal(new StringReader(xmlData));
   }
 
+
+  /**
+   * Returns a IssueDailyProjectData instance from this server, or throws a DailyProjectData
+   * exception if problems occurred.
+   * @param user The user that owns the project.
+   * @param project The project owned by user.
+   * @param timestamp The Timestamp indicating the start of the 24 hour period of build data.
+   * @return A IssueDailyProjectData instance.
+   * @throws DailyProjectDataClientException If the credentials associated with this instance are
+   *         not valid, or if the underlying SensorBase service cannot be reached, or if one or more
+   *         of the supplied user, password, or timestamp is not valid.
+   */
+  public synchronized IssueChangeDailyProjectData getIssueChange(String user, String project,
+      XMLGregorianCalendar timestamp) throws DailyProjectDataClientException {
+    Date startTime = new Date();
+
+    StringBuilder requestStringBuilder = new StringBuilder("issuechange/");
+    requestStringBuilder.append(user);
+    requestStringBuilder.append("/");
+    requestStringBuilder.append(project);
+    requestStringBuilder.append("/");
+    requestStringBuilder.append(timestamp);
+    
+    IssueChangeDailyProjectData issue;
+    String uri = requestStringBuilder.toString();
+    // Check the cache, and return the instance from it if available.
+    if (this.isCacheEnabled) {
+      issue = (IssueChangeDailyProjectData) this.uriCache.getFromGroup(uri, user + project);
+    }
+    Response response = makeRequest(Method.GET, uri, null);
+
+    if (!response.getStatus().isSuccess()) {
+      logElapsedTime(uri, startTime);
+      throw new DailyProjectDataClientException(response.getStatus());
+    }
+    try {
+      String xmlData = response.getEntity().getText();
+      issue = makeIssueChangeDailyProjectData(xmlData);
+      // Add it to the cache if we're using one.
+      if (this.isCacheEnabled && !Tstamp.isTodayOrLater(timestamp)) {
+        this.uriCache.putInGroup(uri, user + project, issue);
+      }
+    }
+    catch (Exception e) {
+      logElapsedTime(uri, startTime, e);
+      throw new DailyProjectDataClientException(response.getStatus(), e);
+    }
+    logElapsedTime(uri, startTime);
+    return issue;
+  }
+
+  /**
+   * Takes a String encoding of a IssueDailyProjectData in XML format and converts it.
+   * 
+   * @param xmlData The XML string representing a DevTimeDailyProjectData.
+   * @return The corresponding IssueDailyProjectData instance.
+   * @throws JAXBException If problems occur during unmarshalling.
+   */
+  private IssueChangeDailyProjectData makeIssueChangeDailyProjectData(String xmlData) 
+      throws JAXBException {
+    Unmarshaller unmarshaller = this.issuechangeJAXB.createUnmarshaller();
+    return (IssueChangeDailyProjectData) unmarshaller.unmarshal(new StringReader(xmlData));
+  }
+  
   /**
    * Logs info to the logger about the elapsed time for this request.
    * 

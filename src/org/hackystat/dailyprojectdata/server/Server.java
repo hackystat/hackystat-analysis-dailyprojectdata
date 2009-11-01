@@ -22,6 +22,7 @@ import org.hackystat.dailyprojectdata.resource.coverage.CoverageResource;
 import org.hackystat.dailyprojectdata.resource.devtime.DevTimeResource;
 import org.hackystat.dailyprojectdata.resource.filemetric.FileMetricResource;
 import org.hackystat.dailyprojectdata.resource.issue.IssueResource;
+import org.hackystat.dailyprojectdata.resource.issuechange.IssueChangeResource;
 import org.hackystat.dailyprojectdata.resource.ping.PingResource;
 import org.hackystat.dailyprojectdata.resource.unittest.UnitTestResource;
 import org.hackystat.sensorbase.client.SensorBaseClient;
@@ -138,6 +139,9 @@ public class Server extends Application {
     JAXBContext issueJAXB = JAXBContext.newInstance(
         org.hackystat.dailyprojectdata.resource.issue.jaxb.ObjectFactory.class);
     attributes.put("IssueJAXB", issueJAXB);
+    JAXBContext issueChangeJAXB = JAXBContext.newInstance(
+        org.hackystat.dailyprojectdata.resource.issuechange.jaxb.ObjectFactory.class);
+    attributes.put("IssueChangeJAXB", issueChangeJAXB);
     
     // Provide a pointer to this server in the Context so that Resources can get at this server.
     attributes.put("DailyProjectDataServer", server);
@@ -208,6 +212,7 @@ public class Server extends Application {
     authRouter.attach("/commit/{user}/{project}/{timestamp}", CommitResource.class);
     authRouter.attach("/issue/{user}/{project}/{timestamp}", IssueResource.class);
     authRouter.attach("/issue/{user}/{project}/{timestamp}?Status={Status}", IssueResource.class);
+    authRouter.attach("/issuechange/{user}/{project}/{timestamp}", IssueChangeResource.class);
     authRouter.attach("/cache/{user}/{project}", CacheResource.class);
     authRouter.attach("/cache", CacheResource.class);
 

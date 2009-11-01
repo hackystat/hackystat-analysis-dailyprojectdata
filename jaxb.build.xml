@@ -50,5 +50,8 @@
     <xjc extension="true" target="${env.JAXB_TARGET}" schema="${basedir}/xml/schema/IssueDailyProjectData.xsd" destdir="src" package="org.hackystat.dailyprojectdata.resource.issue.jaxb">
        <produces dir="${basedir}/src/org/hackystat/dailyprojectdata/resource/issue/jaxb" includes="*" />
     </xjc>  
+    <xjc extension="true" target="${env.JAXB_TARGET}" schema="${basedir}/xml/schema/IssueChangeDailyProjectData.xsd" destdir="src" package="org.hackystat.dailyprojectdata.resource.issuechange.jaxb">
+       <produces dir="${basedir}/src/org/hackystat/dailyprojectdata/resource/issuechange/jaxb" includes="*" />
+    </xjc>  
   </target>
 </project>
