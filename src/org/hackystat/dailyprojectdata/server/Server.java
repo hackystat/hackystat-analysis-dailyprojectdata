@@ -146,8 +146,8 @@ public class Server extends Application {
     // Provide a pointer to this server in the Context so that Resources can get at this server.
     attributes.put("DailyProjectDataServer", server);
     
-    // Move Restlet Logging into a file. 
-    RestletLoggerUtil.useFileHandler("dailyprojectdata");
+    // Disable restlet logging unless dont.disable.restlet.logging is "true".
+    RestletLoggerUtil.disableLogging();
     
     // Now let's open for business. 
     server.logger.warning("Host: " + server.hostName);
